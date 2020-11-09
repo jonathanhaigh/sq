@@ -55,9 +55,11 @@ ResultTree::ResultTree(const ast::Ast& ast, field_types::FieldPtr&& result)
     for (const auto& child : ast.children())
     {
         const auto& field_name = child.data().name();
+        const auto& params = child.data().params();
+        const auto visitor = ResultToResultTreeVisitor(child);
         obj.emplace_back(
             field_name,
-            std::visit(ResultToResultTreeVisitor(child), result->get(field_name))
+            std::visit(visitor, result->get(field_name, params))
         );
     }
 }

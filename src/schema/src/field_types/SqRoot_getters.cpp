@@ -9,8 +9,12 @@
 namespace sq {
 namespace field_types {
 
-Result SqRoot::get_path() const
+Result SqRoot::get_path(const PrimitiveString* path) const
 {
+    if (path)
+    {
+        return field_types::SqPath::create(*path);
+    }
     return field_types::SqPath::create(std::filesystem::current_path());
 }
 

@@ -1,13 +1,18 @@
 #include "ast/ast.h"
 
+#include "field_types/Primitive.h"
 #include "parser/SqLexer.h"
 #include "parser/SqParser.h"
 #include "util/strutil.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <sstream>
+#include <string_view>
+#include <vector>
 
 namespace sp = sq::parser;
 using FieldTreeList = sp::SqParser::Field_tree_listContext;
@@ -26,9 +31,17 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
         os << "ROOT";
         return os;
     }
-    os << ast_data.name()
-       << "(" << util::quoted_join(ast_data.positional_parameters())
-       << ")";
+    // TODO: Something better... Especially when we have ranges or
+    // std::ostream_joiner
+    const auto& params = ast_data.params().pos_params();
+    auto param_strs = std::vector<field_types::PrimitiveString>{};
+    std::transform(
+        std::begin(params),
+        std::end(params),
+        std::back_inserter(param_strs),
+        [](const auto& param) { return std::get<field_types::PrimitiveString>(param); }
+    );
+    os << ast_data.name() << "(" << util::join(param_strs) << ")";
     return os;
 }
 
@@ -90,7 +103,7 @@ static void parse_positional_parameters(Ast& parent, ParameterList& pl)
     for (const auto dq_s_ptr : pl.DQ_STR())
     {
         assert(dq_s_ptr);
-        parent.data().positional_parameters().emplace_back(parse_dq_str(*dq_s_ptr));
+        parent.data().params().pos_params().emplace_back(parse_dq_str(*dq_s_ptr));
     }
 }
 

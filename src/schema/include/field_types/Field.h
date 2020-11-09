@@ -1,6 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
 #define SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
 
+#include "field_types/FieldCallParams.h"
 #include "field_types/Primitive.h"
 
 #include <memory>
@@ -21,7 +22,7 @@ class Field
 public:
     virtual ~Field() noexcept = default;
 
-    virtual Result get(std::string_view member) const = 0;
+    virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
     virtual Primitive to_primitive() const = 0;
 
 protected:

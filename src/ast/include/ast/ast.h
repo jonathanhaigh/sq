@@ -1,6 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_ast_ast_h_
 #define SQ_INCLUDE_GUARD_ast_ast_h_
 
+#include "field_types/FieldCallParams.h"
 #include "util/Tree.h"
 
 #include <iosfwd>
@@ -25,12 +26,12 @@ public:
     { }
 
     const std::string& name() const { return name_; }
-    const std::vector<std::string>& positional_parameters() const { return pos_params_; }
-    std::vector<std::string>& positional_parameters() { return pos_params_; }
+    const field_types::FieldCallParams& params() const { return params_; }
+    field_types::FieldCallParams& params() { return params_; }
 
 private:
     std::string name_;
-    std::vector<std::string> pos_params_;
+    field_types::FieldCallParams params_;
 };
 std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
 

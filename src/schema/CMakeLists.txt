@@ -48,6 +48,7 @@ list_append_prepend(
 set(SQ_TYPE_NOGEN_HEADERS
     ${SQ_TYPE_IMPL_HEADERS}
     "${SQ_TYPE_NOGEN_HEADERS_DIR}/Field.h"
+    "${SQ_TYPE_NOGEN_HEADERS_DIR}/FieldCallParams.h"
     "${SQ_TYPE_NOGEN_HEADERS_DIR}/Primitive.h"
     "${SQ_TYPE_NOGEN_HEADERS_DIR}/InvalidFieldError.h"
 )

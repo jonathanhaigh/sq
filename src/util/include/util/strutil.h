@@ -4,20 +4,31 @@
 namespace sq::util {
 
 template<typename It>
-struct ContainerJoiner
+class join
 {
-    enum class Quoted {
-        Yes,
-        No,
-    };
-
-    ContainerJoiner(It begin, It end, std::string_view delim, Quoted quoted=Quoted::No)
+public:
+    join(It begin, It end, std::string_view delim)
         : begin_{begin}
         , end_{end}
         , delim_{delim}
-        , quoted_{quoted}
     { }
 
+    join(It begin, It end)
+        : begin_{begin}
+        , end_{end}
+    { }
+
+    template <typename C>
+    join(const C& c, std::string_view delim)
+        : join(std::begin(c), std::end(c), delim)
+    { }
+
+    template <typename C>
+    explicit join(const C& c)
+        : join(std::begin(c), std::end(c))
+    { }
+
+private:
     void write_item(std::ostream& os, It it) const
     {
         if (it != begin_)
@@ -25,14 +36,7 @@ struct ContainerJoiner
             os << delim_;
         }
 
-        if (quoted_ == Quoted::Yes)
-        {
-            os << std::quoted(*it);
-        }
-        else
-        {
-            os << (*it);
-        }
+        os << (*it);
     }
 
     std::ostream& write_range(std::ostream& os) const
@@ -44,31 +48,22 @@ struct ContainerJoiner
         return os;
     }
 
+    friend std::ostream& operator<<(std::ostream& os, const join<It>& cj)
+    {
+        return cj.write_range(os);
+    }
+
     It begin_;
     It end_;
-    std::string_view delim_;
-    Quoted quoted_;
+    std::string_view delim_ = ", ";
 };
 
-template <typename It>
-std::ostream& operator<<(std::ostream& os, const ContainerJoiner<It>& cj)
-{
-    return cj.write_range(os);
-}
+template <typename C>
+join(const C& c, std::string_view delim) -> join<typename C::const_iterator>;
 
 template <typename C>
-ContainerJoiner<typename C::const_iterator> join(const C& c, std::string_view delim=", ")
-{
-    using CJ = ContainerJoiner<typename C::const_iterator>;
-    return CJ(std::begin(c), std::end(c), delim, CJ::Quoted::No);
-}
+join(const C& c) -> join<typename C::const_iterator>;
 
-template <typename C>
-ContainerJoiner<typename C::const_iterator> quoted_join(const C& c, std::string_view delim=", ")
-{
-    using CJ = ContainerJoiner<typename C::const_iterator>;
-    return CJ(std::begin(c), std::end(c), delim, CJ::Quoted::Yes);
-}
 
 } // namespace sq::util
 

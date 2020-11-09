@@ -7,4 +7,5 @@ add_library(sq_ast
 )
 target_link_libraries(sq_ast PUBLIC sq_util)
 target_link_libraries(sq_ast PUBLIC sq_parser)
+target_link_libraries(sq_ast PUBLIC sq_schema)
 target_include_directories(sq_ast PUBLIC "${SQ_AST_INCLUDE_DIR}")

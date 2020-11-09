@@ -7,8 +7,10 @@
 namespace sq {
 namespace field_types {
 
+using PrimitiveString = std::string;
+
 using Primitive = std::variant<
-    std::string
+    PrimitiveString
 >;
 
 } // namespace field_types

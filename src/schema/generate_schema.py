@@ -10,6 +10,12 @@ SCHEMA_PATH =  THIS_DIR / "schema.json"
 TYPES_HEADER_DIR = pathlib.Path(sys.argv[1])
 TYPES_SRC_DIR = pathlib.Path(sys.argv[2])
 
+def getter_cpp_param_type(parent, member, param_info):
+    base_type = param_info["type"]
+    if param_info["required"]:
+        return f"const {base_type}&"
+    return f"const {base_type}*"
+
 class FileWriter:
     def __init__(self, path):
         self._path = path
@@ -76,7 +82,7 @@ class TypeHeaderWriter(FileWriter):
         self.write_dtor_decl()
         self.write_generic_getter_decl()
         for member, member_info in self._info.items():
-            self.write_getter_decl(member)
+            self.write_getter_decl(member, member_info)
         self.write_to_primitive_decl()
 
     def write_typedefs(self):
@@ -98,11 +104,21 @@ class TypeHeaderWriter(FileWriter):
     def write_dtor_decl(self):
         self.writeli(1, f"~{self._name}() noexcept override;")
 
-    def write_getter_decl(self, member):
-        self.writeli(1, f"Result get_{member}() const;")
+    def write_getter_decl(self, member, member_info):
+        param_list_str = self.get_param_list_str(member, member_info)
+        self.writeli(1, f"Result get_{member}({param_list_str}) const;")
+
+    def get_param_list_str(self, member, member_info):
+        return ", ".join((
+            self.get_param_str(member, pi) for pi in member_info["params"]
+        ))
+
+    def get_param_str(self, member, param_info):
+        cpp_param_type = getter_cpp_param_type(self._name, member, param_info)
+        return f"{cpp_param_type} {param_info['name']}"
 
     def write_generic_getter_decl(self):
-        self.writeli(1, "Result get(std::string_view member) const override;")
+        self.writeli(1, "Result get(std::string_view member, const FieldCallParams& params) const override;")
 
     def write_to_primitive_decl(self):
         self.writeli(1, "Primitive to_primitive() const override;")
@@ -138,17 +154,33 @@ class TypeCppWriter(FileWriter):
         self.writel("{}")
 
     def write_generic_getter(self):
-        self.writel(f"Result {self._name}::get(std::string_view member) const")
+        self.writel(f"Result {self._name}::get(std::string_view member, const FieldCallParams& params) const")
         self.writel("{")
         for cand, cand_info in self._info.items():
             self.writeli(1, f"if (member.compare(\"{cand}\") == 0)")
             self.writeli(1, "{")
-            self.writeli(2, f"return get_{cand}();")
+            param_list_str = self.get_getter_param_list_str(cand)
+            self.writeli(2, f"return get_{cand}({param_list_str});")
             self.writeli(1, "}")
         self.writel()
         self.writeli(1, f"throw InvalidFieldError(\"{self._name}\", member);")
         self.writeli(1, "return nullptr;")
         self.writel("}")
+
+    def get_getter_param_list_str(self, member):
+        num_params = len(self._info[member]["params"])
+        return ", ".join((
+            self.get_getter_param_str(member, i) for i in range(0, num_params)
+        ))
+
+    def get_getter_param_str(self, member, index):
+        param_info = self._info[member]["params"][index]
+        param_name = param_info["name"]
+        param_base_type = param_info["type"]
+        get_fn = "get"
+        if not param_info["required"]:
+            get_fn = "get_optional"
+        return f'params.{get_fn}<{param_base_type}>({index}, "{param_name}")'
 
 @contextlib.contextmanager
 def include_guard(writer, name):

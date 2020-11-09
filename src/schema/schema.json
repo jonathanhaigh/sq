@@ -2,7 +2,13 @@
     "SqRoot": {
         "path": {
             "return":  "SqPath",
-            "pos_params": [ "PrimitiveString" ]
+            "params": [ 
+                {
+                    "name": "path",
+                    "type": "PrimitiveString",
+                    "required": false
+                }
+            ]
         }
     },
 
@@ -12,27 +18,27 @@
     "SqPath": {
         "string": {
             "return": "SqString",
-            "pos_params": []
+            "params": []
          },
         "parent": {
             "return": "SqPath",
-            "pos_params": []
+            "params": []
         },
         "filename": {
             "return": "SqString",
-            "pos_params": []
+            "params": []
         },
         "stem": {
             "return": "SqString",
-            "pos_params": []
+            "params": []
         },
         "extension": {
             "return": "SqString",
-            "pos_params": []
+            "params": []
         },
         "children": {
             "return": "[SqPath]",
-            "pos_params": []
+            "params": []
         }
     }
 }
