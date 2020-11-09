@@ -9,7 +9,20 @@
                     "required": false
                 }
             ]
+        },
+        "int": {
+            "return": "SqInt",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "PrimitiveInt",
+                    "required": false
+                }
+            ]
         }
+    },
+
+    "SqInt": {
     },
 
     "SqString": {

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -20,6 +21,7 @@ using FieldTree = sp::SqParser::Field_treeContext;
 using DotExpression = sp::SqParser::Dot_expressionContext;
 using FieldCall = sp::SqParser::Field_callContext;
 using ParameterList = sp::SqParser::Parameter_listContext;
+using PrimitiveValue = sp::SqParser::Primitive_valueContext;
 using TerminalNode = antlr4::tree::TerminalNode;
 
 namespace sq::ast {
@@ -34,12 +36,12 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
     // TODO: Something better... Especially when we have ranges or
     // std::ostream_joiner
     const auto& params = ast_data.params().pos_params();
-    auto param_strs = std::vector<field_types::PrimitiveString>{};
+    auto param_strs = std::vector<std::string>{};
     std::transform(
         std::begin(params),
         std::end(params),
         std::back_inserter(param_strs),
-        [](const auto& param) { return std::get<field_types::PrimitiveString>(param); }
+        [](const auto& param) { return util::variant_to_str(param); }
     );
     os << ast_data.name() << "(" << util::join(param_strs) << ")";
     return os;
@@ -49,7 +51,9 @@ static void parse_field_tree(Ast& parent, FieldTree& ft);
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl);
 static void parse_field_call(Ast& parent, FieldCall& fc);
 static void parse_positional_parameters(Ast& parent, ParameterList& pl);
-static std::string parse_dq_str(TerminalNode& dq_s);
+static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
+static field_types::PrimitiveInt parse_integer(TerminalNode& i);
+static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
 
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
@@ -100,17 +104,36 @@ static void parse_field_call(Ast& parent, FieldCall& fc)
 
 static void parse_positional_parameters(Ast& parent, ParameterList& pl)
 {
-    for (const auto dq_s_ptr : pl.DQ_STR())
+    for (const auto pv_ptr : pl.primitive_value())
     {
-        assert(dq_s_ptr);
-        parent.data().params().pos_params().emplace_back(parse_dq_str(*dq_s_ptr));
+        assert(pv_ptr);
+        parent.data().params().pos_params().push_back(parse_primitive_value(*pv_ptr));
     }
 }
 
-static std::string parse_dq_str(TerminalNode& dq_s)
+static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
+{
+    if (pl.INTEGER())
+    {
+        return parse_integer(*(pl.INTEGER()));
+    }
+    assert(pl.DQ_STR());
+    return parse_dq_str(*(pl.DQ_STR()));
+}
+
+static field_types::PrimitiveInt parse_integer(TerminalNode& i)
+{
+    auto ss = std::stringstream{i.getText()};
+    auto ret = field_types::PrimitiveInt{};
+    // TODO: better error checking... Or use something like boost::numeric_cast
+    ss >> ret;
+    return ret;
+}
+
+static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s)
 {
     auto ss = std::stringstream{dq_s.getText()};
-    auto ret = std::string{};
+    auto ret = field_types::PrimitiveString{};
     ss >> quoted(ret);
     return ret;
 }

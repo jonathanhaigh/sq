@@ -1,6 +1,11 @@
 #ifndef SQ_INCLUDE_GUARD_util_strutil_h_
 #define SQ_INCLUDE_GUARD_util_strutil_h_
 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <variant>
+
 namespace sq::util {
 
 template<typename It>
@@ -64,6 +69,17 @@ join(const C& c, std::string_view delim) -> join<typename C::const_iterator>;
 template <typename C>
 join(const C& c) -> join<typename C::const_iterator>;
 
+
+template <typename V>
+std::string variant_to_str(V&& var)
+{
+    auto ss = std::ostringstream{};
+    std::visit(
+        [&ss](auto&& v) { ss << v; },
+        std::forward<V>(var)
+    );
+    return ss.str();
+}
 
 } // namespace sq::util
 

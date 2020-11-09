@@ -19,9 +19,14 @@ public:
         : writer_{&writer}
     { }
 
-    void operator()(const std::string& str)
+    void operator()(const field_types::PrimitiveString& str)
     {
         writer_->String(str.c_str(), str.size(), true /* copy */);
+    }
+
+    void operator()(const field_types::PrimitiveInt& i)
+    {
+        writer_->Int64(i);
     }
 
 private:

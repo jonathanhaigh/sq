@@ -13,6 +13,7 @@ set(SQ_TYPES
     SqPath
     SqRoot
     SqString
+    SqInt
 )
 
 # Generated Headers
