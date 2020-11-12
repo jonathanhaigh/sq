@@ -2,13 +2,15 @@
 #define SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_h_
 
 #include "Primitive.h"
+#include "util/strutil.h"
 
+#include <algorithm>
+#include <iterator>
 #include <map>
-#include <optional>
 #include <string>
+#include <sstream>
 #include <string>
 #include <string_view>
-#include <variant>
 #include <vector>
 
 namespace sq::field_types {
@@ -58,6 +60,35 @@ public:
     }
 
 private:
+
+    friend std::ostream& operator <<(std::ostream& os, const FieldCallParams& params)
+    {
+        // TODO: Something better... Especially when we have ranges or
+        // std::ostream_joiner
+        auto param_strs = std::vector<std::string>{};
+        const auto& pos_params = params.pos_params();
+        std::transform(
+            std::begin(pos_params),
+            std::end(pos_params),
+            std::back_inserter(param_strs),
+            [](const auto& p) { return util::variant_to_str(p); }
+        );
+
+        const auto& named_params = params.named_params();
+        std::transform(
+            std::begin(named_params),
+            std::end(named_params),
+            std::back_inserter(param_strs),
+            [](const auto& p) {
+                std::ostringstream oss;
+                oss << p.first << "=" << util::variant_to_str(p.second);
+                return oss.str();
+            }
+        );
+        os << util::join(param_strs);
+        return os;
+    }
+
     PosParams pos_params_;
     NamedParams named_params_;
 };

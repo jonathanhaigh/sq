@@ -100,5 +100,6 @@ add_library(sq_schema
 )
 
 set_target_properties(sq_schema PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(sq_schema PUBLIC sq_util)
 target_include_directories(sq_schema PUBLIC ${SQ_GEN_INCLUDE_DIR})
 target_include_directories(sq_schema PUBLIC ${SQ_NOGEN_INCLUDE_DIR})

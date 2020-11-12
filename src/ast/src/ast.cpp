@@ -3,17 +3,11 @@
 #include "field_types/Primitive.h"
 #include "parser/SqLexer.h"
 #include "parser/SqParser.h"
-#include "util/strutil.h"
 
-#include <algorithm>
 #include <cassert>
-#include <iomanip>
 #include <iostream>
-#include <iterator>
 #include <sstream>
 #include <string>
-#include <string_view>
-#include <vector>
 
 namespace sp = sq::parser;
 using FieldTreeList = sp::SqParser::Field_tree_listContext;
@@ -21,6 +15,8 @@ using FieldTree = sp::SqParser::Field_treeContext;
 using DotExpression = sp::SqParser::Dot_expressionContext;
 using FieldCall = sp::SqParser::Field_callContext;
 using ParameterList = sp::SqParser::Parameter_listContext;
+using Parameter = sp::SqParser::ParameterContext;
+using NamedParameter = sp::SqParser::Named_parameterContext;
 using PrimitiveValue = sp::SqParser::Primitive_valueContext;
 using TerminalNode = antlr4::tree::TerminalNode;
 
@@ -33,24 +29,15 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
         os << "ROOT";
         return os;
     }
-    // TODO: Something better... Especially when we have ranges or
-    // std::ostream_joiner
-    const auto& params = ast_data.params().pos_params();
-    auto param_strs = std::vector<std::string>{};
-    std::transform(
-        std::begin(params),
-        std::end(params),
-        std::back_inserter(param_strs),
-        [](const auto& param) { return util::variant_to_str(param); }
-    );
-    os << ast_data.name() << "(" << util::join(param_strs) << ")";
+    os << ast_data.name() << "(" << ast_data.params() << ")";
     return os;
 }
 
 static void parse_field_tree(Ast& parent, FieldTree& ft);
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl);
 static void parse_field_call(Ast& parent, FieldCall& fc);
-static void parse_positional_parameters(Ast& parent, ParameterList& pl);
+static void parse_parameters(Ast& parent, ParameterList& pl);
+static void parse_parameter(Ast& parent, Parameter& p);
 static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
 static field_types::PrimitiveInt parse_integer(TerminalNode& i);
 static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
@@ -98,17 +85,36 @@ static void parse_field_call(Ast& parent, FieldCall& fc)
     const auto pl_ptr = fc.parameter_list();
     if (pl_ptr)
     {
-        parse_positional_parameters(fc_ast, *pl_ptr);
+        parse_parameters(fc_ast, *pl_ptr);
     }
 }
 
-static void parse_positional_parameters(Ast& parent, ParameterList& pl)
+static void parse_parameters(Ast& parent, ParameterList& pl)
 {
-    for (const auto pv_ptr : pl.primitive_value())
+    for (const auto p_ptr : pl.parameter())
     {
-        assert(pv_ptr);
-        parent.data().params().pos_params().push_back(parse_primitive_value(*pv_ptr));
+        assert(p_ptr);
+        parse_parameter(parent, *p_ptr);
     }
+}
+
+static void parse_parameter(Ast& parent, Parameter& p)
+{
+    if (p.primitive_value())
+    {
+        parent.data().params().pos_params().push_back(
+            parse_primitive_value(*p.primitive_value())
+        );
+        return;
+    }
+    const auto np_ptr = p.named_parameter();
+    assert(np_ptr);
+    assert(np_ptr->ID());
+    assert(np_ptr->primitive_value());
+    const auto [it, success] = parent.data().params().named_params().emplace(
+        np_ptr->ID()->getText(),
+        parse_primitive_value(*(np_ptr->primitive_value()))
+    );
 }
 
 static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
