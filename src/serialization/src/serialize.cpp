@@ -29,6 +29,11 @@ public:
         writer_->Int64(i);
     }
 
+    void operator()(const field_types::PrimitiveBool& b)
+    {
+        writer_->Bool(b);
+    }
+
 private:
     Writer* writer_;
 };

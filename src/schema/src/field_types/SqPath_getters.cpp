@@ -1,6 +1,8 @@
 #include "field_types/SqPath.gen.h"
 #include "field_types/SqPathImpl.h"
 
+#include "field_types/SqBool.gen.h"
+#include "field_types/SqBoolImpl.h"
 #include "field_types/SqString.gen.h"
 #include "field_types/SqStringImpl.h"
 
@@ -34,12 +36,27 @@ Result SqPath::get_stem() const
 
 Result SqPath::get_children() const
 {
-    std::vector<FieldPtr> ret;
+    auto ret = std::vector<FieldPtr>{};
     for (const auto& dirent : std::filesystem::directory_iterator(impl_->path_))
     {
         ret.emplace_back(create(dirent.path()));
     }
     return ret;
+}
+
+Result SqPath::get_parts() const
+{
+    auto ret = std::vector<FieldPtr>{};
+    for (const auto& part : impl_->path_)
+    {
+        ret.emplace_back(create(part.string()));
+    }
+    return ret;
+}
+
+Result SqPath::get_is_absolute() const
+{
+    return SqBool::create(impl_->path_.is_absolute());
 }
 
 Primitive SqPath::to_primitive() const

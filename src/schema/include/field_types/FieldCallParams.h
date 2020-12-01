@@ -51,7 +51,7 @@ public:
     {
         try
         {
-            return &get<ParamType>(index, name);
+            return &(get<ParamType>(index, name));
         }
         catch (const std::out_of_range& e)
         {

@@ -14,6 +14,7 @@ set(SQ_TYPES
     SqRoot
     SqString
     SqInt
+    SqBool
 )
 
 # Generated Headers

@@ -18,6 +18,7 @@ using ParameterList = sp::SqParser::Parameter_listContext;
 using Parameter = sp::SqParser::ParameterContext;
 using NamedParameter = sp::SqParser::Named_parameterContext;
 using PrimitiveValue = sp::SqParser::Primitive_valueContext;
+using Boolean = sp::SqParser::BooleanContext;
 using TerminalNode = antlr4::tree::TerminalNode;
 
 namespace sq::ast {
@@ -41,6 +42,7 @@ static void parse_parameter(Ast& parent, Parameter& p);
 static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
 static field_types::PrimitiveInt parse_integer(TerminalNode& i);
 static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
+static field_types::PrimitiveBool parse_boolean(Boolean& b);
 
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
@@ -123,8 +125,12 @@ static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
     {
         return parse_integer(*(pl.INTEGER()));
     }
-    assert(pl.DQ_STR());
-    return parse_dq_str(*(pl.DQ_STR()));
+    else if (pl.DQ_STR())
+    {
+        return parse_dq_str(*(pl.DQ_STR()));
+    }
+    assert(pl.boolean());
+    return parse_boolean(*(pl.boolean()));
 }
 
 static field_types::PrimitiveInt parse_integer(TerminalNode& i)
@@ -142,6 +148,16 @@ static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s)
     auto ret = field_types::PrimitiveString{};
     ss >> quoted(ret);
     return ret;
+}
+
+static field_types::PrimitiveBool parse_boolean(Boolean& b)
+{
+    if (b.BOOLEAN_TRUE())
+    {
+        return true;
+    }
+    assert(b.BOOLEAN_FALSE());
+    return false;
 }
 
 Ast generate_ast(const std::string& sq_command)

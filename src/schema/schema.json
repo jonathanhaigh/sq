@@ -19,7 +19,20 @@
                     "required": false
                 }
             ]
+        },
+        "bool": {
+            "return": "SqBool",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "PrimitiveBool",
+                    "required": false
+                }
+            ]
         }
+    },
+
+    "SqBool": {
     },
 
     "SqInt": {
@@ -51,6 +64,14 @@
         },
         "children": {
             "return": "[SqPath]",
+            "params": []
+        },
+        "parts": {
+            "return": "[SqString]",
+            "params": []
+        },
+        "is_absolute": {
+            "return": "SqBool",
             "params": []
         }
     }

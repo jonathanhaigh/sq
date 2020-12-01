@@ -4,6 +4,9 @@
 #include "field_types/SqInt.gen.h"
 #include "field_types/SqIntImpl.h"
 
+#include "field_types/SqBool.gen.h"
+#include "field_types/SqBoolImpl.h"
+
 #include "field_types/SqPath.gen.h"
 #include "field_types/SqPathImpl.h"
 
@@ -28,6 +31,15 @@ Result SqRoot::get_int(const PrimitiveInt* value) const
         return field_types::SqInt::create(*value);
     }
     return field_types::SqInt::create(0);
+}
+
+Result SqRoot::get_bool(const PrimitiveBool* value) const
+{
+    if (value)
+    {
+        return field_types::SqBool::create(*value);
+    }
+    return field_types::SqBool::create(false);
 }
 
 Primitive SqRoot::to_primitive() const
