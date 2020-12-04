@@ -70,6 +70,14 @@
             "return": "[SqString]",
             "params": []
         },
+        "absolute": {
+            "return": "SqPath",
+            "params": []
+        },
+        "canonical": {
+            "return": "SqPath",
+            "params": []
+        },
         "is_absolute": {
             "return": "SqBool",
             "params": []

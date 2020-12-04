@@ -54,6 +54,16 @@ Result SqPath::get_parts() const
     return ret;
 }
 
+Result SqPath::get_absolute() const
+{
+    return create(std::filesystem::absolute(impl_->path_));
+}
+
+Result SqPath::get_canonical() const
+{
+    return create(std::filesystem::canonical(impl_->path_));
+}
+
 Result SqPath::get_is_absolute() const
 {
     return SqBool::create(impl_->path_.is_absolute());
