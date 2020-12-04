@@ -13,6 +13,41 @@ project(Sq
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=*)
+
+set(SQ_GCC_STYLE_WARNING_FLAGS
+    -Wall
+    -Wextra
+    -pedantic-errors
+    -pedantic
+    -Wconversion
+    -Wsign-conversion
+    -Werror
+    -Weffc++
+    -Wold-style-cast
+    -Woverloaded-virtual
+)
+
+set(SQ_MSVC_WARNING_FLAGS
+    /W4
+    /WX
+)
+
+# Compilers (as they would appear in CMAKE_CXX_COMPILER_ID) that take GCC style
+# flags.
+set(SQ_GCC_STYLE_COMPILERS
+    GNU
+    Clang
+    AppleClang
+)
+
+if ("${CMAKE_CXX_COMPILER_ID}" IN_LIST SQ_GCC_STYLE_COMPILERS)
+    set(SQ_WARNING_FLAGS ${SQ_GCC_STYLE_WARNING_FLAGS})
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL MSVC)
+    set(SQ_WARNING_FLAGS ${SQ_MSVC_WARNING_FLAGS})
+endif()
+
+add_compile_options(${SQ_WARNING_FLAGS})
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
