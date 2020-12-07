@@ -13,7 +13,7 @@ project(Sq
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=*)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=*,-google-runtime-references,-hicpp-no-array-decay,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-fuchsia-overloaded-operator,-modernize-use-trailing-return-type,-fuchsia-default-arguments-calls,-fuchsia-trailing-return)
 
 set(SQ_GCC_STYLE_WARNING_FLAGS
     -Wall
@@ -23,7 +23,6 @@ set(SQ_GCC_STYLE_WARNING_FLAGS
     -Wconversion
     -Wsign-conversion
     -Werror
-    -Weffc++
     -Wold-style-cast
     -Woverloaded-virtual
 )

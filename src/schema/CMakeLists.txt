@@ -100,7 +100,19 @@ add_library(sq_schema
     ${SQ_TYPE_NOGEN_SRC}
 )
 
+# The generated code includes method declarations that will be defined
+# manually, so it doesn't know whether those methods will actually use their
+# *this objects or not. Tell clang-tidy not to suggest that those methods that
+# don't use *this should be static.
+set_property(
+    TARGET sq_schema
+    APPEND_STRING
+    PROPERTY CXX_CLANG_TIDY
+    ",-readability-convert-member-functions-to-static"
+)
+
 set_target_properties(sq_schema PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(sq_schema PUBLIC sq_util)
+target_link_libraries(sq_schema PUBLIC sq_exceptions)
 target_include_directories(sq_schema PUBLIC ${SQ_GEN_INCLUDE_DIR})
 target_include_directories(sq_schema PUBLIC ${SQ_NOGEN_INCLUDE_DIR})

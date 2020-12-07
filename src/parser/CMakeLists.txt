@@ -52,14 +52,16 @@ set_target_properties(sq_parser PROPERTIES CXX_CLANG_TIDY "")
 if ("${CMAKE_CXX_COMPILER_ID}" IN_LIST SQ_GCC_STYLE_COMPILERS)
     target_compile_options(sq_parser PRIVATE
         -Wno-attributes
-        -Wno-effc++
         -Wno-overloaded-virtual
      )
 endif()
 
-target_include_directories(sq_parser PUBLIC ${SQ_ANTLR4_GEN_INCLUDE_DIR})
+# Use "SYSTEM" for the generated headers so that clang-tidy and the compiler
+# don't complain about the style used in the generated headers when they are
+# included from cpp files in other targets for which we do want to run static
+# analysis.
+target_include_directories(sq_parser SYSTEM PUBLIC ${SQ_ANTLR4_GEN_INCLUDE_DIR})
 
-# TODO: this should be PRIVATE
 target_include_directories(sq_parser PUBLIC ${ANTLR4_CPP_RUNTIME_INCLUDE_DIR})
 
 target_link_libraries(sq_parser PUBLIC antlr4-runtime)

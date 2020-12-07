@@ -1,10 +1,12 @@
 #include "ast/ast.h"
 
+#include "ast/ParseError.h"
 #include "field_types/Primitive.h"
 #include "parser/SqLexer.h"
 #include "parser/SqParser.h"
 
 #include <cassert>
+#include <charconv>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -47,10 +49,10 @@ static field_types::PrimitiveBool parse_boolean(Boolean& b);
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
     const auto ft_ptrs = ftl.field_tree();
-    assert(ft_ptrs.size());
+    assert(!ft_ptrs.empty());
     for (const auto ft_ptr : ft_ptrs)
     {
-        assert(ft_ptr);
+        assert(ft_ptr != nullptr);
         parse_field_tree(parent, *ft_ptr);
     }
 }
@@ -58,22 +60,22 @@ static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 static void parse_field_tree(Ast& parent, FieldTree& ft)
 {
     const auto de_ptr = ft.dot_expression();
-    assert(de_ptr);
+    assert(de_ptr != nullptr);
 
     auto current_ptr = &parent;
     for (const auto de_fc_ptr : de_ptr->field_call())
     {
-        assert(de_fc_ptr);
+        assert(de_fc_ptr != nullptr);
         parse_field_call(*current_ptr, *de_fc_ptr);
         assert(current_ptr->children().size() == 1);
         current_ptr = &current_ptr->children().front();
     }
 
     const auto be_ptr = ft.brace_expression();
-    if (be_ptr)
+    if (be_ptr != nullptr)
     {
         const auto ftl_ptr = be_ptr->field_tree_list();
-        assert(ftl_ptr);
+        assert(ftl_ptr != nullptr);
         parse_field_tree_list(*current_ptr, *ftl_ptr);
     }
 }
@@ -81,11 +83,11 @@ static void parse_field_tree(Ast& parent, FieldTree& ft)
 static void parse_field_call(Ast& parent, FieldCall& fc)
 {
     const auto id_ptr = fc.ID();
-    assert(id_ptr);
+    assert(id_ptr != nullptr);
     auto& fc_ast = parent.children().emplace_back(id_ptr->getText());
 
     const auto pl_ptr = fc.parameter_list();
-    if (pl_ptr)
+    if (pl_ptr != nullptr)
     {
         parse_parameters(fc_ast, *pl_ptr);
     }
@@ -95,14 +97,14 @@ static void parse_parameters(Ast& parent, ParameterList& pl)
 {
     for (const auto p_ptr : pl.parameter())
     {
-        assert(p_ptr);
+        assert(p_ptr != nullptr);
         parse_parameter(parent, *p_ptr);
     }
 }
 
 static void parse_parameter(Ast& parent, Parameter& p)
 {
-    if (p.primitive_value())
+    if (p.primitive_value() != nullptr)
     {
         parent.data().params().pos_params().push_back(
             parse_primitive_value(*p.primitive_value())
@@ -110,36 +112,62 @@ static void parse_parameter(Ast& parent, Parameter& p)
         return;
     }
     const auto np_ptr = p.named_parameter();
-    assert(np_ptr);
-    assert(np_ptr->ID());
-    assert(np_ptr->primitive_value());
+    assert(np_ptr != nullptr);
+    assert(np_ptr->ID() != nullptr);
+    assert(np_ptr->primitive_value() != nullptr);
     const auto [it, success] = parent.data().params().named_params().emplace(
         np_ptr->ID()->getText(),
         parse_primitive_value(*(np_ptr->primitive_value()))
     );
+    if (!success)
+    {
+        auto ss = std::ostringstream{};
+        ss << "named parameter \"" << np_ptr->ID()->getText()
+           << "\" given multiple times in one call";
+        throw SqParseError(np_ptr->ID()->getSymbol(), ss.str());
+    }
 }
 
 static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
 {
-    if (pl.INTEGER())
+    if (pl.INTEGER() != nullptr)
     {
         return parse_integer(*(pl.INTEGER()));
     }
-    else if (pl.DQ_STR())
+    if (pl.DQ_STR() != nullptr)
     {
         return parse_dq_str(*(pl.DQ_STR()));
     }
-    assert(pl.boolean());
+    assert(pl.boolean() != nullptr);
     return parse_boolean(*(pl.boolean()));
 }
 
 static field_types::PrimitiveInt parse_integer(TerminalNode& i)
 {
-    auto ss = std::stringstream{i.getText()};
-    auto ret = field_types::PrimitiveInt{};
-    // TODO: better error checking... Or use something like boost::numeric_cast
-    ss >> ret;
-    return ret;
+    const auto str = i.getText();
+    const auto begin = str.data();
+    // We can't really avoid using pointer arithmetic when using
+    // std::from_chars - it requires a const char* to indicate the end of the
+    // string, but we can only reasonably make one using pointer arithmetic.
+    // In particular, std::string, std::string_view, std::span etc. only
+    // provide iterator versions of end(), but we need a pointer.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const auto end = begin + str.size();
+    field_types::PrimitiveInt value = 0;
+    const auto [ptr, ec] = std::from_chars(begin, end, value, 10);
+    if (ec == std::errc::result_out_of_range)
+    {
+        auto ss = std::ostringstream{};
+        ss << "integer \"" << str << "\" is out of range";
+        throw SqParseError(i.getSymbol(), ss.str());
+    }
+    if (ec != std::errc() || ptr != end)
+    {
+        auto ss = std::ostringstream{};
+        ss << "failed to parse \"" << str << "\" as integer";
+        throw SqParseError(i.getSymbol(), ss.str());
+    }
+    return value;
 }
 
 static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s)
@@ -152,11 +180,11 @@ static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s)
 
 static field_types::PrimitiveBool parse_boolean(Boolean& b)
 {
-    if (b.BOOLEAN_TRUE())
+    if (b.BOOLEAN_TRUE() != nullptr)
     {
         return true;
     }
-    assert(b.BOOLEAN_FALSE());
+    assert(b.BOOLEAN_FALSE() != nullptr);
     return false;
 }
 

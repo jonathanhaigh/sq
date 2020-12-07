@@ -6,8 +6,7 @@
 #include "field_types/SqString.gen.h"
 #include "field_types/SqStringImpl.h"
 
-namespace sq {
-namespace field_types {
+namespace sq::field_types {
 
 Result SqPath::get_string() const
 {
@@ -74,5 +73,4 @@ Primitive SqPath::to_primitive() const
     return impl_->path_.string();
 }
 
-} // namespace sq
-} // namespace field_types
+} // namespace sq::field_types

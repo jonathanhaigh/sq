@@ -9,8 +9,9 @@ using namespace std::string_literals;
 
 namespace sq::results {
 
-struct ResultToResultTreeVisitor
+class ResultToResultTreeVisitor
 {
+public:
     explicit ResultToResultTreeVisitor(const ast::Ast& ast)
         : ast_{&ast}
     { }
@@ -21,6 +22,7 @@ struct ResultToResultTreeVisitor
         return ResultTree(*ast_, std::forward<ResultType>(result));
     }
 
+private:
     const ast::Ast* ast_;
 };
 

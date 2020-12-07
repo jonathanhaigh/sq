@@ -1,3 +1,6 @@
 [submodule "3rdparty/rapidjson"]
 	path = 3rdparty/rapidjson
 	url = https://github.com/Tencent/rapidjson/
+[submodule "3rdparty/gsl/GSL"]
+	path = 3rdparty/gsl/GSL
+	url = https://github.com/Microsoft/GSL

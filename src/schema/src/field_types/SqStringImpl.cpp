@@ -2,8 +2,8 @@
 
 namespace sq::field_types {
 
-SqStringImpl::SqStringImpl(const std::string& str)
-    : string_{str}
+SqStringImpl::SqStringImpl(std::string str)
+    : string_{std::move(str)}
 { }
 
 } // namespace sq::field_types

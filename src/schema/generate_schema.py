@@ -79,7 +79,7 @@ class TypeHeaderWriter(FileWriter):
         self.writel()
         self.write_create()
         self.writel()
-        self.write_dtor_decl()
+        self.write_dtor()
         self.write_generic_getter_decl()
         for member, member_info in self._info.items():
             self.write_getter_decl(member, member_info)
@@ -101,8 +101,8 @@ class TypeHeaderWriter(FileWriter):
         self.writeli(2, f"return std::make_unique<{self._name}>(std::forward<Ts>(args)...);")
         self.writeli(1, "}")
 
-    def write_dtor_decl(self):
-        self.writeli(1, f"~{self._name}() noexcept override;")
+    def write_dtor(self):
+        self.writeli(1, f"~{self._name}() noexcept override = default;")
 
     def write_getter_decl(self, member, member_info):
         param_list_str = self.get_param_list_str(member, member_info)
@@ -139,7 +139,6 @@ class TypeCppWriter(FileWriter):
         self.write_includes()
         with namespace(self, "sq::field_types"):
             self.writel()
-            self.write_dtor()
             self.writel()
             self.write_generic_getter()
 
@@ -149,12 +148,13 @@ class TypeCppWriter(FileWriter):
         self.writel(f"#include \"field_types/{self._name}.gen.h\"")
         self.writel(f"#include \"field_types/{self._name}Impl.h\"")
 
-    def write_dtor(self):
-        self.writel(f"{self._name}::~{self._name}()")
-        self.writel("{}")
-
     def write_generic_getter(self):
-        self.writel(f"Result {self._name}::get(std::string_view member, const FieldCallParams& params) const")
+        self.writel(
+            f"Result {self._name}::get("
+            "std::string_view member, "
+            "[[maybe_unused]] const FieldCallParams& params"
+            ") const"
+        )
         self.writel("{")
         for cand, cand_info in self._info.items():
             self.writeli(1, f"if (member.compare(\"{cand}\") == 0)")

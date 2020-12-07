@@ -5,6 +5,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
+#include <gsl/narrow>
 #include <string>
 
 namespace rj = rapidjson;
@@ -15,13 +16,19 @@ template <typename Writer>
 class RjPrimitiveVisitor
 {
 public:
-    RjPrimitiveVisitor(Writer& writer)
+    explicit RjPrimitiveVisitor(Writer& writer)
         : writer_{&writer}
     { }
 
     void operator()(const field_types::PrimitiveString& str)
     {
-        writer_->String(str.c_str(), str.size(), true /* copy */);
+        // RapidJSON's String's size type can be smaller than
+        // std::string::size_type so we have to narrow here.
+        writer_->String(
+            str.c_str(),
+            gsl::narrow<rj::SizeType>(str.size()),
+            true /* copy */
+        );
     }
 
     void operator()(const field_types::PrimitiveInt& i)
@@ -42,7 +49,7 @@ template <typename Writer>
 class RjResultVisitor
 {
 public:
-    RjResultVisitor(Writer& writer)
+    explicit RjResultVisitor(Writer& writer)
         : writer_{&writer}
     { }
 

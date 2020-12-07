@@ -7,4 +7,5 @@ add_library(sq_serialization
 )
 target_link_libraries(sq_serialization PUBLIC rapidjson)
 target_link_libraries(sq_serialization PUBLIC sq_results)
+target_link_libraries(sq_serialization PUBLIC gsl)
 target_include_directories(sq_serialization PUBLIC "${SQ_SERIALIZATION_INCLUDE_DIR}")

@@ -8,7 +8,7 @@ namespace sq::field_types {
 class SqStringImpl
 {
 public:
-    explicit SqStringImpl(const PrimitiveString& str);
+    explicit SqStringImpl(PrimitiveString str);
 
 private:
     PrimitiveString string_;
