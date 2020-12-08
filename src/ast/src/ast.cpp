@@ -188,12 +188,34 @@ static field_types::PrimitiveBool parse_boolean(Boolean& b)
     return false;
 }
 
+class SqErrorListener
+    : public antlr4::BaseErrorListener
+{
+public:
+    void syntaxError(
+        [[maybe_unused]] antlr4::Recognizer * recognizer,
+        antlr4::Token *symbol,
+        [[maybe_unused]] std::size_t line,
+        [[maybe_unused]] std::size_t charPositionInLine,
+        const std::string &msg,
+        [[maybe_unused]] std::exception_ptr e
+    ) override
+    {
+        throw SqParseError(symbol, msg);
+    }
+};
+
 Ast generate_ast(const std::string& sq_command)
 {
     auto input_stream = antlr4::ANTLRInputStream{sq_command};
+    auto error_listener = SqErrorListener{};
     auto lexer = sp::SqLexer{&input_stream};
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(&error_listener);
     auto token_stream = antlr4::CommonTokenStream{&lexer};
     auto parser = sp::SqParser{&token_stream};
+    parser.removeErrorListeners();
+    parser.addErrorListener(&error_listener);
     const auto ftl_ptr = parser.field_tree_list();
     assert(ftl_ptr);
     auto root = Ast{""};
