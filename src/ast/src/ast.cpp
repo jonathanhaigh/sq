@@ -50,7 +50,7 @@ static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
     const auto ft_ptrs = ftl.field_tree();
     assert(!ft_ptrs.empty());
-    for (const auto ft_ptr : ft_ptrs)
+    for (auto* const ft_ptr : ft_ptrs)
     {
         assert(ft_ptr != nullptr);
         parse_field_tree(parent, *ft_ptr);
@@ -59,34 +59,35 @@ static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 
 static void parse_field_tree(Ast& parent, FieldTree& ft)
 {
-    const auto de_ptr = ft.dot_expression();
+    auto* const de_ptr = ft.dot_expression();
     assert(de_ptr != nullptr);
 
-    auto current_ptr = &parent;
-    for (const auto de_fc_ptr : de_ptr->field_call())
+    auto* current_ptr = &parent;
+    for (auto* const de_fc_ptr : de_ptr->field_call())
     {
         assert(de_fc_ptr != nullptr);
         parse_field_call(*current_ptr, *de_fc_ptr);
-        assert(current_ptr->children().size() == 1);
-        current_ptr = &current_ptr->children().front();
+        assert(!current_ptr->children().empty());
+        current_ptr = &current_ptr->children().back();
     }
 
-    const auto be_ptr = ft.brace_expression();
+    auto* const be_ptr = ft.brace_expression();
     if (be_ptr != nullptr)
     {
-        const auto ftl_ptr = be_ptr->field_tree_list();
+        auto* const ftl_ptr = be_ptr->field_tree_list();
         assert(ftl_ptr != nullptr);
         parse_field_tree_list(*current_ptr, *ftl_ptr);
+        assert(!current_ptr->children().empty());
     }
 }
 
 static void parse_field_call(Ast& parent, FieldCall& fc)
 {
-    const auto id_ptr = fc.ID();
+    auto* const id_ptr = fc.ID();
     assert(id_ptr != nullptr);
     auto& fc_ast = parent.children().emplace_back(id_ptr->getText());
 
-    const auto pl_ptr = fc.parameter_list();
+    auto* const pl_ptr = fc.parameter_list();
     if (pl_ptr != nullptr)
     {
         parse_parameters(fc_ast, *pl_ptr);
@@ -95,7 +96,7 @@ static void parse_field_call(Ast& parent, FieldCall& fc)
 
 static void parse_parameters(Ast& parent, ParameterList& pl)
 {
-    for (const auto p_ptr : pl.parameter())
+    for (auto* const p_ptr : pl.parameter())
     {
         assert(p_ptr != nullptr);
         parse_parameter(parent, *p_ptr);
@@ -111,7 +112,7 @@ static void parse_parameter(Ast& parent, Parameter& p)
         );
         return;
     }
-    const auto np_ptr = p.named_parameter();
+    auto* const np_ptr = p.named_parameter();
     assert(np_ptr != nullptr);
     assert(np_ptr->ID() != nullptr);
     assert(np_ptr->primitive_value() != nullptr);
@@ -145,14 +146,14 @@ static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
 static field_types::PrimitiveInt parse_integer(TerminalNode& i)
 {
     const auto str = i.getText();
-    const auto begin = str.data();
+    const auto* const begin = str.data();
     // We can't really avoid using pointer arithmetic when using
     // std::from_chars - it requires a const char* to indicate the end of the
     // string, but we can only reasonably make one using pointer arithmetic.
     // In particular, std::string, std::string_view, std::span etc. only
     // provide iterator versions of end(), but we need a pointer.
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const auto end = begin + str.size();
+    const auto* const end = begin + str.size();
     field_types::PrimitiveInt value = 0;
     const auto [ptr, ec] = std::from_chars(begin, end, value, 10);
     if (ec == std::errc::result_out_of_range)
@@ -216,7 +217,7 @@ Ast generate_ast(const std::string& sq_command)
     auto parser = sp::SqParser{&token_stream};
     parser.removeErrorListeners();
     parser.addErrorListener(&error_listener);
-    const auto ftl_ptr = parser.field_tree_list();
+    auto* const ftl_ptr = parser.field_tree_list();
     assert(ftl_ptr);
     auto root = Ast{""};
     parse_field_tree_list(root, *ftl_ptr);
