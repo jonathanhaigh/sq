@@ -9,11 +9,13 @@ namespace sq::field_types {
 
 using PrimitiveString = std::string;
 using PrimitiveInt = std::int64_t;
+using PrimitiveFloat = double;
 using PrimitiveBool = bool;
 
 using Primitive = std::variant<
     PrimitiveString,
     PrimitiveInt,
+    PrimitiveFloat,
     PrimitiveBool
 >;
 

@@ -38,6 +38,64 @@
     "SqInt": {
     },
 
+    "SqFloat": {
+    },
+
+    "SqDataSize": {
+        "B": {
+            "return": "SqInt",
+            "params": []
+        },
+        "KiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "kB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "MiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "MB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "GiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "GB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "TiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "TB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "PiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "PB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "EiB": {
+            "return": "SqFloat",
+            "params": []
+        },
+        "EB": {
+            "return": "SqFloat",
+            "params": []
+        }
+    },
+
     "SqString": {
     },
 
@@ -80,6 +138,10 @@
         },
         "is_absolute": {
             "return": "SqBool",
+            "params": []
+        },
+        "size": {
+            "return": "SqDataSize",
             "params": []
         }
     }

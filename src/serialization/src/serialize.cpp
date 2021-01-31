@@ -41,6 +41,11 @@ public:
         writer_->Bool(b);
     }
 
+    void operator()(const field_types::PrimitiveFloat& f)
+    {
+        writer_->Double(f);
+    }
+
 private:
     Writer* writer_;
 };

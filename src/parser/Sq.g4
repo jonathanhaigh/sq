@@ -13,7 +13,7 @@ boolean: (BOOLEAN_TRUE | BOOLEAN_FALSE);
 
 BOOLEAN_TRUE: 'true';
 BOOLEAN_FALSE: 'false';
-ID: [a-z_]+;
+ID: [a-zA-Z_]+;
 WS: [ \t\r\n]+ -> skip;
 DQ_STR: '"' (~'"' | '\\"' )* '"';
 INTEGER: '-'?[0-9]+;

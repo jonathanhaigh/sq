@@ -1,8 +1,8 @@
-#include "field_types/SqString.gen.h"
+#include "field_types/SqFloat.gen.h"
 
 namespace sq::field_types {
 
-Primitive SqString::to_primitive() const
+Primitive SqFloat::to_primitive() const
 {
     return impl_;
 }

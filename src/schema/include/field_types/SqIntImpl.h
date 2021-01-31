@@ -5,15 +5,7 @@
 
 namespace sq::field_types {
 
-class SqIntImpl
-{
-public:
-    explicit SqIntImpl(PrimitiveInt value);
-
-private:
-    PrimitiveInt value_;
-    friend class SqInt;
-};
+using SqIntImpl = PrimitiveInt;
 
 } // namespace sq::field_types
 

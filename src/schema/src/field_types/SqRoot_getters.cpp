@@ -1,14 +1,8 @@
 #include "field_types/SqRoot.gen.h"
-#include "field_types/SqRootImpl.h"
-
-#include "field_types/SqInt.gen.h"
-#include "field_types/SqIntImpl.h"
 
 #include "field_types/SqBool.gen.h"
-#include "field_types/SqBoolImpl.h"
-
+#include "field_types/SqInt.gen.h"
 #include "field_types/SqPath.gen.h"
-#include "field_types/SqPathImpl.h"
 
 #include <string>
 

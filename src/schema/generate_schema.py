@@ -57,7 +57,6 @@ class TypeHeaderWriter(FileWriter):
             self.write_includes()
             with namespace(self, "sq::field_types"):
                 self.writel()
-                self.write_fwd_decls()
                 with class_decl(self, self._name, "Field"):
                     self.write_public_members()
                     self.writel()
@@ -67,13 +66,10 @@ class TypeHeaderWriter(FileWriter):
         self.writel("#include <memory>")
         self.writel()
         self.writel("#include \"field_types/Field.h\"")
-
-    def write_fwd_decls(self):
-        self.writel(f"class {self._impl_name};")
+        self.writel(f"#include \"field_types/{self._impl_name}.h\"")
 
     def write_public_members(self):
         self.writel("public:")
-        self.write_typedefs();
         self.writel()
         self.write_ctor()
         self.writel()
@@ -85,13 +81,10 @@ class TypeHeaderWriter(FileWriter):
             self.write_getter_decl(member, member_info)
         self.write_to_primitive_decl()
 
-    def write_typedefs(self):
-        self.writeli(1, f"using ImplPtr = std::unique_ptr<{self._impl_name}>;")
-
     def write_ctor(self):
         self.writeli(1, "template <typename... Ts>")
         self.writeli(1, f"explicit {self._name}(Ts&&... args)")
-        self.writeli(2, f": impl_{{std::make_unique<{self._impl_name}>(std::forward<Ts>(args)...)}}")
+        self.writeli(2, f": impl_{{std::forward<Ts>(args)...}}")
         self.writeli(1, "{}")
 
     def write_create(self):
@@ -125,7 +118,7 @@ class TypeHeaderWriter(FileWriter):
 
     def write_private_members(self):
         self.writeli(0, "private:")
-        self.writeli(1, f"ImplPtr impl_;")
+        self.writeli(1, f"{self._impl_name} impl_;")
 
 
 class TypeCppWriter(FileWriter):

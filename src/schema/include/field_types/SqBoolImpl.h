@@ -5,15 +5,7 @@
 
 namespace sq::field_types {
 
-class SqBoolImpl
-{
-public:
-    explicit SqBoolImpl(PrimitiveBool value);
-
-private:
-    PrimitiveBool value_;
-    friend class SqBool;
-};
+using SqBoolImpl = PrimitiveBool;
 
 } // namespace sq::field_types
 
