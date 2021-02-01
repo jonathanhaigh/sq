@@ -1,6 +1,12 @@
 [submodule "3rdparty/rapidjson"]
 	path = 3rdparty/rapidjson
 	url = https://github.com/Tencent/rapidjson/
+	branch = v1.1.0
 [submodule "3rdparty/gsl/GSL"]
 	path = 3rdparty/gsl/GSL
 	url = https://github.com/Microsoft/GSL
+	branch = v3.1.0
+[submodule "3rdparty/range-v3"]
+	path = 3rdparty/range-v3
+	url = https://github.com/ericniebler/range-v3
+	branch = 0.11.0
