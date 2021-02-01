@@ -8,6 +8,10 @@
 #include <gsl/narrow>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_access.hpp>
+#include <range/v3/view/drop.hpp>
+#include <range/v3/view/reverse.hpp>
+#include <range/v3/view/slice.hpp>
+#include <range/v3/view/stride.hpp>
 
 using namespace std::string_literals;
 
@@ -98,6 +102,26 @@ static ResultTree::Data data_from_field_ptr(
     return obj;
 }
 
+static ptrdiff_t normalize_range_index(ptrdiff_t index, ptrdiff_t range_size)
+{
+    if (index < 0)
+    {
+        return range_size + index;
+    }
+    return index;
+}
+
+template <typename R>
+static ResultTree::ArrayData create_array_data(const ast::Ast& ast, R&& rng)
+{
+    auto arr = ResultTree::ArrayData{};
+    for (auto&& result : rng)
+    {
+        arr.emplace_back(ast, std::move(result));
+    }
+    return arr;
+}
+
 static ResultTree::Data data_from_field_list(
     const ast::Ast& ast,
     FieldList&& list_result)
@@ -112,16 +136,41 @@ static ResultTree::Data data_from_field_list(
 
     if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
     {
-        throw NotImplementedError("List slicing has not been implemented");
+        const auto& spec = std::get<ast::ListSliceSpec>(filter_spec);
+        const auto size = gsl::narrow<ptrdiff_t>(list_result.size());
+        const auto step = spec.step_.value_or(1);
+        assert(step != 0);
+        const bool reverse = step < 0;
+
+        const auto start = normalize_range_index(
+            spec.start_.value_or(reverse? size : 0),
+            size
+        );
+
+        const auto stop = normalize_range_index(
+            spec.stop_.value_or(reverse? 0 : size),
+            size
+        );
+
+        if (reverse)
+        {
+            if (start < stop) { return ResultTree::ArrayData{}; }
+            auto rng = list_result |
+                   ranges::views::reverse |
+                   ranges::views::slice(size - start, size - stop) |
+                   ranges::views::stride(-step);
+
+            return create_array_data(ast, rng);
+        }
+        if (start > stop) { return ResultTree::ArrayData{}; }
+        auto rng = list_result |
+               ranges::views::slice(start, stop) |
+               ranges::views::stride(step);
+        return create_array_data(ast, rng);
     }
 
     assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
-    auto arr = ResultTree::ArrayData{};
-    for (auto&& result : list_result)
-    {
-        arr.emplace_back(ast, std::move(result));
-    }
-    return arr;
+    return create_array_data(ast, std::move(list_result));
 }
 
 static ResultTree::Data data_from_field_input_range(
@@ -142,16 +191,23 @@ static ResultTree::Data data_from_field_input_range(
 
     if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
     {
-        throw NotImplementedError("List slicing has not been implemented");
+        const auto& spec = std::get<ast::ListSliceSpec>(filter_spec);
+        const auto start = spec.start_.value_or(0);
+        const auto step = spec.step_.value_or(1);
+        if (start < 0 || spec.stop_ || step < 0)
+        {
+            // We can't handle these cases for an input range so we'll have to
+            // save the data to a vector to get a random access range
+            return data_from_field_list(ast, range_result | ranges::to<std::vector>());
+        }
+        auto rng = range_result |
+               ranges::views::drop(start) |
+               ranges::views::stride(step);
+        return create_array_data(ast, std::move(rng));
     }
 
     assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
-    auto arr = ResultTree::ArrayData{};
-    for (auto&& result : range_result)
-    {
-        arr.emplace_back(ast, std::move(result));
-    }
-    return arr;
+    return create_array_data(ast, std::move(range_result));
 }
 
 ResultTree::ResultTree(const ast::Ast& ast)
