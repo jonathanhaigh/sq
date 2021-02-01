@@ -81,6 +81,18 @@ std::string variant_to_str(V&& var)
     return ss.str();
 }
 
+template <typename T>
+std::string optional_to_str(T&& var)
+{
+    if (var)
+    {
+        auto ss = std::ostringstream{};
+        ss << *std::forward<T>(var);
+        return ss.str();
+    }
+    return std::string{};
+}
+
 } // namespace sq::util
 
 #endif // SQ_INCLUDE_GUARD_util_strutil_h_

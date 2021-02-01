@@ -19,6 +19,10 @@ using FieldCall = sp::SqParser::Field_callContext;
 using ParameterList = sp::SqParser::Parameter_listContext;
 using Parameter = sp::SqParser::ParameterContext;
 using NamedParameter = sp::SqParser::Named_parameterContext;
+using ListFilter = sp::SqParser::List_filterContext;
+using ListElementAccess = sp::SqParser::List_element_accessContext;
+using SimpleListSlice = sp::SqParser::Simple_list_sliceContext;
+using ListSlice = sp::SqParser::List_sliceContext;
 using PrimitiveValue = sp::SqParser::Primitive_valueContext;
 using Boolean = sp::SqParser::BooleanContext;
 using TerminalNode = antlr4::tree::TerminalNode;
@@ -32,7 +36,10 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
         os << "ROOT";
         return os;
     }
-    os << ast_data.name() << "(" << ast_data.params() << ")";
+    os << ast_data.name()
+       << "(" << ast_data.params() << ")"
+       << "[" << util::variant_to_str(ast_data.list_filter_spec()) << "]";
+
     return os;
 }
 
@@ -41,8 +48,12 @@ static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl);
 static void parse_field_call(Ast& parent, FieldCall& fc);
 static void parse_parameters(Ast& parent, ParameterList& pl);
 static void parse_parameter(Ast& parent, Parameter& p);
+static void parse_list_filter(Ast& parent, ListFilter& lf);
+static ListElementAccessSpec parse_list_element_access(ListElementAccess& lea);
+static ListSliceSpec parse_simple_list_slice(SimpleListSlice& sls);
+static ListSliceSpec parse_list_slice(ListSlice& ls);
 static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
-static field_types::PrimitiveInt parse_integer(TerminalNode& i);
+template <typename T> static T parse_integer(TerminalNode& i);
 static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
 static field_types::PrimitiveBool parse_boolean(Boolean& b);
 
@@ -92,6 +103,12 @@ static void parse_field_call(Ast& parent, FieldCall& fc)
     {
         parse_parameters(fc_ast, *pl_ptr);
     }
+
+    auto* const lf_ptr = fc.list_filter();
+    if (lf_ptr != nullptr)
+    {
+        parse_list_filter(fc_ast, *lf_ptr);
+    }
 }
 
 static void parse_parameters(Ast& parent, ParameterList& pl)
@@ -129,11 +146,86 @@ static void parse_parameter(Ast& parent, Parameter& p)
     }
 }
 
+static void parse_list_filter(Ast& parent, ListFilter& lf)
+{
+    auto* const lea_ptr = lf.list_element_access();
+    auto* const sls_ptr = lf.simple_list_slice();
+    auto* const ls_ptr = lf.list_slice();
+    if (lea_ptr != nullptr)
+    {
+        assert(sls_ptr == nullptr);
+        assert(ls_ptr == nullptr);
+        parent.data().list_filter_spec() = parse_list_element_access(*lea_ptr);
+        return;
+    }
+
+    if (sls_ptr != nullptr)
+    {
+        assert(ls_ptr == nullptr);
+        parent.data().list_filter_spec() = parse_simple_list_slice(*sls_ptr);
+        return;
+    }
+
+    assert(ls_ptr != nullptr);
+    parent.data().list_filter_spec() = parse_list_slice(*ls_ptr);
+}
+
+static ListElementAccessSpec parse_list_element_access(ListElementAccess& lea)
+{
+    assert(lea.INTEGER() != nullptr);
+
+    return ListElementAccessSpec{
+        parse_integer<std::ptrdiff_t>(*(lea.INTEGER()))
+   };
+}
+
+static ListSliceSpec parse_simple_list_slice(SimpleListSlice& sls)
+{
+    ListSliceSpec ret;
+
+    if (sls.list_slice_start() != nullptr)
+    {
+        assert(sls.list_slice_start()->INTEGER() != nullptr);
+        ret.start_ = parse_integer<std::ptrdiff_t>(*(sls.list_slice_start()->INTEGER()));
+    }
+
+    if (sls.list_slice_stop() != nullptr)
+    {
+        assert(sls.list_slice_stop()->INTEGER() != nullptr);
+        ret.stop_ = parse_integer<std::ptrdiff_t>(*(sls.list_slice_stop()->INTEGER()));
+    }
+    return ret;
+}
+
+static ListSliceSpec parse_list_slice(ListSlice& ls)
+{
+    ListSliceSpec ret;
+
+    if (ls.list_slice_start() != nullptr)
+    {
+        assert(ls.list_slice_start()->INTEGER() != nullptr);
+        ret.start_ = parse_integer<std::ptrdiff_t>(*(ls.list_slice_start()->INTEGER()));
+    }
+
+    if (ls.list_slice_stop() != nullptr)
+    {
+        assert(ls.list_slice_stop()->INTEGER() != nullptr);
+        ret.stop_ = parse_integer<std::ptrdiff_t>(*(ls.list_slice_stop()->INTEGER()));
+    }
+
+    if (ls.list_slice_step() != nullptr)
+    {
+        assert(ls.list_slice_step()->INTEGER() != nullptr);
+        ret.step_ = parse_integer<std::ptrdiff_t>(*(ls.list_slice_step()->INTEGER()));
+    }
+    return ret;
+}
+
 static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
 {
     if (pl.INTEGER() != nullptr)
     {
-        return parse_integer(*(pl.INTEGER()));
+        return parse_integer<field_types::PrimitiveInt>(*(pl.INTEGER()));
     }
     if (pl.DQ_STR() != nullptr)
     {
@@ -143,7 +235,8 @@ static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
     return parse_boolean(*(pl.boolean()));
 }
 
-static field_types::PrimitiveInt parse_integer(TerminalNode& i)
+template <typename T>
+static T parse_integer(TerminalNode& i)
 {
     const auto str = i.getText();
     const auto* const begin = str.data();
@@ -154,7 +247,7 @@ static field_types::PrimitiveInt parse_integer(TerminalNode& i)
     // provide iterator versions of end(), but we need a pointer.
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     const auto* const end = begin + str.size();
-    field_types::PrimitiveInt value = 0;
+    T value = 0;
     const auto [ptr, ec] = std::from_chars(begin, end, value, 10);
     if (ec == std::errc::result_out_of_range)
     {

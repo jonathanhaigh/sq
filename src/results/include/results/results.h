@@ -37,6 +37,7 @@ public:
     Data& data() { return data_; }
 
 private:
+    void from_field_ptr(const ast::Ast& ast, field_types::FieldPtr&& result);
     const ast::Ast* ast_;
     Data data_;
 };
