@@ -28,6 +28,7 @@ public:
 
     explicit ResultTree(const ast::Ast& ast);
     ResultTree(const ast::Ast& ast, field_types::FieldList&& result);
+    ResultTree(const ast::Ast& ast, field_types::FieldInputRange&& result);
     ResultTree(const ast::Ast& ast, field_types::FieldPtr&& result);
     ResultTree(const ast::Ast& ast, field_types::Primitive&& result);
 
@@ -37,7 +38,6 @@ public:
     Data& data() { return data_; }
 
 private:
-    void from_field_ptr(const ast::Ast& ast, field_types::FieldPtr&& result);
     const ast::Ast* ast_;
     Data data_;
 };

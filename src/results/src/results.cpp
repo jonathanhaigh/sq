@@ -6,13 +6,16 @@
 
 #include <cassert>
 #include <gsl/narrow>
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/range_access.hpp>
 
 using namespace std::string_literals;
 
 namespace sq::results {
 
-using FieldList = field_types::FieldList;
 using FieldPtr = field_types::FieldPtr;
+using FieldList = field_types::FieldList;
+using FieldInputRange = field_types::FieldInputRange;
 using Primitive = field_types::Primitive;
 
 class ResultToResultTreeVisitor
@@ -31,6 +34,46 @@ public:
 private:
     const ast::Ast* ast_;
 };
+
+static FieldPtr range_at(FieldList&& rng, ptrdiff_t index)
+{
+    auto positive_index = index;
+    if (index < 0)
+    {
+        auto size = gsl::narrow<ptrdiff_t>(rng.size());
+        positive_index = size + index;
+        if (positive_index < 0)
+        {
+            throw std::out_of_range("range_at<FieldList>: out of range");
+        }
+    }
+    return std::move(rng.at(gsl::narrow<FieldList::size_type>(positive_index)));
+}
+
+static FieldPtr range_at(FieldInputRange&& rng, ptrdiff_t index)
+{
+    if (index < 0)
+    {
+        // index < 0 means the index is relative to the end of the range, but
+        // we only have an input range so we won't know where the end is until
+        // we get there. We'll have to save the elements of the range in a
+        // container and then work out the element specified by the index.
+        return range_at(rng | ranges::to<std::vector>(), index);
+    }
+    auto it = ranges::begin(rng);
+    const auto end = ranges::end(rng);
+    auto i = index;
+    while (i != 0 && it != end)
+    {
+        --i;
+        ++it;
+    }
+    if (it == end)
+    {
+        throw std::out_of_range("range_at<FieldInputRange>: out of range");
+    }
+    return *it;
+}
 
 static ResultTree::Data data_from_field_ptr(
     const ast::Ast& ast,
@@ -63,10 +106,8 @@ static ResultTree::Data data_from_field_list(
 
     if (std::holds_alternative<ast::ListElementAccessSpec>(filter_spec))
     {
-        const auto index = gsl::narrow<FieldList::size_type>(
-            std::get<ast::ListElementAccessSpec>(filter_spec).index_
-        );
-        return data_from_field_ptr(ast, std::move(list_result.at(index)));
+        const auto index = std::get<ast::ListElementAccessSpec>(filter_spec).index_;
+        return data_from_field_ptr(ast, range_at(std::move(list_result), index));
     }
 
     if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
@@ -83,6 +124,36 @@ static ResultTree::Data data_from_field_list(
     return arr;
 }
 
+static ResultTree::Data data_from_field_input_range(
+    const ast::Ast& ast,
+    FieldInputRange&& range_result)
+{
+    const auto& filter_spec = ast.data().list_filter_spec();
+
+    if (std::holds_alternative<ast::ListElementAccessSpec>(filter_spec))
+    {
+        const auto index = std::get<ast::ListElementAccessSpec>(filter_spec).index_;
+        // TODO: the range_at call below could throw std::out_of_range. When
+        // that happens we should catch and rethrow with the position in the
+        // query that contained the index. Will need to augment the AST
+        // structure to contain that info.
+        return data_from_field_ptr(ast, range_at(std::move(range_result), index));
+    }
+
+    if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
+    {
+        throw NotImplementedError("List slicing has not been implemented");
+    }
+
+    assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
+    auto arr = ResultTree::ArrayData{};
+    for (auto&& result : range_result)
+    {
+        arr.emplace_back(ast, std::move(result));
+    }
+    return arr;
+}
+
 ResultTree::ResultTree(const ast::Ast& ast)
     : ResultTree(ast, field_types::SqRoot::create())
 { }
@@ -90,6 +161,12 @@ ResultTree::ResultTree(const ast::Ast& ast)
 ResultTree::ResultTree(const ast::Ast& ast, FieldList&& list_result)
     : ast_{&ast}
     , data_{data_from_field_list(ast, std::move(list_result))}
+{
+}
+
+ResultTree::ResultTree(const ast::Ast& ast, field_types::FieldInputRange&& result)
+    : ast_{&ast}
+    , data_{data_from_field_input_range(ast, std::move(result))}
 {
 }
 

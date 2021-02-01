@@ -1,44 +1,5 @@
 {
-    "SqRoot": {
-        "path": {
-            "return":  "SqPath",
-            "params": [ 
-                {
-                    "name": "path",
-                    "type": "PrimitiveString",
-                    "required": false
-                }
-            ]
-        },
-        "int": {
-            "return": "SqInt",
-            "params": [
-                {
-                    "name": "value",
-                    "type": "PrimitiveInt",
-                    "required": false
-                }
-            ]
-        },
-        "bool": {
-            "return": "SqBool",
-            "params": [
-                {
-                    "name": "value",
-                    "type": "PrimitiveBool",
-                    "required": false
-                }
-            ]
-        }
-    },
-
     "SqBool": {
-    },
-
-    "SqInt": {
-    },
-
-    "SqFloat": {
     },
 
     "SqDataSize": {
@@ -96,7 +57,10 @@
         }
     },
 
-    "SqString": {
+    "SqFloat": {
+    },
+
+    "SqInt": {
     },
 
     "SqPath": {
@@ -144,5 +108,41 @@
             "return": "SqDataSize",
             "params": []
         }
+    },
+
+    "SqRoot": {
+        "path": {
+            "return":  "SqPath",
+            "params": [ 
+                {
+                    "name": "path",
+                    "type": "PrimitiveString",
+                    "required": false
+                }
+            ]
+        },
+        "int": {
+            "return": "SqInt",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "PrimitiveInt",
+                    "required": false
+                }
+            ]
+        },
+        "bool": {
+            "return": "SqBool",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "PrimitiveBool",
+                    "required": false
+                }
+            ]
+        }
+    },
+
+    "SqString": {
     }
 }

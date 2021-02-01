@@ -5,6 +5,7 @@
 #include "field_types/Primitive.h"
 
 #include <memory>
+#include <range/v3/view/any_view.hpp>
 #include <string_view>
 #include <vector>
 
@@ -15,7 +16,16 @@ class Field;
 
 using FieldPtr = std::unique_ptr<Field>;
 using FieldList = std::vector<FieldPtr>;
-using Result = std::variant<FieldPtr, FieldList>;
+
+using FieldInputRange = ranges::any_view<
+    FieldPtr, ranges::category::input
+>;
+
+using Result = std::variant<
+    FieldPtr,
+    FieldList,
+    FieldInputRange
+>;
 
 class Field
 {

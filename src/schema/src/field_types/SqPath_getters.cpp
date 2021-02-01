@@ -5,6 +5,8 @@
 #include "field_types/SqString.gen.h"
 
 #include <gsl/narrow>
+#include <range/v3/iterator_range.hpp>
+#include <range/v3/view/transform.hpp>
 
 namespace sq::field_types {
 
@@ -35,12 +37,15 @@ Result SqPath::get_stem() const
 
 Result SqPath::get_children() const
 {
-    auto ret = std::vector<FieldPtr>{};
-    for (const auto& dirent : std::filesystem::directory_iterator(impl_))
-    {
-        ret.emplace_back(create(dirent.path()));
-    }
-    return ret;
+    return FieldInputRange{
+        ranges::iterator_range(
+            std::filesystem::directory_iterator{impl_},
+            std::filesystem::directory_iterator{}
+        ) |
+        ranges::views::transform(
+            [](const auto& dirent){ return create(dirent.path()); }
+        )
+    };
 }
 
 Result SqPath::get_parts() const
