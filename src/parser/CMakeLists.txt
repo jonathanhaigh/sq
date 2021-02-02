@@ -56,6 +56,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" IN_LIST SQ_GCC_STYLE_COMPILERS)
      )
 endif()
 
+# Antlr4 doesn't seem to compile as c++20 yet
+set_property(TARGET sq_parser PROPERTY CXX_STANDARD 17)
+
 # Use "SYSTEM" for the generated headers so that clang-tidy and the compiler
 # don't complain about the style used in the generated headers when they are
 # included from cpp files in other targets for which we do want to run static

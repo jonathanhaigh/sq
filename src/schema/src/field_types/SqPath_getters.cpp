@@ -37,7 +37,7 @@ Result SqPath::get_stem() const
 
 Result SqPath::get_children() const
 {
-    return FieldInputRange{
+    return FieldRange<ranges::category::input>{
         ranges::iterator_range(
             std::filesystem::directory_iterator{impl_},
             std::filesystem::directory_iterator{}
@@ -50,12 +50,12 @@ Result SqPath::get_children() const
 
 Result SqPath::get_parts() const
 {
-    auto ret = std::vector<FieldPtr>{};
-    for (const auto& part : impl_)
-    {
-        ret.emplace_back(create(part.string()));
-    }
-    return ret;
+    return FieldRange<ranges::category::bidirectional>{
+        impl_ |
+        ranges::views::transform(
+            [](const auto& part){ return SqString::create(part.string()); }
+        )
+    };
 }
 
 Result SqPath::get_absolute() const

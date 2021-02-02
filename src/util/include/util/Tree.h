@@ -4,6 +4,8 @@
 #include <iterator>
 #include <vector>
 
+#include <iostream>
+
 namespace sq::util {
 
 template <typename T>

@@ -15,16 +15,22 @@ namespace field_types {
 class Field;
 
 using FieldPtr = std::unique_ptr<Field>;
-using FieldList = std::vector<FieldPtr>;
+using FieldVector = std::vector<FieldPtr>;
 
-using FieldInputRange = ranges::any_view<
-    FieldPtr, ranges::category::input
->;
+template <ranges::category Cat>
+using FieldRange = ranges::any_view<FieldPtr, Cat>;
 
 using Result = std::variant<
     FieldPtr,
-    FieldList,
-    FieldInputRange
+    FieldVector,
+    FieldRange<ranges::category::input>,
+    FieldRange<ranges::category::input | ranges::category::sized>,
+    FieldRange<ranges::category::forward>,
+    FieldRange<ranges::category::forward | ranges::category::sized>,
+    FieldRange<ranges::category::bidirectional>,
+    FieldRange<ranges::category::bidirectional | ranges::category::sized>,
+    FieldRange<ranges::category::random_access>,
+    FieldRange<ranges::category::random_access | ranges::category::sized>
 >;
 
 class Field
@@ -40,6 +46,15 @@ protected:
 };
 
 } // namespace field_types
+
+using FieldPtr = field_types::FieldPtr;
+using FieldVector = field_types::FieldVector;
+
+template <ranges::category Cat>
+using FieldRange = field_types::FieldRange<Cat>;
+
+using Result = field_types::Result;
+
 } // namespace sq
 
 #endif // SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
