@@ -27,10 +27,8 @@ public:
     ~ResultTree() noexcept = default;
 
     explicit ResultTree(const ast::Ast& ast);
-    ResultTree(const ast::Ast& ast, field_types::FieldList&& result);
-    ResultTree(const ast::Ast& ast, field_types::FieldInputRange&& result);
-    ResultTree(const ast::Ast& ast, field_types::FieldPtr&& result);
-    ResultTree(const ast::Ast& ast, field_types::Primitive&& result);
+    ResultTree(const ast::Ast& ast, field_types::Result&& result);
+    ResultTree(const ast::Ast& ast, Data&& data);
 
     const ast::Ast& ast() const { return *ast_; }
 

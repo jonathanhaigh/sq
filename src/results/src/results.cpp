@@ -1,8 +1,6 @@
 #include "results/results.h"
 
-#include "exceptions/NotImplementedError.h"
 #include "field_types/SqRoot.gen.h"
-#include "field_types/SqRootImpl.h"
 
 #include <cassert>
 #include <gsl/narrow>
@@ -21,23 +19,9 @@ using FieldPtr = field_types::FieldPtr;
 using FieldList = field_types::FieldList;
 using FieldInputRange = field_types::FieldInputRange;
 using Primitive = field_types::Primitive;
-
-class ResultToResultTreeVisitor
-{
-public:
-    explicit ResultToResultTreeVisitor(const ast::Ast& ast)
-        : ast_{&ast}
-    { }
-
-    template <typename ResultType>
-    ResultTree operator()(ResultType&& result) const
-    {
-        return ResultTree(*ast_, std::forward<ResultType>(result));
-    }
-
-private:
-    const ast::Ast* ast_;
-};
+using Data = ResultTree::Data;
+using ObjData = ResultTree::ObjData;
+using ArrayData = ResultTree::ArrayData;
 
 static FieldPtr range_at(FieldList&& rng, ptrdiff_t index)
 {
@@ -79,29 +63,6 @@ static FieldPtr range_at(FieldInputRange&& rng, ptrdiff_t index)
     return *it;
 }
 
-static ResultTree::Data data_from_field_ptr(
-    const ast::Ast& ast,
-    FieldPtr&& result)
-{
-    if (ast.children().empty())
-    {
-        return result->to_primitive();
-    }
-
-    auto obj = ResultTree::ObjData{};
-    for (const auto& child : ast.children())
-    {
-        const auto& field_name = child.data().name();
-        const auto& params = child.data().params();
-        const auto visitor = ResultToResultTreeVisitor(child);
-        obj.emplace_back(
-            field_name,
-            std::visit(visitor, result->get(field_name, params))
-        );
-    }
-    return obj;
-}
-
 static ptrdiff_t normalize_range_index(ptrdiff_t index, ptrdiff_t range_size)
 {
     if (index < 0)
@@ -112,9 +73,9 @@ static ptrdiff_t normalize_range_index(ptrdiff_t index, ptrdiff_t range_size)
 }
 
 template <typename R>
-static ResultTree::ArrayData create_array_data(const ast::Ast& ast, R&& rng)
+static ArrayData create_array_data(const ast::Ast& ast, R&& rng)
 {
-    auto arr = ResultTree::ArrayData{};
+    auto arr = ArrayData{};
     for (auto&& result : rng)
     {
         arr.emplace_back(ast, std::move(result));
@@ -122,62 +83,115 @@ static ResultTree::ArrayData create_array_data(const ast::Ast& ast, R&& rng)
     return arr;
 }
 
-static ResultTree::Data data_from_field_list(
+static Data data_from_slice(
     const ast::Ast& ast,
+    const ast::ListSliceSpec& spec,
     FieldList&& list_result)
 {
-    const auto& filter_spec = ast.data().list_filter_spec();
+    // The range-v3 library has a slice function but it's not quite enough
+    // to emulate Python's slices directly. Specifically:
+    // * range-v3's slice doesn't have a step/stride parameter. range-v3
+    //   does have a "stride" view, but it doesn't support negative
+    //   strides.
+    // * range-v3's slice supports negative indexes, but only by providing
+    //   overloads with different signatures, which means it's not ideal
+    //   for our use here.
+    // We therefore will:
+    // * Convert negative indeces into positive ones.
+    // * Make adjustments for negative steps/strides. 
 
-    if (std::holds_alternative<ast::ListElementAccessSpec>(filter_spec))
+    const auto size = gsl::narrow<ptrdiff_t>(list_result.size());
+    const auto step = spec.step_.value_or(1);
+    assert(step != 0);
+
+    if (step > 0)
     {
-        const auto index = std::get<ast::ListElementAccessSpec>(filter_spec).index_;
-        return data_from_field_ptr(ast, range_at(std::move(list_result), index));
-    }
-
-    if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
-    {
-        const auto& spec = std::get<ast::ListSliceSpec>(filter_spec);
-        const auto size = gsl::narrow<ptrdiff_t>(list_result.size());
-        const auto step = spec.step_.value_or(1);
-        assert(step != 0);
-        const bool reverse = step < 0;
-
-        const auto start = normalize_range_index(
-            spec.start_.value_or(reverse? size : 0),
-            size
-        );
-
-        const auto stop = normalize_range_index(
-            spec.stop_.value_or(reverse? 0 : size),
-            size
-        );
-
-        if (reverse)
-        {
-            if (start < stop) { return ResultTree::ArrayData{}; }
-            auto rng = list_result |
-                   ranges::views::reverse |
-                   ranges::views::slice(size - start, size - stop) |
-                   ranges::views::stride(-step);
-
-            return create_array_data(ast, rng);
-        }
-        if (start > stop) { return ResultTree::ArrayData{}; }
+        const auto start = normalize_range_index(spec.start_.value_or(0), size);
+        const auto stop = normalize_range_index(spec.stop_.value_or(size), size);
+        if (start > stop) { return ArrayData{}; }
         auto rng = list_result |
                ranges::views::slice(start, stop) |
                ranges::views::stride(step);
         return create_array_data(ast, rng);
     }
 
-    assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
-    return create_array_data(ast, std::move(list_result));
+    const auto stop = 1 + normalize_range_index(spec.start_.value_or(size - 1), size);
+    auto start = std::ptrdiff_t{0};
+    if (spec.stop_)
+    {
+        start = 1 + normalize_range_index(spec.stop_.value(), size);
+    }
+    if (start > stop) { return ArrayData{}; }
+    auto rng = list_result |
+           ranges::views::slice(start, stop) |
+           ranges::views::reverse |
+           ranges::views::stride(-step);
+    return create_array_data(ast, rng);
 }
 
-static ResultTree::Data data_from_field_input_range(
+static Data data_from_slice(
     const ast::Ast& ast,
+    const ast::ListSliceSpec& spec,
     FieldInputRange&& range_result)
 {
-    const auto& filter_spec = ast.data().list_filter_spec();
+    const auto start = spec.start_.value_or(0);
+    const auto step = spec.step_.value_or(1);
+    if (start < 0 || spec.stop_ || step < 0)
+    {
+        // We can't handle these cases for an input range so we'll have to
+        // save the data to a FieldList and work with that.
+        return data_from_slice(ast, spec, range_result | ranges::to<std::vector>());
+    }
+    auto rng = range_result |
+           ranges::views::drop(start) |
+           ranges::views::stride(step);
+    return create_array_data(ast, std::move(rng));
+}
+
+
+
+class ResultToDataVisitor
+{
+public:
+    explicit ResultToDataVisitor(const ast::Ast& ast)
+        : ast_{&ast}
+    { }
+
+    Data operator()(FieldPtr&& field_ptr) const;
+    Data operator()(FieldList&& field_list) const;
+    Data operator()(FieldInputRange&& field_range) const;
+
+private:
+    const ast::Ast* ast_;
+};
+
+Data ResultToDataVisitor::operator()(FieldPtr&& field_ptr) const
+{
+    if (ast_->children().empty())
+    {
+        return field_ptr->to_primitive();
+    }
+
+    auto obj = ObjData{};
+    for (const auto& child : ast_->children())
+    {
+        const auto& field_name = child.data().name();
+        const auto& params = child.data().params();
+        const auto visitor = ResultToDataVisitor{child};
+        obj.emplace_back(
+            field_name,
+            ResultTree{
+                child,
+                std::visit(visitor, field_ptr->get(field_name, params))
+            }
+        );
+    }
+    return obj;
+}
+
+Data ResultToDataVisitor::operator()(FieldList&& field_list) const
+{
+    const auto& filter_spec = ast_->data().list_filter_spec();
 
     if (std::holds_alternative<ast::ListElementAccessSpec>(filter_spec))
     {
@@ -186,56 +200,57 @@ static ResultTree::Data data_from_field_input_range(
         // that happens we should catch and rethrow with the position in the
         // query that contained the index. Will need to augment the AST
         // structure to contain that info.
-        return data_from_field_ptr(ast, range_at(std::move(range_result), index));
+        return (*this)(range_at(std::move(field_list), index));
+    }
+
+    if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
+    {
+        const auto spec = std::get<ast::ListSliceSpec>(filter_spec);
+        return data_from_slice(*ast_, spec, std::move(field_list));
+    }
+
+    assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
+    return create_array_data(*ast_, std::move(field_list));
+}
+
+Data ResultToDataVisitor::operator()(FieldInputRange&& field_range) const
+{
+    const auto& filter_spec = ast_->data().list_filter_spec();
+
+    if (std::holds_alternative<ast::ListElementAccessSpec>(filter_spec))
+    {
+        const auto index = std::get<ast::ListElementAccessSpec>(filter_spec).index_;
+        // TODO: the range_at call below could throw std::out_of_range. When
+        // that happens we should catch and rethrow with the position in the
+        // query that contained the index. Will need to augment the AST
+        // structure to contain that info.
+        return (*this)(range_at(std::move(field_range), index));
     }
 
     if (std::holds_alternative<ast::ListSliceSpec>(filter_spec))
     {
         const auto& spec = std::get<ast::ListSliceSpec>(filter_spec);
-        const auto start = spec.start_.value_or(0);
-        const auto step = spec.step_.value_or(1);
-        if (start < 0 || spec.stop_ || step < 0)
-        {
-            // We can't handle these cases for an input range so we'll have to
-            // save the data to a vector to get a random access range
-            return data_from_field_list(ast, range_result | ranges::to<std::vector>());
-        }
-        auto rng = range_result |
-               ranges::views::drop(start) |
-               ranges::views::stride(step);
-        return create_array_data(ast, std::move(rng));
+        return data_from_slice(*ast_, spec, std::move(field_range));
     }
 
     assert(std::holds_alternative<ast::NoListFilterSpec>(filter_spec));
-    return create_array_data(ast, std::move(range_result));
+    return create_array_data(*ast_, std::move(field_range));
 }
+
 
 ResultTree::ResultTree(const ast::Ast& ast)
-    : ResultTree(ast, field_types::SqRoot::create())
+    : ResultTree{ast, field_types::SqRoot::create()}
 { }
 
-ResultTree::ResultTree(const ast::Ast& ast, FieldList&& list_result)
-    : ast_{&ast}
-    , data_{data_from_field_list(ast, std::move(list_result))}
-{
-}
-
-ResultTree::ResultTree(const ast::Ast& ast, field_types::FieldInputRange&& result)
-    : ast_{&ast}
-    , data_{data_from_field_input_range(ast, std::move(result))}
-{
-}
-
-ResultTree::ResultTree(const ast::Ast& ast, FieldPtr&& result)
-    :ast_{&ast}
-    , data_{data_from_field_ptr(ast, std::move(result))}
-{
-}
-
-ResultTree::ResultTree(const ast::Ast& ast, Primitive&& result)
-    : ast_{&ast}
-    , data_{std::move(result)}
+ResultTree::ResultTree(const ast::Ast& ast, field_types::Result&& result)
+    : ResultTree{ast, std::visit(ResultToDataVisitor{ast}, std::move(result))}
 { }
+
+ResultTree::ResultTree(const ast::Ast& ast, Data&& data)
+    : ast_{&ast}
+    , data_{std::move(data)}
+{ }
+
 
 ResultTree generate_results(const ast::Ast& ast)
 {
