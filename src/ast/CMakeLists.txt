@@ -4,8 +4,8 @@ set(SQ_AST_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_library(sq_ast
     "${SQ_AST_INCLUDE_DIR}/ast/ast.h"
     "${SQ_AST_SRC_DIR}/ast.cpp"
-    "${SQ_AST_INCLUDE_DIR}/ast/ListFilterSpec.h"
-    "${SQ_AST_SRC_DIR}/ListFilterSpec.cpp"
+    "${SQ_AST_INCLUDE_DIR}/ast/FilterSpec.h"
+    "${SQ_AST_SRC_DIR}/FilterSpec.cpp"
     "${SQ_AST_INCLUDE_DIR}/ast/ParseError.h"
     "${SQ_AST_SRC_DIR}/ParseError.cpp"
 )

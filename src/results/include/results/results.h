@@ -3,6 +3,7 @@
 
 #include "ast/ast.h"
 #include "field_types/Field.h"
+#include "results/ResultView.h"
 
 #include <string>
 #include <utility>
@@ -26,8 +27,7 @@ public:
     ResultTree& operator=(ResultTree&& other) = default;
     ~ResultTree() noexcept = default;
 
-    explicit ResultTree(const ast::Ast& ast);
-    ResultTree(const ast::Ast& ast, field_types::Result&& result);
+    ResultTree(const ast::Ast& ast, ResultView&& result);
     ResultTree(const ast::Ast& ast, Data&& data);
 
     const ast::Ast& ast() const { return *ast_; }

@@ -75,6 +75,8 @@ class TypeHeaderWriter(FileWriter):
         self.writel()
         self.write_create()
         self.writel()
+        self.write_sq_type()
+        self.writel()
         self.write_dtor()
         self.write_generic_getter_decl()
         for member, member_info in self._info.items():
@@ -93,6 +95,12 @@ class TypeHeaderWriter(FileWriter):
         self.writeli(1, "{")
         self.writeli(2, f"return std::make_unique<{self._name}>(std::forward<Ts>(args)...);")
         self.writeli(1, "}")
+
+    def write_sq_type(self):
+        self.writeli(1, "static const char* sq_type()")
+        self.writeli(1, "{");
+        self.writeli(2, f"return \"{self._name}\";")
+        self.writeli(1, "}");
 
     def write_dtor(self):
         self.writeli(1, f"~{self._name}() noexcept override = default;")

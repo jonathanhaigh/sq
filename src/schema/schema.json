@@ -131,6 +131,21 @@
                 }
             ]
         },
+        "ints": {
+            "return": "[SqInt]",
+            "params": [
+                {
+                    "name": "start",
+                    "type": "PrimitiveInt",
+                    "required": false
+                },
+                {
+                    "name": "stop",
+                    "type": "PrimitiveInt",
+                    "required": false
+                }
+            ]
+        },
         "bool": {
             "return": "SqBool",
             "params": [

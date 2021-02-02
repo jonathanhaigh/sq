@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
     }
     os << ast_data.name()
        << "(" << ast_data.params() << ")"
-       << "[" << util::variant_to_str(ast_data.list_filter_spec()) << "]";
+       << "[" << util::variant_to_str(ast_data.filter_spec()) << "]";
 
     return os;
 }
@@ -49,9 +49,9 @@ static void parse_field_call(Ast& parent, FieldCall& fc);
 static void parse_parameters(Ast& parent, ParameterList& pl);
 static void parse_parameter(Ast& parent, Parameter& p);
 static void parse_list_filter(Ast& parent, ListFilter& lf);
-static ListElementAccessSpec parse_list_element_access(ListElementAccess& lea);
-static ListSliceSpec parse_simple_list_slice(SimpleListSlice& sls);
-static ListSliceSpec parse_list_slice(ListSlice& ls);
+static ElementAccessSpec parse_list_element_access(ListElementAccess& lea);
+static SliceSpec parse_simple_list_slice(SimpleListSlice& sls);
+static SliceSpec parse_list_slice(ListSlice& ls);
 static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
 template <typename T> static T parse_integer(TerminalNode& i);
 static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
@@ -155,33 +155,33 @@ static void parse_list_filter(Ast& parent, ListFilter& lf)
     {
         assert(sls_ptr == nullptr);
         assert(ls_ptr == nullptr);
-        parent.data().list_filter_spec() = parse_list_element_access(*lea_ptr);
+        parent.data().filter_spec() = parse_list_element_access(*lea_ptr);
         return;
     }
 
     if (sls_ptr != nullptr)
     {
         assert(ls_ptr == nullptr);
-        parent.data().list_filter_spec() = parse_simple_list_slice(*sls_ptr);
+        parent.data().filter_spec() = parse_simple_list_slice(*sls_ptr);
         return;
     }
 
     assert(ls_ptr != nullptr);
-    parent.data().list_filter_spec() = parse_list_slice(*ls_ptr);
+    parent.data().filter_spec() = parse_list_slice(*ls_ptr);
 }
 
-static ListElementAccessSpec parse_list_element_access(ListElementAccess& lea)
+static ElementAccessSpec parse_list_element_access(ListElementAccess& lea)
 {
     assert(lea.INTEGER() != nullptr);
 
-    return ListElementAccessSpec{
+    return ElementAccessSpec{
         parse_integer<std::ptrdiff_t>(*(lea.INTEGER()))
    };
 }
 
-static ListSliceSpec parse_simple_list_slice(SimpleListSlice& sls)
+static SliceSpec parse_simple_list_slice(SimpleListSlice& sls)
 {
-    ListSliceSpec ret;
+    SliceSpec ret;
 
     if (sls.list_slice_start() != nullptr)
     {
@@ -197,9 +197,9 @@ static ListSliceSpec parse_simple_list_slice(SimpleListSlice& sls)
     return ret;
 }
 
-static ListSliceSpec parse_list_slice(ListSlice& ls)
+static SliceSpec parse_list_slice(ListSlice& ls)
 {
-    ListSliceSpec ret;
+    SliceSpec ret;
 
     if (ls.list_slice_start() != nullptr)
     {
