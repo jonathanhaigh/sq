@@ -4,6 +4,8 @@ if(${CMAKE_VERSION} VERSION_LESS 3.15)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+add_subdirectory(3rdparty)
+
 project(Sq
     VERSION 0.0.1
     DESCRIPTION "Command line tool to obtain system information in JSON"
@@ -48,5 +50,4 @@ endif()
 
 add_compile_options(${SQ_WARNING_FLAGS})
 
-add_subdirectory(3rdparty)
 add_subdirectory(src)
