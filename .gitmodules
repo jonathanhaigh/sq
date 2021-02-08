@@ -10,3 +10,7 @@
 	path = 3rdparty/range-v3
 	url = https://github.com/ericniebler/range-v3
 	branch = 0.11.0
+[submodule "3rdparty/googletest"]
+	path = 3rdparty/googletest
+	url = https://github.com/google/googletest
+	branch = release-1.10.0
