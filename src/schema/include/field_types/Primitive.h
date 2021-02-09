@@ -5,7 +5,7 @@
 #include <variant>
 #include <cstdint>
 
-namespace sq::field_types {
+namespace sq {
 
 using PrimitiveString = std::string;
 using PrimitiveInt = std::int64_t;
@@ -19,6 +19,6 @@ using Primitive = std::variant<
     PrimitiveBool
 >;
 
-} // namespace sq::field_types
+} // namespace sq
 
 #endif // SQ_INCLUDE_GUARD_FIELD_TYPES_Primitive_h_

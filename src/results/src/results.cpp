@@ -9,7 +9,6 @@ using namespace std::string_literals;
 
 namespace sq::results {
 
-using Primitive = field_types::Primitive;
 using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
 using ArrayData = ResultTree::ArrayData;

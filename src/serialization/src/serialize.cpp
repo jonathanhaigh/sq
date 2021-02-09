@@ -20,7 +20,7 @@ public:
         : writer_{&writer}
     { }
 
-    void operator()(const field_types::PrimitiveString& str)
+    void operator()(const PrimitiveString& str)
     {
         // RapidJSON's String's size type can be smaller than
         // std::string::size_type so we have to narrow here.
@@ -31,17 +31,17 @@ public:
         );
     }
 
-    void operator()(const field_types::PrimitiveInt& i)
+    void operator()(const PrimitiveInt& i)
     {
         writer_->Int64(i);
     }
 
-    void operator()(const field_types::PrimitiveBool& b)
+    void operator()(const PrimitiveBool& b)
     {
         writer_->Bool(b);
     }
 
-    void operator()(const field_types::PrimitiveFloat& f)
+    void operator()(const PrimitiveFloat& f)
     {
         writer_->Double(f);
     }
@@ -79,7 +79,7 @@ public:
         writer_->EndArray();
     }
 
-    void operator()(const results::ResultTree::PrimitiveData& prim)
+    void operator()(const Primitive& prim)
     {
         std::visit(RjPrimitiveVisitor{*writer_}, prim); 
     }

@@ -6,10 +6,36 @@
 
 namespace sq::ast {
 
+std::ostream& operator<<(std::ostream& os, [[maybe_unused]] NoFilterSpec nlfs)
+{
+    return os;
+}
+
+bool operator==([[maybe_unused]] NoFilterSpec lhs, [[maybe_unused]] NoFilterSpec rhs)
+{
+    return true;
+}
+
+bool operator!=([[maybe_unused]] NoFilterSpec lhs, [[maybe_unused]] NoFilterSpec rhs)
+{
+    return !(lhs == rhs);
+}
+
+
 std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas)
 {
     os << leas.index_;
     return os;
+}
+
+bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs)
+{
+    return lhs.index_ == rhs.index_;
+}
+
+bool operator!=(ElementAccessSpec lhs, ElementAccessSpec rhs)
+{
+    return !(lhs == rhs);
 }
 
 std::ostream& operator<<(std::ostream& os, SliceSpec lss)
@@ -22,9 +48,16 @@ std::ostream& operator<<(std::ostream& os, SliceSpec lss)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, [[maybe_unused]] NoFilterSpec nlfs)
+bool operator==(const SliceSpec& lhs, const SliceSpec& rhs)
 {
-    return os;
+    return lhs.start_ == rhs.start_ &&
+           lhs.stop_ == rhs.stop_ &&
+           lhs.step_ == rhs.step_;
+}
+
+bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs)
+{
+    return !(lhs == rhs);
 }
 
 } // namespace sq::ast

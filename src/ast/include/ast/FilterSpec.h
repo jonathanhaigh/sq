@@ -11,12 +11,16 @@ namespace sq::ast {
 
 struct NoFilterSpec { };
 std::ostream& operator<<(std::ostream& os, NoFilterSpec nlfs);
+bool operator==(NoFilterSpec lhs, NoFilterSpec rhs);
+bool operator!=(NoFilterSpec lhs, NoFilterSpec rhs);
 
 struct ElementAccessSpec
 {
     std::ptrdiff_t index_;
 };
 std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas);
+bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs);
+bool operator!=(ElementAccessSpec lhs, ElementAccessSpec rhs);
 
 struct SliceSpec
 {
@@ -25,6 +29,8 @@ struct SliceSpec
     std::optional<std::ptrdiff_t> step_;
 };
 std::ostream& operator<<(std::ostream& os, SliceSpec lss);
+bool operator==(const SliceSpec& lhs, const SliceSpec& rhs);
+bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs);
 
 using FilterSpec = std::variant<
     NoFilterSpec,

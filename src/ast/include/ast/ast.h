@@ -28,18 +28,20 @@ public:
 
     const std::string& name() const { return name_; }
 
-    const field_types::FieldCallParams& params() const { return params_; }
-    field_types::FieldCallParams& params() { return params_; }
+    const FieldCallParams& params() const { return params_; }
+    FieldCallParams& params() { return params_; }
 
     const FilterSpec& filter_spec() const { return filter_spec_; }
     FilterSpec& filter_spec() { return filter_spec_; }
 
 private:
     std::string name_;
-    field_types::FieldCallParams params_;
+    FieldCallParams params_;
     FilterSpec filter_spec_;
 };
 std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
+bool operator==(const AstData& lhs, const AstData& rhs);
+bool operator!=(const AstData& lhs, const AstData& rhs);
 
 using Ast = util::MoveOnlyTree<AstData>;
 

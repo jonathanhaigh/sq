@@ -3,6 +3,7 @@
 
 #include "ast/ast.h"
 #include "field_types/Field.h"
+#include "field_types/Primitive.h"
 #include "results/ResultView.h"
 
 #include <string>
@@ -16,8 +17,7 @@ class ResultTree {
 public:
     using ObjData = std::vector<std::pair<std::string, ResultTree>>;
     using ArrayData = std::vector<ResultTree>;
-    using PrimitiveData = field_types::Primitive;
-    using Data = std::variant<ObjData, ArrayData, PrimitiveData>;
+    using Data = std::variant<ObjData, ArrayData, Primitive>;
 
     ResultTree() = delete;
     ResultTree(const ResultTree&) = delete;

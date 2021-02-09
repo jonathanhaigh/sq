@@ -1,9 +1,9 @@
 #include "results/Filter.h"
 
 #include "exceptions/SqException.h"
-#include "util/typeutil.h" // for util::disable_lvalues_t
+#include "util/typeutil.h"
 
-#include <cstddef> // For std::ptrdiff_t
+#include <cstddef>
 #include <gsl/narrow>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_access.hpp>
@@ -14,6 +14,7 @@
 #include <range/v3/view/slice.hpp>
 #include <range/v3/view/stride.hpp>
 #include <range/v3/view/take.hpp>
+#include <sstream>
 
 namespace sq::results {
 

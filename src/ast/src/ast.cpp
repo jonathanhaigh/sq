@@ -4,6 +4,7 @@
 #include "field_types/Primitive.h"
 #include "parser/SqLexer.h"
 #include "parser/SqParser.h"
+#include "util/strutil.h"
 
 #include <cassert>
 #include <charconv>
@@ -43,6 +44,17 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data)
     return os;
 }
 
+bool operator==(const AstData& lhs, const AstData& rhs)
+{
+    return lhs.name() == rhs.name() &&
+           lhs.params() == rhs.params() &&
+           lhs.filter_spec() == rhs.filter_spec();
+}
+bool operator!=(const AstData& lhs, const AstData& rhs)
+{
+    return !(lhs == rhs);
+}
+
 static void parse_field_tree(Ast& parent, FieldTree& ft);
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl);
 static void parse_field_call(Ast& parent, FieldCall& fc);
@@ -52,10 +64,10 @@ static void parse_list_filter(Ast& parent, ListFilter& lf);
 static ElementAccessSpec parse_list_element_access(ListElementAccess& lea);
 static SliceSpec parse_simple_list_slice(SimpleListSlice& sls);
 static SliceSpec parse_list_slice(ListSlice& ls);
-static field_types::Primitive  parse_primitive_value(PrimitiveValue& pl);
+static Primitive  parse_primitive_value(PrimitiveValue& pl);
 template <typename T> static T parse_integer(TerminalNode& i);
-static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s);
-static field_types::PrimitiveBool parse_boolean(Boolean& b);
+static PrimitiveString parse_dq_str(TerminalNode& dq_s);
+static PrimitiveBool parse_boolean(Boolean& b);
 
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
@@ -221,11 +233,11 @@ static SliceSpec parse_list_slice(ListSlice& ls)
     return ret;
 }
 
-static field_types::Primitive parse_primitive_value(PrimitiveValue& pl)
+static Primitive parse_primitive_value(PrimitiveValue& pl)
 {
     if (pl.INTEGER() != nullptr)
     {
-        return parse_integer<field_types::PrimitiveInt>(*(pl.INTEGER()));
+        return parse_integer<PrimitiveInt>(*(pl.INTEGER()));
     }
     if (pl.DQ_STR() != nullptr)
     {
@@ -264,15 +276,15 @@ static T parse_integer(TerminalNode& i)
     return value;
 }
 
-static field_types::PrimitiveString parse_dq_str(TerminalNode& dq_s)
+static PrimitiveString parse_dq_str(TerminalNode& dq_s)
 {
     auto ss = std::stringstream{dq_s.getText()};
-    auto ret = field_types::PrimitiveString{};
+    auto ret = PrimitiveString{};
     ss >> quoted(ret);
     return ret;
 }
 
-static field_types::PrimitiveBool parse_boolean(Boolean& b)
+static PrimitiveBool parse_boolean(Boolean& b)
 {
     if (b.BOOLEAN_TRUE() != nullptr)
     {

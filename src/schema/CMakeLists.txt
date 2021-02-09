@@ -78,6 +78,7 @@ set(SQ_TYPE_NOGEN_SRC
     ${SQ_TYPE_GETTER_SRC}
     ${SQ_TYPE_IMPL_SRC}
     "${SQ_TYPE_NOGEN_SRC_DIR}/Field.cpp"
+    "${SQ_TYPE_NOGEN_SRC_DIR}/FieldCallParams.cpp"
     "${SQ_TYPE_NOGEN_SRC_DIR}/Primitive.cpp"
     "${SQ_TYPE_NOGEN_SRC_DIR}/InvalidFieldError.cpp"
 )
