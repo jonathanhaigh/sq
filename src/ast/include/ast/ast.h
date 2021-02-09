@@ -3,7 +3,7 @@
 
 #include "ast/FilterSpec.h"
 #include "field_types/FieldCallParams.h"
-#include "util/Tree.h"
+#include "util/MoveOnlyTree.h"
 
 #include <iosfwd>
 #include <string>
@@ -41,7 +41,7 @@ private:
 };
 std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
 
-using Ast = util::Tree<AstData>;
+using Ast = util::MoveOnlyTree<AstData>;
 
 Ast generate_ast(const std::string& sq_command);
 
