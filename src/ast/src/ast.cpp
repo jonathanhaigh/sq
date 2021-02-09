@@ -13,6 +13,7 @@
 #include <string>
 
 namespace sp = sq::parser;
+using Query = sp::SqParser::QueryContext;
 using FieldTreeList = sp::SqParser::Field_tree_listContext;
 using FieldTree = sp::SqParser::Field_treeContext;
 using DotExpression = sp::SqParser::Dot_expressionContext;
@@ -55,6 +56,7 @@ bool operator!=(const AstData& lhs, const AstData& rhs)
     return !(lhs == rhs);
 }
 
+static void parse_query(Ast& parent, Query& q);
 static void parse_field_tree(Ast& parent, FieldTree& ft);
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl);
 static void parse_field_call(Ast& parent, FieldCall& fc);
@@ -68,6 +70,13 @@ static Primitive  parse_primitive_value(PrimitiveValue& pl);
 template <typename T> static T parse_integer(TerminalNode& i);
 static PrimitiveString parse_dq_str(TerminalNode& dq_s);
 static PrimitiveBool parse_boolean(Boolean& b);
+
+static void parse_query(Ast& parent, Query& q)
+{
+    auto *const ftl_ptr = q.field_tree_list();
+    assert(ftl_ptr != nullptr);
+    return parse_field_tree_list(parent, *ftl_ptr);
+}
 
 static void parse_field_tree_list(Ast& parent, FieldTreeList& ftl)
 {
@@ -322,10 +331,10 @@ Ast generate_ast(const std::string& sq_command)
     auto parser = sp::SqParser{&token_stream};
     parser.removeErrorListeners();
     parser.addErrorListener(&error_listener);
-    auto* const ftl_ptr = parser.field_tree_list();
+    auto* const ftl_ptr = parser.query();
     assert(ftl_ptr);
     auto root = Ast{""};
-    parse_field_tree_list(root, *ftl_ptr);
+    parse_query(root, *ftl_ptr);
     return root;
 }
 

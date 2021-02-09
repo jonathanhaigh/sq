@@ -12,16 +12,12 @@ set(SQ_ANTLR4_GEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 set(SQ_ANTLR4_GEN_DIR "${SQ_ANTLR4_GEN_INCLUDE_DIR}/parser")
 
 set(SQ_ANTLR4_GEN_HEADERS
-    "${SQ_ANTLR4_GEN_DIR}/SqBaseVisitor.h"
     "${SQ_ANTLR4_GEN_DIR}/SqLexer.h"
-    "${SQ_ANTLR4_GEN_DIR}/SqVisitor.h"
     "${SQ_ANTLR4_GEN_DIR}/SqParser.h"
 )
 
 set (SQ_ANTLR4_GEN_SRC
-    "${SQ_ANTLR4_GEN_DIR}/SqBaseVisitor.cpp"
     "${SQ_ANTLR4_GEN_DIR}/SqLexer.cpp"
-    "${SQ_ANTLR4_GEN_DIR}/SqVisitor.cpp"
     "${SQ_ANTLR4_GEN_DIR}/SqParser.cpp"
 )
 
@@ -33,7 +29,7 @@ add_custom_command(
         -Dlanguage=Cpp
         -Werror
         -no-listener
-        -visitor
+        -no-visitor
         -package "sq::parser"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sq.g4"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Sq.g4"

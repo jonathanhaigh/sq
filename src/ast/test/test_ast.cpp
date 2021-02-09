@@ -1,5 +1,6 @@
 #include "ast/ast.h"
 #include "ast/FilterSpec.h"
+#include "ast/ParseError.h"
 #include "util/strutil.h"
 
 
@@ -72,12 +73,15 @@ TEST(AstTest, DotExpression)
     expect_plain_leaf(b, "b");
 }
 
-TEST(AstTest, BraceExpression)
+TEST(AstTest, EquivalentQueries)
 {
     expect_equivalent_query("a { b }", "a.b");
     expect_equivalent_query("a { b { c } }", "a.b.c");
     expect_equivalent_query("a { b { c { d } } }", "a.b.c.d");
+}
 
+TEST(AstTest, BraceExpression)
+{
     const auto root = generate_ast("a { b c }");
     expect_root(root, 1);
 
@@ -118,17 +122,17 @@ TEST_P(SimpleAstTest, SimpleTest)
 }
 
 template <typename T>
-Primitive to_primitive(T&& v)
+static Primitive to_primitive(T&& v)
 {
     return std::forward<T>(v);
 }
 
-Primitive to_primitive(int v)
+static Primitive to_primitive(int v)
 {
     return static_cast<PrimitiveInt>(v);
 }
 
-Primitive to_primitive(const char* v)
+static Primitive to_primitive(const char* v)
 {
     return PrimitiveString(v);
 }
@@ -168,6 +172,44 @@ INSTANTIATE_TEST_SUITE_P(
         SimpleTestCase{"a(true)", pos_params(true), no_filter_spec},
         SimpleTestCase{"a(false)", pos_params(false), no_filter_spec},
         SimpleTestCase{"a(1, 2, 3, 4)", pos_params(1, 2, 3, 4), no_filter_spec}
+    )
+);
+
+class InvalidQueryTest : public testing::TestWithParam<const char*> { };
+
+TEST_P(InvalidQueryTest, InvalidQuery)
+{
+    try {
+        const auto ast = generate_ast(GetParam());
+        FAIL() << "Expected SqParseError; ast = " << ast;
+    }
+    catch(const SqParseError& e)
+    {
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    InvalidQueryTestInstantiation,
+    InvalidQueryTest,
+    testing::Values(
+        ".a",
+        "a.",
+        "{",
+        "a {",
+        "}",
+        "a }",
+        "a { }",
+        "{ }",
+        "{ } a",
+        "{ } a",
+        "a(",
+        "a)",
+        "a(1",
+        "a(\"str)",
+        "a(p=)",
+        "a(p)",
+        "a(p=1,2)"
+        "a(p-x)"
     )
 );
 

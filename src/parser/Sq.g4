@@ -1,5 +1,6 @@
 grammar Sq;
 
+query: field_tree_list EOF;
 field_tree_list: field_tree (field_tree)*;
 field_tree: dot_expression (brace_expression)?;
 brace_expression: '{' field_tree_list '}';
