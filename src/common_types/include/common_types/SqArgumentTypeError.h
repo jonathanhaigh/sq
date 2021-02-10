@@ -13,13 +13,8 @@ class SqArgumentTypeError
 {
 public:
     SqArgumentTypeError(const Primitive& received, std::string_view type_expected);
-
-    template <typename Expected>
-    static SqArgumentTypeError create(const Primitive& received);
 };
 
 } // namespace sq
-
-#include "SqArgumentTypeError.inl.h"
 
 #endif // SQ_INCLUDE_GUARD_common_types_SqArgumentTypeError_h_

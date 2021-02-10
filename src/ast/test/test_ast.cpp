@@ -23,14 +23,14 @@ void expect_node(
     const Size noof_children
 )
 {
-    auto ss = std::ostringstream{};
-    ss << "expect_node(node, "
+    SCOPED_TRACE(testing::Message()
+        << "expect_node(node, "
         << std::quoted(name) << ", "
         << params << ", "
         << util::variant_to_str(filter_spec) << ", "
         << noof_children
-        << ")";
-    SCOPED_TRACE(ss.str());
+        << ")"
+    );
     EXPECT_EQ(node.data().name(), name);
     EXPECT_EQ(node.data().params(), params);
     EXPECT_EQ(node.data().filter_spec(), filter_spec);
@@ -57,9 +57,11 @@ void expect_root(const Ast& node, const Size noof_children)
 
 void expect_equivalent_query(const char* const q1, const char* const q2)
 {
-    auto ss = std::ostringstream{};
-    ss << "expect_equivalent_query(" << q1 << ", " << q2 << ")";
-    SCOPED_TRACE(ss.str());
+    SCOPED_TRACE(testing::Message()
+        << "expect_equivalent_query("
+        << q1 << ", "
+        << q2 << ")"
+    );
     ASSERT_EQ(generate_ast(q1), generate_ast(q2));
 }
 
