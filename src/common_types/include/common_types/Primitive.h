@@ -1,5 +1,5 @@
-#ifndef SQ_INCLUDE_GUARD_FIELD_TYPES_Primitive_h_
-#define SQ_INCLUDE_GUARD_FIELD_TYPES_Primitive_h_
+#ifndef SQ_INCLUDE_GUARD_common_types_Primitive_h_
+#define SQ_INCLUDE_GUARD_common_types_Primitive_h_
 
 #include <string>
 #include <variant>
@@ -21,4 +21,4 @@ using Primitive = std::variant<
 
 } // namespace sq
 
-#endif // SQ_INCLUDE_GUARD_FIELD_TYPES_Primitive_h_
+#endif // SQ_INCLUDE_GUARD_common_types_Primitive_h_

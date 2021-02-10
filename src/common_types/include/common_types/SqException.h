@@ -1,5 +1,5 @@
-#ifndef SQ_INCLUDE_GUARD_exceptions_SqException_h_
-#define SQ_INCLUDE_GUARD_exceptions_SqException_h_
+#ifndef SQ_INCLUDE_GUARD_common_types_SqException_h_
+#define SQ_INCLUDE_GUARD_common_types_SqException_h_
 
 #include <stdexcept>
 
@@ -14,4 +14,4 @@ public:
 
 } // namespace sq
 
-#endif // SQ_INCLUDE_GUARD_exceptions_SqException_h_
+#endif // SQ_INCLUDE_GUARD_common_types_SqException_h_

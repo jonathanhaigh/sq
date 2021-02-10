@@ -2,8 +2,8 @@
 #define SQ_INCLUDE_GUARD_results_generate_results_h_
 
 #include "ast/ast.h"
-#include "field_types/Field.h"
-#include "field_types/Primitive.h"
+#include "common_types/Field.h"
+#include "common_types/Primitive.h"
 #include "results/ResultView.h"
 
 #include <string>

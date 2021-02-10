@@ -63,10 +63,11 @@ class TypeHeaderWriter(FileWriter):
                     self.write_private_members()
 
     def write_includes(self):
-        self.writel("#include <memory>")
-        self.writel()
-        self.writel("#include \"field_types/Field.h\"")
         self.writel(f"#include \"field_types/{self._impl_name}.h\"")
+        self.writel()
+        self.writel("#include \"common_types/Field.h\"")
+        self.writel()
+        self.writel("#include <memory>")
 
     def write_public_members(self):
         self.writel("public:")
@@ -144,9 +145,10 @@ class TypeCppWriter(FileWriter):
             self.write_generic_getter()
 
     def write_includes(self):
-        self.writel(f"#include \"field_types/InvalidFieldError.h\"")
-        self.writel()
         self.writel(f"#include \"field_types/{self._name}.gen.h\"")
+        self.writel()
+        self.writel(f"#include \"common_types/FieldCallParams.h\"")
+        self.writel(f"#include \"common_types/InvalidFieldError.h\"")
         self.writel(f"#include \"field_types/{self._name}Impl.h\"")
 
     def write_generic_getter(self):

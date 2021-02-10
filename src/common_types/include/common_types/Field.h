@@ -1,8 +1,7 @@
-#ifndef SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
-#define SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
+#ifndef SQ_INCLUDE_GUARD_common_types_Field_h_
+#define SQ_INCLUDE_GUARD_common_types_Field_h_
 
-#include "field_types/FieldCallParams.h"
-#include "field_types/Primitive.h"
+#include "common_types/Primitive.h"
 
 #include <memory>
 #include <range/v3/view/any_view.hpp>
@@ -10,8 +9,8 @@
 #include <vector>
 
 namespace sq {
-namespace field_types {
 
+class FieldCallParams;
 class Field;
 
 using FieldPtr = std::unique_ptr<Field>;
@@ -45,16 +44,6 @@ protected:
     Field() = default;
 };
 
-} // namespace field_types
-
-using FieldPtr = field_types::FieldPtr;
-using FieldVector = field_types::FieldVector;
-
-template <ranges::category Cat>
-using FieldRange = field_types::FieldRange<Cat>;
-
-using Result = field_types::Result;
-
 } // namespace sq
 
-#endif // SQ_INCLUDE_GUARD_FIELD_TYPES_Field_h_
+#endif // SQ_INCLUDE_GUARD_common_types_Field_h_

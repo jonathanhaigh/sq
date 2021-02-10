@@ -1,7 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_field_types_InvalidFieldError_h_
 #define SQ_INCLUDE_GUARD_field_types_InvalidFieldError_h_
 
-#include "exceptions/SqException.h"
+#include "common_types/SqException.h"
 
 namespace sq {
 

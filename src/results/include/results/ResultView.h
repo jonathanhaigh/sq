@@ -1,7 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_results_ResultView_h_
 #define SQ_INCLUDE_GUARD_results_ResultView_h_
 
-#include "field_types/Field.h"
+#include "common_types/Field.h"
 
 #include <functional>
 #include <range/v3/view/any_view.hpp>

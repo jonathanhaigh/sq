@@ -1,7 +1,7 @@
-#ifndef SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_h_
-#define SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_h_
+#ifndef SQ_INCLUDE_GUARD_common_types_FieldCallParams_h_
+#define SQ_INCLUDE_GUARD_common_types_FieldCallParams_h_
 
-#include "Primitive.h"
+#include "common_types/Primitive.h"
 
 #include <map>
 #include <string>
@@ -49,4 +49,4 @@ bool operator!=(const FieldCallParams& lhs, const FieldCallParams& rhs);
 
 #include "FieldCallParams.inl.h"
 
-#endif // SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_h_
+#endif // SQ_INCLUDE_GUARD_common_types_FieldCallParams_h_

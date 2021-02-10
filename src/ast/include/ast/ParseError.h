@@ -1,7 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_ast_ParseError_h_
 #define SQ_INCLUDE_GUARD_ast_ParseError_h_
 
-#include "exceptions/SqException.h"
+#include "common_types/SqException.h"
 
 #include <string_view>
 

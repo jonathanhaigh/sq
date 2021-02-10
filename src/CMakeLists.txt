@@ -1,5 +1,5 @@
 set(SQ_ALL_LIBS
-    exceptions
+    common_types
     util
     schema
     parser

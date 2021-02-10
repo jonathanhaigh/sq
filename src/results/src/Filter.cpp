@@ -1,6 +1,6 @@
 #include "results/Filter.h"
 
-#include "exceptions/SqException.h"
+#include "common_types/SqException.h"
 #include "util/typeutil.h"
 
 #include <cstddef>

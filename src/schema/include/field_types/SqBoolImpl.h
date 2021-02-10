@@ -1,7 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_field_types_SqBoolImpl_h_
 #define SQ_INCLUDE_GUARD_field_types_SqBoolImpl_h_
 
-#include "Primitive.h"
+#include "common_types/Primitive.h"
 
 namespace sq::field_types {
 

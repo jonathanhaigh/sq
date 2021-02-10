@@ -2,7 +2,7 @@
 #define SQ_INCLUDE_GUARD_ast_ast_h_
 
 #include "ast/FilterSpec.h"
-#include "field_types/FieldCallParams.h"
+#include "common_types/FieldCallParams.h"
 #include "util/MoveOnlyTree.h"
 
 #include <iosfwd>

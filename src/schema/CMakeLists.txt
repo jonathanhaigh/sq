@@ -30,7 +30,7 @@ list_append_prepend(
 )
 
 # Generated Source
-set(SQ_TYPE_GEN_SRC_DIR "${SQ_GEN_SRC_DIR}/field_types")
+set(SQ_TYPE_GEN_SRC_DIR "${SQ_GEN_SRC_DIR}")
 
 list_append_prepend(
     SQ_TYPES
@@ -51,14 +51,10 @@ list_append_prepend(
 
 set(SQ_TYPE_NOGEN_HEADERS
     ${SQ_TYPE_IMPL_HEADERS}
-    "${SQ_TYPE_NOGEN_HEADERS_DIR}/Field.h"
-    "${SQ_TYPE_NOGEN_HEADERS_DIR}/FieldCallParams.h"
-    "${SQ_TYPE_NOGEN_HEADERS_DIR}/Primitive.h"
-    "${SQ_TYPE_NOGEN_HEADERS_DIR}/InvalidFieldError.h"
 )
 
 # Non-generated Source
-set(SQ_TYPE_NOGEN_SRC_DIR "${SQ_NOGEN_SRC_DIR}/field_types")
+set(SQ_TYPE_NOGEN_SRC_DIR "${SQ_NOGEN_SRC_DIR}")
 
 list_append_prepend(
     SQ_TYPES
@@ -77,10 +73,6 @@ list_append_prepend(
 set(SQ_TYPE_NOGEN_SRC
     ${SQ_TYPE_GETTER_SRC}
     ${SQ_TYPE_IMPL_SRC}
-    "${SQ_TYPE_NOGEN_SRC_DIR}/Field.cpp"
-    "${SQ_TYPE_NOGEN_SRC_DIR}/FieldCallParams.cpp"
-    "${SQ_TYPE_NOGEN_SRC_DIR}/Primitive.cpp"
-    "${SQ_TYPE_NOGEN_SRC_DIR}/InvalidFieldError.cpp"
 )
 
 # Autogen command
@@ -116,7 +108,7 @@ set_property(
 
 set_target_properties(sq_schema PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(sq_schema PUBLIC sq_util)
-target_link_libraries(sq_schema PUBLIC sq_exceptions)
+target_link_libraries(sq_schema PUBLIC sq_common_types)
 target_link_libraries(sq_schema PUBLIC gsl)
 target_link_libraries(sq_schema PUBLIC range-v3)
 target_include_directories(sq_schema PUBLIC ${SQ_GEN_INCLUDE_DIR})

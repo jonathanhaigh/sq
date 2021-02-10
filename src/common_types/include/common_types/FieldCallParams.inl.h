@@ -1,5 +1,5 @@
-#ifndef SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_inl_h_
-#define SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_inl_h_
+#ifndef SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
+#define SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
 
 #include <stdexcept>
 
@@ -32,4 +32,4 @@ const ParamType* FieldCallParams::get_optional(const size_t index, const std::st
 
 } // namespace sq
 
-#endif // SQ_INCLUDE_GUARD_FIELD_TYPES_FieldCallParams_inl_h_
+#endif // SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_

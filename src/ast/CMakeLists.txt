@@ -9,7 +9,7 @@ add_library(sq_ast
     "${SQ_AST_INCLUDE_DIR}/ast/ParseError.h"
     "${SQ_AST_SRC_DIR}/ParseError.cpp"
 )
-target_link_libraries(sq_ast PUBLIC sq_exceptions)
+target_link_libraries(sq_ast PUBLIC sq_common_types)
 target_link_libraries(sq_ast PUBLIC sq_util)
 target_link_libraries(sq_ast PUBLIC sq_parser)
 target_link_libraries(sq_ast PUBLIC sq_schema)

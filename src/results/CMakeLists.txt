@@ -10,7 +10,7 @@ add_library(sq_results
     "${SQ_RESULTS_SRC_DIR}/ResultView.cpp"
 )
 target_link_libraries(sq_results PUBLIC gsl)
-target_link_libraries(sq_results PUBLIC sq_exceptions)
+target_link_libraries(sq_results PUBLIC sq_common_types)
 target_link_libraries(sq_results PUBLIC sq_schema)
 target_link_libraries(sq_results PUBLIC sq_ast)
 target_link_libraries(sq_results PUBLIC sq_util)

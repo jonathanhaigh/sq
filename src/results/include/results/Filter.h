@@ -2,7 +2,7 @@
 #define SQ_INCLUDE_GUARD_results_Filter_h_
 
 #include "ast/FilterSpec.h"
-#include "field_types/Field.h"
+#include "common_types/Field.h"
 #include "results/ResultView.h"
 
 #include <functional>

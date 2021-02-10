@@ -1,7 +1,7 @@
 #include "ast/ast.h"
 
 #include "ast/ParseError.h"
-#include "field_types/Primitive.h"
+#include "common_types/Primitive.h"
 #include "parser/SqLexer.h"
 #include "parser/SqParser.h"
 #include "util/strutil.h"

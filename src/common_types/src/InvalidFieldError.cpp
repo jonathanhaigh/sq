@@ -1,4 +1,4 @@
-#include "field_types/InvalidFieldError.h"
+#include "common_types/InvalidFieldError.h"
 
 #include <sstream>
 

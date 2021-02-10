@@ -1,1 +1,0 @@
-#include "exceptions/SqException.h"
