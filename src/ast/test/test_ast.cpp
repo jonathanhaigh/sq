@@ -9,6 +9,8 @@
 namespace sq::ast::test {
 
 using Size = Ast::Children::size_type;
+using PosParam = FieldCallParams::PosParams::value_type;
+using NamedParam = FieldCallParams::NamedParams::value_type;
 
 static const auto no_params = FieldCallParams{};
 static const auto no_filter_spec = FilterSpec{NoFilterSpec{}};
@@ -137,41 +139,192 @@ static Primitive to_primitive(const char* v)
     return PrimitiveString(v);
 }
 
-template <typename... Args>
-static FieldCallParams pos_params(Args... args)
+template <typename T>
+static void add_params(FieldCallParams& fcp, T&& p)
 {
-    auto params = FieldCallParams{};
-    params.pos_params() = std::initializer_list<Primitive>{to_primitive(std::forward<Args>(args))...};
-    return params;
+    fcp.pos_params().emplace_back(to_primitive(std::forward<T>(p)));
+}
+
+static void add_params(FieldCallParams& fcp, NamedParam&& p)
+{
+    fcp.named_params().emplace(std::move(p));
+}
+
+template <typename T, typename... Args>
+static void add_params(FieldCallParams& fct, T&& p, Args&&... args)
+{
+    add_params(fct, std::forward<T>(p));
+    add_params(fct, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+static FieldCallParams params(Args&&... args)
+{
+    auto ret = FieldCallParams{};
+    add_params(ret, std::forward<Args>(args)...);
+    return ret;
+}
+
+template <typename T>
+static NamedParam named(const char* name, T&& np)
+{
+    return NamedParam{name, to_primitive(std::forward<T>(np))};
 }
 
 INSTANTIATE_TEST_SUITE_P(
     SimpleAstTestInstantiation,
     SimpleAstTest,
     testing::Values(
-        SimpleTestCase{"a", no_params, no_filter_spec},
-        SimpleTestCase{"a[0]", no_params, ElementAccessSpec{0}},
-        SimpleTestCase{"a[99]", no_params, ElementAccessSpec{99}},
-        SimpleTestCase{"a[-1]", no_params, ElementAccessSpec{-1}},
-        SimpleTestCase{"a[-50]", no_params, ElementAccessSpec{-50}},
-        SimpleTestCase{"a[:]", no_params, SliceSpec{std::nullopt, std::nullopt, std::nullopt}},
-        SimpleTestCase{"a[1:]", no_params, SliceSpec{1, std::nullopt, std::nullopt}},
-        SimpleTestCase{"a[:1]", no_params, SliceSpec{std::nullopt, 1, std::nullopt}},
-        SimpleTestCase{"a[1:1]", no_params, SliceSpec{1, 1, std::nullopt}},
-        SimpleTestCase{"a[::]", no_params, SliceSpec{std::nullopt, std::nullopt, std::nullopt}},
-        SimpleTestCase{"a[1::]", no_params, SliceSpec{1, std::nullopt, std::nullopt}},
-        SimpleTestCase{"a[:1:]", no_params, SliceSpec{std::nullopt, 1, std::nullopt}},
-        SimpleTestCase{"a[1:1:]", no_params, SliceSpec{1, 1, std::nullopt}},
-        SimpleTestCase{"a[::1]", no_params, SliceSpec{std::nullopt, std::nullopt, 1}},
-        SimpleTestCase{"a[1::1]", no_params, SliceSpec{1, std::nullopt, 1}},
-        SimpleTestCase{"a[:1:1]", no_params, SliceSpec{std::nullopt, 1, 1}},
-        SimpleTestCase{"a[1:1:1]", no_params, SliceSpec{1, 1, 1}},
-        SimpleTestCase{"a(1)", pos_params(1), no_filter_spec},
-        SimpleTestCase{"a(-1)", pos_params(-1), no_filter_spec},
-        SimpleTestCase{"a(\"str\")", pos_params("str"), no_filter_spec},
-        SimpleTestCase{"a(true)", pos_params(true), no_filter_spec},
-        SimpleTestCase{"a(false)", pos_params(false), no_filter_spec},
-        SimpleTestCase{"a(1, 2, 3, 4)", pos_params(1, 2, 3, 4), no_filter_spec}
+        SimpleTestCase{
+            "a",
+            no_params,
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a[0]",
+            no_params,
+            ElementAccessSpec{0}
+        },
+        SimpleTestCase{
+            "a[99]",
+            no_params,
+            ElementAccessSpec{99}
+        },
+        SimpleTestCase{
+            "a[-1]",
+            no_params,
+            ElementAccessSpec{-1}
+        },
+        SimpleTestCase{
+            "a[-50]",
+            no_params,
+            ElementAccessSpec{-50}
+        },
+        SimpleTestCase{
+            "a[:]",
+            no_params,
+            SliceSpec{std::nullopt, std::nullopt, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[1:]",
+            no_params,
+            SliceSpec{1, std::nullopt, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[:1]",
+            no_params,
+            SliceSpec{std::nullopt, 1, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[1:1]",
+            no_params,
+            SliceSpec{1, 1, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[::]",
+            no_params,
+            SliceSpec{std::nullopt, std::nullopt, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[1::]",
+            no_params,
+            SliceSpec{1, std::nullopt, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[:1:]",
+            no_params,
+            SliceSpec{std::nullopt, 1, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[1:1:]",
+            no_params,
+            SliceSpec{1, 1, std::nullopt}
+        },
+        SimpleTestCase{
+            "a[::1]",
+            no_params,
+            SliceSpec{std::nullopt, std::nullopt, 1}
+        },
+        SimpleTestCase{
+            "a[1::1]",
+            no_params,
+            SliceSpec{1, std::nullopt, 1}
+        },
+        SimpleTestCase{
+            "a[:1:1]",
+            no_params,
+            SliceSpec{std::nullopt, 1, 1}
+        },
+        SimpleTestCase{
+            "a[1:1:1]",
+            no_params,
+            SliceSpec{1, 1, 1}
+        },
+        SimpleTestCase{
+            "a(1)",
+            params(1),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-1)",
+            params(-1),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(\"str\")",
+            params("str"),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(true)",
+            params(true),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(false)",
+            params(false),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(1, 2, 3, 4)",
+            params(1, 2, 3, 4),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=1)",
+            params(named("n", 1)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=-1)",
+            params(named("n", -1)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=\"str\")",
+            params(named("n", "str")),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=true)",
+            params(named("n", true)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=false)",
+            params(named("n", false)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(n=1, o=2, p=3, q=4)",
+            params(named("n", 1), named("o", 2), named("p", 3), named("q", 4)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(1, true, \"str\", n=9)",
+            params(1, true, "str", named("n", 9)),
+            no_filter_spec
+        }
     )
 );
 
