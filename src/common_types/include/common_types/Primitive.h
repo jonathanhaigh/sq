@@ -19,6 +19,17 @@ using Primitive = std::variant<
     PrimitiveBool
 >;
 
+template <typename T>
+static const char* const primitive_type_name_v = nullptr;
+
+template <typename T>
+static const char* primitive_type_name(const T& value);
+
+template <typename T>
+std::string primitive_to_str(const T& value);
+
 } // namespace sq
+
+#include "Primitive.inl.h"
 
 #endif // SQ_INCLUDE_GUARD_common_types_Primitive_h_

@@ -18,6 +18,10 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/Primitive.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/Primitive.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqArgumentTypeError.h"
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqArgumentTypeError.inl.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/SqArgumentTypeError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqException.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/SqException.cpp"
 )
