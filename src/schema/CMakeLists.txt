@@ -83,7 +83,11 @@ add_custom_command(
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate_schema.py"
         "${SQ_TYPE_GEN_HEADERS_DIR}"
         "${SQ_TYPE_GEN_SRC_DIR}"
-    DEPENDS "schema.json" "generate_schema.py"
+    DEPENDS 
+        "schema.json"
+        "generate_schema.py"
+        "templates/SqType.gen.h.jinja"
+        "templates/SqType.gen.cpp.jinja"
     VERBATIM
 )
 
