@@ -1,55 +1,20 @@
-#ifndef SQ_INCLUDE_GUARD_field_types_{{ sq_type.name }}_gen_h_
-#define SQ_INCLUDE_GUARD_field_types_{{ sq_type.name }}_gen_h_
-
-#include "field_types/{{ sq_type.name }}Impl.h"
+#ifndef SQ_INCLUDE_GUARD_schema_{{ sq_type.name }}_gen_h_
+#define SQ_INCLUDE_GUARD_schema_{{ sq_type.name }}_gen_h_
 
 #include "common_types/Field.h"
 
-#include <memory>
+namespace sq::schema {
 
-namespace sq::field_types {
-
-
+template <typename Impl>
 class {{ sq_type.name }}
     : public Field
 {
 public:
-
-    template <typename... Ts>
-    explicit {{ sq_type.name }}(Ts&&... args)
-        : impl_{std::forward<Ts>(args)...}
-    {}
-
-    ~{{ sq_type.name }}() noexcept override = default;
-
-    template <typename... Ts>
-    static FieldPtr create(Ts&&... args)
-    {
-        return std::make_unique<{{ sq_type.name }}>(std::forward<Ts>(args)...);
-    }
-
     Result get(std::string_view member, const FieldCallParams& params) const override;
-
-{%- for field in sq_type.fields %}
-    Result get_{{field.name}}(
-{%- set sep = joiner(", ") -%}
-{%- for param in field.params -%}
-            {{sep()}}{{ "{} {}".format(param.type, param.name)}}
-{%- endfor -%}
-    ) const;
-{%- endfor %}
-
-    Primitive to_primitive() const override;
-
-    static const char* sq_type()
-    {
-        return "{{ sq_type.name }}";
-    }
-
-private:
-    {{sq_type.name}}Impl impl_;
 };
 
-} // namespace sq::field_types
+} // namespace sq::schema
 
-#endif // SQ_INCLUDE_GUARD_field_types_{{ sq_type.name }}_gen_h_
+#include "schema/{{ sq_type.name }}.gen.inl.h"
+
+#endif // SQ_INCLUDE_GUARD_schema_{{ sq_type.name }}_gen_h_

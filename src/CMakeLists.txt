@@ -1,11 +1,12 @@
 set(SQ_ALL_LIBS
-    common_types
-    util
-    schema
-    parser
     ast
+    common_types
+    parser
     results
+    schema
     serialization
+    system
+    util
 )
 
 foreach(SQ_LIB ${SQ_ALL_LIBS})

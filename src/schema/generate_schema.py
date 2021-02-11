@@ -57,6 +57,7 @@ def generate_schema_files():
     )
     for sq_type in sq_types:
         create_sq_type_file(TYPES_HEADER_DIR, sq_type, "h", jinja_env)
+        create_sq_type_file(TYPES_HEADER_DIR, sq_type, "inl.h", jinja_env)
         create_sq_type_file(TYPES_SRC_DIR, sq_type, "cpp", jinja_env)
 
 generate_schema_files()

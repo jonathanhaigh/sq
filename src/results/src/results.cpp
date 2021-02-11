@@ -1,7 +1,7 @@
 #include "results/results.h"
 
-#include "field_types/SqRoot.gen.h"
 #include "results/Filter.h"
+#include "system/root.h"
 
 #include <iostream>
 
@@ -80,7 +80,7 @@ ResultTree::ResultTree(const ast::Ast& ast, Data&& data)
 
 ResultTree generate_results(const ast::Ast& ast)
 {
-    return ResultTree{ast, field_types::SqRoot::create()};
+    return ResultTree{ast, system::root()};
 }
 
 } // namespace sq::results

@@ -11,7 +11,7 @@ add_library(sq_results
 )
 target_link_libraries(sq_results PUBLIC gsl)
 target_link_libraries(sq_results PUBLIC sq_common_types)
-target_link_libraries(sq_results PUBLIC sq_schema)
+target_link_libraries(sq_results PUBLIC sq_system)
 target_link_libraries(sq_results PUBLIC sq_ast)
 target_link_libraries(sq_results PUBLIC sq_util)
 
