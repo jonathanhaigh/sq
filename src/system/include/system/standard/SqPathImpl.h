@@ -1,21 +1,21 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqPathImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqPathImpl_h_
 
-#include "schema/SqPath.gen.h"
+#include "system/SqPath.gen.h"
 
 #include <filesystem>
 
 namespace sq::system::standard {
 
 class SqPathImpl
-    : public schema::SqPath<SqPathImpl>
+    : public SqPath<SqPathImpl>
 {
 public:
     SqPathImpl(const std::filesystem::path& value);
     SqPathImpl(std::filesystem::path&& value);
 
 private:
-    friend class schema::SqPath<SqPathImpl>;
+    friend class SqPath<SqPathImpl>;
 
     Result get_string() const;
     Result get_parent() const;

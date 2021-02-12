@@ -1,20 +1,20 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqDataSizeImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqDataSizeImpl_h_
 
-#include "schema/SqDataSize.gen.h"
+#include "system/SqDataSize.gen.h"
 
 #include <cstdint>
 
 namespace sq::system::standard {
 
 class SqDataSizeImpl
-    : public schema::SqDataSize<SqDataSizeImpl>
+    : public SqDataSize<SqDataSizeImpl>
 {
 public:
     explicit SqDataSizeImpl(std::size_t value);
 
 private:
-    friend class schema::SqDataSize<SqDataSizeImpl>;
+    friend class SqDataSize<SqDataSizeImpl>;
 
     Result get_B() const;
     Result get_KiB() const;

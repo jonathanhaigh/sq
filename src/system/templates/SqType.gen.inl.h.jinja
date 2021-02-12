@@ -1,10 +1,10 @@
-#ifndef SQ_INCLUDE_GUARD_schema_{{ sq_type.name }}_gen_inl_h_
-#define SQ_INCLUDE_GUARD_schema_{{ sq_type.name }}_gen_inl_h_
+#ifndef SQ_INCLUDE_GUARD__{{ sq_type.name }}_gen_inl_h_
+#define SQ_INCLUDE_GUARD__{{ sq_type.name }}_gen_inl_h_
 
 #include "common_types/FieldCallParams.h"
 #include "common_types/InvalidFieldError.h"
 
-namespace sq::schema {
+namespace sq::system {
 
 template <typename Impl>
 Result {{ sq_type.name }}<Impl>::get(std::string_view member, [[maybe_unused]] const FieldCallParams& params) const
@@ -37,6 +37,6 @@ Result {{ sq_type.name }}<Impl>::get(std::string_view member, [[maybe_unused]] c
     return nullptr;
 }
 
-} // namespace sq::schema
+} // namespace sq::system
 
-#endif // SQ_INCLUDE_GUARD_schema_{{ sq_type.name}}_gen_inl_h_
+#endif // SQ_INCLUDE_GUARD__{{ sq_type.name}}_gen_inl_h_

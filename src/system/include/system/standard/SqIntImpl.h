@@ -1,18 +1,18 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqIntImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqIntImpl_h_
 
-#include "schema/SqInt.gen.h"
+#include "system/SqInt.gen.h"
 
 namespace sq::system::standard {
 
 class SqIntImpl
-    : public schema::SqInt<SqIntImpl>
+    : public SqInt<SqIntImpl>
 {
 public:
     explicit SqIntImpl(PrimitiveInt value);
 
 private:
-    friend class schema::SqInt<SqIntImpl>;
+    friend class SqInt<SqIntImpl>;
 
     Primitive to_primitive() const;
 

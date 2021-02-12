@@ -1,18 +1,18 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqBoolImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqBoolImpl_h_
 
-#include "schema/SqBool.gen.h"
+#include "system/SqBool.gen.h"
 
 namespace sq::system::standard {
 
 class SqBoolImpl
-    : public schema::SqBool<SqBoolImpl>
+    : public SqBool<SqBoolImpl>
 {
 public:
     explicit SqBoolImpl(PrimitiveBool value);
 
 private:
-    friend class schema::SqBool<SqBoolImpl>;
+    friend class SqBool<SqBoolImpl>;
 
     Primitive to_primitive() const override;
 

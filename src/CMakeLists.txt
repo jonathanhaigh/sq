@@ -3,7 +3,6 @@ set(SQ_ALL_LIBS
     common_types
     parser
     results
-    schema
     serialization
     system
     util

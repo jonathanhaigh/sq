@@ -1,15 +1,15 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
 
-#include "schema/SqRoot.gen.h"
+#include "system/SqRoot.gen.h"
 
 namespace sq::system::standard {
 
 class SqRootImpl
-    : public schema::SqRoot<SqRootImpl>
+    : public SqRoot<SqRootImpl>
 {
 private:
-    friend class schema::SqRoot<SqRootImpl>;
+    friend class SqRoot<SqRootImpl>;
 
     static Result get_path(const PrimitiveString* path);
     static Result get_int(const PrimitiveInt* value);

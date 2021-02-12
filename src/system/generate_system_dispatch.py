@@ -44,7 +44,7 @@ def create_sq_type_file(parent_path, sq_type, extension, jinja_env):
     with open(path, "wt") as f:
         f.write(template.render(sq_type=sq_type))
 
-def generate_schema_files():
+def generate_system_dispatch_files():
     TYPES_HEADER_DIR.mkdir(parents=True, exist_ok=True)
     TYPES_SRC_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -60,4 +60,4 @@ def generate_schema_files():
         create_sq_type_file(TYPES_HEADER_DIR, sq_type, "inl.h", jinja_env)
         create_sq_type_file(TYPES_SRC_DIR, sq_type, "cpp", jinja_env)
 
-generate_schema_files()
+generate_system_dispatch_files()
