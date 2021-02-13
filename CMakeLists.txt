@@ -4,6 +4,9 @@ if(${CMAKE_VERSION} VERSION_LESS 3.15)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(3rdparty)
 
 project(Sq
@@ -12,9 +15,6 @@ project(Sq
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=*,-google-runtime-references,-hicpp-no-array-decay,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-fuchsia-overloaded-operator,-modernize-use-trailing-return-type,-fuchsia-default-arguments-calls,-fuchsia-trailing-return,-modernize-pass-by-value)
 
 set(SQ_GCC_STYLE_WARNING_FLAGS

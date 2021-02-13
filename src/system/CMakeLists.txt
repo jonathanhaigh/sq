@@ -11,6 +11,7 @@
 #
 # * The sq_system library that provides a handle to the system.
 
+include(sq_functions.cmake)
 include(sq_system_dispatch.cmake)
 include(sq_system_standard.cmake)
 
@@ -18,9 +19,10 @@ set(SQ_SYSTEM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(SQ_SYSTEM_HEADERS_DIR "${SQ_SYSTEM_INCLUDE_DIR}/system")
 set(SQ_SYSTEM_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-add_library(sq_system 
+set(SQ_SYSTEM_SRC
     "${SQ_SYSTEM_HEADERS_DIR}/root.h"
     "${SQ_SYSTEM_SRC_DIR}/root.cpp"
 )
+add_library(sq_system ${SQ_SYSTEM_SRC})
 target_link_libraries(sq_system sq_system_standard)
 target_include_directories(sq_system PUBLIC "${SQ_SYSTEM_INCLUDE_DIR}")

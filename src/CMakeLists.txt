@@ -22,6 +22,7 @@ endforeach()
 add_executable(sq-test)
 target_link_libraries(sq-test gtest_main)
 target_link_libraries(sq-test gtest)
+target_link_libraries(sq-test gmock)
 set_target_properties(sq-test PROPERTIES CXX_CLANG_TIDY "")
 
 foreach(SQ_LIB ${SQ_ALL_LIBS})

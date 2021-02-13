@@ -1,6 +1,7 @@
 #include "ast/ast.h"
 #include "results/results.h"
 #include "serialization/serialize.h"
+#include "system/root.h"
 
 #include <cstddef>
 #include <gsl/narrow>
@@ -20,9 +21,8 @@ static int run_sq(int argc, char** argv)
     }
     const auto sq_command = std::string{args[1]};
     const auto ast = sq::ast::generate_ast(sq_command);
-    std::cerr << "AST:\n";
-    std::cerr << ast << '\n';
-    const auto results = sq::results::generate_results(ast);
+    auto root = sq::results::ResultView{sq::system::root()};
+    const auto results = sq::results::ResultTree(ast, std::move(root));
 
     sq::serialization::serialize_results(std::cerr, results);
 

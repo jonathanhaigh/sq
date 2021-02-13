@@ -8,8 +8,8 @@ import sys
 THIS_DIR = pathlib.Path(__file__).parent.absolute()
 SCHEMA_PATH =  THIS_DIR / "schema.json"
 TEMPLATE_PATH = THIS_DIR / "templates"
-TYPES_HEADER_DIR = pathlib.Path(sys.argv[1])
-TYPES_SRC_DIR = pathlib.Path(sys.argv[2])
+TEMPLATE_NAME = sys.argv[1]
+OUTPUT_PATH_FORMAT = sys.argv[2];
 
 class SqParam:
     def __init__(self, index, schema):
@@ -38,15 +38,7 @@ def get_schema():
     with SCHEMA_PATH.open(mode="rb") as s:
         return json.load(s)
 
-def create_sq_type_file(parent_path, sq_type, extension, jinja_env):
-    template = jinja_env.get_template(f"SqType.gen.{extension}.jinja")
-    path = parent_path / f"{sq_type.name}.gen.{extension}"
-    with open(path, "wt") as f:
-        f.write(template.render(sq_type=sq_type))
-
-def generate_system_dispatch_files():
-    TYPES_HEADER_DIR.mkdir(parents=True, exist_ok=True)
-    TYPES_SRC_DIR.mkdir(parents=True, exist_ok=True)
+def generate_system_files():
 
     sq_types = [SqType(n, s) for n, s in get_schema().items()]
 
@@ -55,9 +47,12 @@ def generate_system_dispatch_files():
         autoescape=False,
         undefined=jinja2.StrictUndefined
     )
-    for sq_type in sq_types:
-        create_sq_type_file(TYPES_HEADER_DIR, sq_type, "h", jinja_env)
-        create_sq_type_file(TYPES_HEADER_DIR, sq_type, "inl.h", jinja_env)
-        create_sq_type_file(TYPES_SRC_DIR, sq_type, "cpp", jinja_env)
+    template = jinja_env.get_template(f"{TEMPLATE_NAME}.jinja");
 
-generate_system_dispatch_files()
+    for sq_type in sq_types:
+        path = pathlib.Path(OUTPUT_PATH_FORMAT % sq_type.name)
+        path.parent.mkdir(parents=True, exist_ok=True);
+        with open(path, "wt") as f:
+            f.write(template.render(sq_type=sq_type))
+
+generate_system_files()

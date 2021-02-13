@@ -1,7 +1,6 @@
 #include "results/results.h"
 
 #include "results/Filter.h"
-#include "system/root.h"
 
 #include <iostream>
 
@@ -50,7 +49,6 @@ Data ResultViewToDataVisitor::operator()(FieldPtr&& field) const
         obj.emplace_back(
             field_name,
             ResultTree{
-                child,
                 std::visit(visitor, filter->view(std::move(child_result_view)))
             }
         );
@@ -70,17 +68,21 @@ Data ResultViewToDataVisitor::operator()(FieldRange<Cat>&& rng) const
 }
 
 ResultTree::ResultTree(const ast::Ast& ast, ResultView&& result_view)
-    : ResultTree{ast, std::visit(ResultViewToDataVisitor{ast}, std::move(result_view))}
+    : ResultTree{std::visit(ResultViewToDataVisitor{ast}, std::move(result_view))}
 { }
 
-ResultTree::ResultTree(const ast::Ast& ast, Data&& data)
-    : ast_{&ast}
-    , data_{std::move(data)}
+ResultTree::ResultTree(Data&& data)
+    : data_{std::move(data)}
 { }
 
-ResultTree generate_results(const ast::Ast& ast)
+bool operator==(const ResultTree& lhs, const ResultTree& rhs)
 {
-    return ResultTree{ast, system::root()};
+    return lhs.data() == rhs.data();
+}
+
+bool operator!=(const ResultTree& lhs, const ResultTree& rhs)
+{
+    return !(lhs == rhs);
 }
 
 } // namespace sq::results

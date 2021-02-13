@@ -90,7 +90,6 @@ private:
 
 void serialize_results(std::ostream& os, const results::ResultTree& results)
 {
-    assert(results.ast().data().name().empty());
     auto buf = rj::StringBuffer{};
     auto writer = rj::Writer<rj::StringBuffer>{buf};
     std::visit(RjResultVisitor{writer}, results.data());

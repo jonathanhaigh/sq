@@ -28,19 +28,17 @@ public:
     ~ResultTree() noexcept = default;
 
     ResultTree(const ast::Ast& ast, ResultView&& result);
-    ResultTree(const ast::Ast& ast, Data&& data);
-
-    const ast::Ast& ast() const { return *ast_; }
+    explicit ResultTree(Data&& data);
 
     const Data& data() const { return data_; }
     Data& data() { return data_; }
 
 private:
-    const ast::Ast* ast_;
     Data data_;
 };
 
-ResultTree generate_results(const ast::Ast& ast);
+bool operator==(const ResultTree& lhs, const ResultTree& rhs);
+bool operator!=(const ResultTree& lhs, const ResultTree& rhs);
 
 } // namespace sq::results
 
