@@ -5,6 +5,7 @@
 #include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <utility>
 
 namespace sq::test {
 

@@ -21,7 +21,7 @@ list_slice_step: INTEGER;
 
 BOOLEAN_TRUE: 'true';
 BOOLEAN_FALSE: 'false';
-ID: [a-zA-Z_]+;
+ID: [a-zA-Z_][a-zA-Z0-9]*;
 WS: [ \t\r\n]+ -> skip;
 DQ_STR: '"' (~'"' | '\\"' )* '"';
 INTEGER: '-'?[0-9]+;

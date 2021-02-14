@@ -1,10 +1,11 @@
-#include "results_test_util.h"
-
 #include "results/results.h"
 
 #include "ast/ast.h"
+#include "results_test_util.h"
+#include "test/FieldCallParams_test_util.h"
 
 #include <gtest/gtest.h>
+#include <utility>
 
 namespace sq::test {
 
@@ -78,5 +79,51 @@ TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
     const auto expected = obj_data_tree("a", std::move(a));
     EXPECT_EQ(results, expected);
 }
+
+// -----------------------------------------------------------------------------
+// Param passing tests
+// -----------------------------------------------------------------------------
+
+using ParamPassingTestCase = std::tuple<const char*, FieldCallParams>;
+class ResultTreeParamTest
+    : public testing::TestWithParam<ParamPassingTestCase>
+{ };
+
+TEST_P(ResultTreeParamTest, TestParamPassing)
+{
+    const auto [ query, params ] = GetParam();
+    const auto ast = ast::generate_ast(query);
+    auto a = field_with_one_primitive_access(PrimitiveInt{0});
+    auto root = field_with_accesses("a", params, std::move(a));
+    const auto results = ResultTree(ast, std::move(root));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    ResultTreeParamTestInstantiation,
+    ResultTreeParamTest,
+    testing::Values(
+        ParamPassingTestCase{"a(\"str\")", params("str")},
+        ParamPassingTestCase{"a(\"\")", params("")},
+        ParamPassingTestCase{"a(0)", params(0)},
+        ParamPassingTestCase{"a(1)", params(1)},
+        ParamPassingTestCase{"a(-1)", params(-1)},
+        ParamPassingTestCase{"a(true)", params(true)},
+        ParamPassingTestCase{"a(false)", params(false)},
+        ParamPassingTestCase{"a(n=\"str\")", params(named("n", "str"))},
+        ParamPassingTestCase{"a(n=\"\")", params(named("n", ""))},
+        ParamPassingTestCase{"a(n=0)", params(named("n", 0))},
+        ParamPassingTestCase{"a(n=1)", params(named("n", 1))},
+        ParamPassingTestCase{"a(n=-1)", params(named("n", -1))},
+        ParamPassingTestCase{"a(n=true)", params(named("n", true))},
+        ParamPassingTestCase{"a(n=false)", params(named("n", false))},
+        ParamPassingTestCase{
+            "a(\"str\", 1, true, n1=\"\", n2=-1, n3=false)",
+            params(
+                "str", 1, true,
+                named("n1", ""), named("n2", -1), named("n3", false)
+            )
+        }
+    )
+);
 
 } // namespace sq::test
