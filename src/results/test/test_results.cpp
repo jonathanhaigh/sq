@@ -12,7 +12,7 @@ namespace sq::results::test {
 // Minimal system call tests:
 // Ensure that the results gathering library doesn't call into the system more
 // than it needs to. The results gathering code should assume that all calls
-// into the system are expesive and should cache results if repeated access is
+// into the system are expensive and should cache results if repeated access is
 // required.
 // -----------------------------------------------------------------------------
 TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
