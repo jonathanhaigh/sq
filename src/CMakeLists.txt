@@ -8,24 +8,16 @@ set(SQ_ALL_LIBS
     util
 )
 
-foreach(SQ_LIB ${SQ_ALL_LIBS})
-    add_subdirectory("${SQ_LIB}")
-endforeach()
-
 add_executable(sq main.cpp)
 target_link_libraries(sq gsl)
 
-foreach(SQ_LIB ${SQ_ALL_LIBS})
-    target_link_libraries(sq "sq_${SQ_LIB}")
-endforeach()
-
-add_executable(sq-test)
+add_executable(sq-test test.cpp)
 target_link_libraries(sq-test gtest_main)
-target_link_libraries(sq-test gtest)
-target_link_libraries(sq-test gmock)
-set_target_properties(sq-test PROPERTIES CXX_CLANG_TIDY "")
 
 foreach(SQ_LIB ${SQ_ALL_LIBS})
-    target_link_libraries(sq-test "sq_${SQ_LIB}")
-    target_sources(sq-test PRIVATE "${SQ_LIB}/test/test_${SQ_LIB}.cpp")
+    add_subdirectory("${SQ_LIB}")
+    target_link_libraries(sq "sq_${SQ_LIB}")
+
+    add_subdirectory("${SQ_LIB}/test")
+    target_link_libraries(sq-test "sq_${SQ_LIB}_test")
 endforeach()

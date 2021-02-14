@@ -5,7 +5,9 @@
 
 #include <gmock/gmock.h>
 
-namespace sq::results::test {
+namespace sq::test {
+
+using namespace sq::results;
 
 using testing::Return;
 using testing::ByMove;
@@ -160,6 +162,6 @@ static ResultTree obj_data_tree(Args&&... args)
     return ResultTree{std::move(obj_data)};
 }
 
-} // namespace sq::results::test
+} // namespace sq::test
 
 #endif // SQ_INCLUDE_GUARD_results_test_results_test_util_h_
