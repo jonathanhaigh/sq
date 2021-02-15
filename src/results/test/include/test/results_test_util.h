@@ -162,6 +162,46 @@ static ResultTree obj_data_tree(Args&&... args)
     return ResultTree{std::move(obj_data)};
 }
 
+static constexpr auto input = ranges::category::input;
+static constexpr auto forward = ranges::category::forward;
+static constexpr auto bidirectional = ranges::category::bidirectional;
+static constexpr auto random_access = ranges::category::random_access;
+static constexpr auto sized = ranges::category::sized;
+
 } // namespace sq::test
+
+namespace ranges  {
+
+std::ostream& operator<<(std::ostream& os, const category& cat)
+{
+    if ((cat & category::sized) == category::sized)
+    {
+        os << "sized ";
+    }
+    if ((cat & category::mask) == category::random_access) 
+    {
+        os << "random_access";
+    }
+    else if((cat & category::mask) == category::bidirectional)
+    {
+        os << "bidirectional";
+    }
+    else if ((cat & category::mask) == category::forward)
+    {
+        os << "forward";
+    }
+    else if ((cat & category::mask) == category::input)
+    {
+        os << "input";
+    }
+    else
+    {
+        os << "unknown";
+    }
+    return os;
+}
+
+} // namespace ranges
+
 
 #endif // SQ_INCLUDE_GUARD_results_test_results_test_util_h_

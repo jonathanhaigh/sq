@@ -50,4 +50,14 @@ endif()
 
 add_compile_options(${SQ_WARNING_FLAGS})
 
+option(FORCE_COLOR "Force coloured compiler output" TRUE)
+if("${FORCE_COLOR}" OR "$ENV{CLICOLOR_FORCE}")
+    string(APPEND CMAKE_CXX_CLANG_TIDY ";--use-color")
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL GNU)
+        add_compile_options(-fdiagnostics-color=always)
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL Clang)
+        add_compile_options(-fcolor-diagnostics)
+    endif()
+endif()
+
 add_subdirectory(src)
