@@ -4,7 +4,9 @@
 #include <gtest/gtest.h>
 #include <initializer_list>
 
-namespace sq::util::test {
+namespace sq::test {
+
+using namespace sq::util;
 
 TEST(UtilTest, JoinCStrings)
 {
@@ -134,7 +136,6 @@ TEST(UtilTest, MoveOnlyTree)
     EXPECT_EQ(tree.data(), 0);
     EXPECT_EQ(tree.children(), mkchildren(no_children));
 
-
     tree.children().emplace_back(1);
     tree.children().emplace_back(2);
     tree.children().emplace_back(3);
@@ -148,4 +149,4 @@ TEST(UtilTest, MoveOnlyTree)
     EXPECT_TRUE(tree.children()[2].children().empty());
 }
 
-} // namespace sq::util::test
+} // namespace sq::test

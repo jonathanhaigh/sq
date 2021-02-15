@@ -3,9 +3,13 @@
 #include "ast/ast.h"
 #include "results_test_util.h"
 #include "test/FieldCallParams_test_util.h"
+#include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <range/v3/view/iota.hpp>
+#include <range/v3/view/transform.hpp>
 #include <utility>
+#include <sstream>
 
 namespace sq::test {
 
@@ -43,6 +47,145 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
     );
     auto root = field_with_accesses("a", fcp, std::move(a));
     const auto results = ResultTree(ast, std::move(root));
+}
+
+struct MockFieldGenerator
+{
+    MOCK_METHOD(FieldPtr, get, (std::ptrdiff_t index), (const));
+};
+
+template <typename T>
+struct TestWithFieldRangeType : testing::Test { };
+
+using FieldRangeTypes = testing::Types<
+    FieldRange<input>,
+    FieldRange<forward>,
+    FieldRange<bidirectional>,
+    FieldRange<random_access>,
+    FieldRange<input | sized>,
+    FieldRange<forward | sized>,
+    FieldRange<bidirectional | sized>,
+    FieldRange<random_access | sized>
+>;
+TYPED_TEST_SUITE(TestWithFieldRangeType, FieldRangeTypes,);
+
+template <ranges::category Cat>
+void test_minimal_system_calls_with_element_access(
+    std::ptrdiff_t index,
+    std::ptrdiff_t size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_minimal_system_calls_with_element_access<"
+        << Cat << ">("
+        << index << ", "
+        << size << ")"
+    );
+
+    auto ss = std::stringstream{};
+    ss << "a[" << index << "]";
+    const auto ast = ast::generate_ast(ss.str());
+
+    auto a0 = field_with_one_primitive_access(PrimitiveInt{1});
+    auto mfg = testing::StrictMock<MockFieldGenerator>{};
+    const auto normalized_index = (index >= 0)? index : (size + index);
+    EXPECT_CALL(mfg, get(normalized_index))
+        .WillOnce(Return(ByMove(std::move(a0))));
+
+    auto arange = FieldRange<Cat>{
+        ranges::views::iota(std::ptrdiff_t{0}, size) |
+        ranges::views::transform(
+            [&](int i) { return mfg.get(i); }
+        )
+    };
+    const auto fcp = FieldCallParams{};
+    auto root = field_with_accesses("a", fcp, std::move(arange));
+    const auto results = ResultTree(ast, std::move(root));
+}
+
+TEST(ResultTreeTest, TestMinimalSystemCallsWithElementAccess)
+{
+    test_minimal_system_calls_with_element_access<input>(10, 20);
+
+    // Only sized input ranges or forward ranges can handle negative indeces
+    // efficiently
+    test_minimal_system_calls_with_element_access<input | sized>(-10, 20);
+    test_minimal_system_calls_with_element_access<forward>(-10, 20);
+}
+
+template <ranges::category Cat>
+void test_minimal_system_calls_with_slice(
+    std::optional<std::ptrdiff_t> start,
+    std::optional<std::ptrdiff_t> stop,
+    std::optional<std::ptrdiff_t> step,
+    std::ptrdiff_t size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_minimal_system_calls_with_slice<"
+        << Cat << ">("
+        << util::optional_to_str(start) << ", "
+        << util::optional_to_str(stop) << ", "
+        << util::optional_to_str(step) << ", "
+        << size << ")"
+    );
+
+    auto ss = std::ostringstream{};
+    ss << "a["
+       << util::optional_to_str(start) << ":"
+       << util::optional_to_str(stop) << ":"
+       << util::optional_to_str(step) << "]";
+    const auto ast = ast::generate_ast(ss.str());
+    auto mfg = testing::StrictMock<MockFieldGenerator>{};
+    auto step_v = step.value_or(1);
+    auto start_v = start.value_or(0);
+    auto stop_v = stop.value_or(size);
+    auto compare = [=](auto i, auto e) {
+        return (step_v > 0)? (i < e) : (i > e);
+    };
+    if (step_v < 0)
+    {
+        start_v = start.value_or(size - 1);
+        stop_v = stop.value_or(-1);
+    }
+    if (start_v < 0) { start_v += size; }
+    if (stop && stop_v < 0) { stop_v += size; }
+
+    for (auto i = start_v; compare(i, stop_v); i += step_v)
+    {
+        EXPECT_CALL(mfg, get(i))
+            .WillOnce(Return(ByMove(
+                field_with_one_primitive_access(PrimitiveInt{1})
+            )));
+    }
+    auto arange = FieldRange<Cat>{
+        ranges::views::iota(std::ptrdiff_t{0}, size) |
+        ranges::views::transform(
+            [&](int index) { return mfg.get(index); }
+        )
+    };
+    const auto fcp = FieldCallParams{};
+    auto root = field_with_accesses("a", fcp, std::move(arange));
+    const auto results = ResultTree(ast, std::move(root));
+}
+
+TEST(ResultTreeTest, TestMinimalSystemCallsWithSlice)
+{
+    test_minimal_system_calls_with_slice<input>(5, 15, 2, 20);
+
+    // Non-sized input ranges can't handle negative indeces efficiently
+    test_minimal_system_calls_with_slice<input | sized>(5, -5, 2, 20);
+    test_minimal_system_calls_with_slice<input | sized>(-15, 15, 2, 20);
+    test_minimal_system_calls_with_slice<input | sized>(-15, -5, 2, 20);
+    test_minimal_system_calls_with_slice<forward>(5, -5, 2, 20);
+    test_minimal_system_calls_with_slice<forward>(-15, 15, 2, 20);
+    test_minimal_system_calls_with_slice<forward>(-15, -5, 2, 20);
+
+    // Only bidirectional ranges can handle negative steps efficiently
+    test_minimal_system_calls_with_slice<bidirectional>(15, 5, -2, 20);
+    test_minimal_system_calls_with_slice<bidirectional>(15, -15, -2, 20);
+    test_minimal_system_calls_with_slice<bidirectional>(-5, 5, -2, 20);
+    test_minimal_system_calls_with_slice<bidirectional>(-5, -15, -2, 20);
 }
 
 // -----------------------------------------------------------------------------

@@ -74,7 +74,7 @@ constexpr auto slurp_range_into_vector = SlurpRangeIntoVector{};
 template <typename R>
 Int get_range_size(R& rng)
 {
-    if constexpr (!ranges::forward_range<R>)
+    if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
     {
         throw SqException{"get_range_size: internal error: bad range category"};
         return 0;
@@ -226,7 +226,8 @@ struct FilterImpl<ast::SliceSpec>
         }
         if (start_.value_or(0) < 0 || stop_.value_or(0) < 0)
         {
-            if (HasRangeCategory{ranges::category::forward}(result))
+            if (HasRangeCategory{ranges::category::forward}(result) ||
+                HasRangeCategory{ranges::category::sized}(result))
             {
                 return std::move(result);
             }
@@ -322,7 +323,7 @@ private:
     template <typename R, typename = util::disable_lvalues_t<R>>
     static auto mixed_index_pos_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(ranges::forward_range<R>);
+        assert(ranges::forward_range<R> || ranges::sized_range<R>);
         assert(step > 0);
         assert(start < 0 || stop < 0);
         auto size = get_range_size(rng);
@@ -337,7 +338,7 @@ private:
     template <typename R, typename = util::disable_lvalues_t<R>>
     static auto neg_index_no_stop_pos_step(R&& rng, Int start, Int step)
     {
-        assert(ranges::forward_range<R>);
+        assert(ranges::forward_range<R> || ranges::sized_range<R>);
         assert(step > 0);
         assert(start < 0);
         start += get_range_size(rng);

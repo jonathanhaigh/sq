@@ -12,6 +12,7 @@ add_executable(sq main.cpp)
 target_link_libraries(sq gsl)
 
 add_executable(sq-test test.cpp)
+set_target_properties(sq-test PROPERTIES CXX_CLANG_TIDY "")
 target_link_libraries(sq-test gtest_main)
 
 foreach(SQ_LIB ${SQ_ALL_LIBS})
