@@ -28,7 +28,7 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
 {
     const auto ast = ast::generate_ast("a.b.c");
     const auto fcp = FieldCallParams{};
-    auto c = field_with_one_primitive_access(PrimitiveInt{1});
+    auto c = field_with_one_primitive_access(1);
     auto b = field_with_accesses("c", fcp, std::move(c));
     auto a = field_with_accesses("b", fcp, std::move(b));
     auto root = field_with_accesses("a", fcp, std::move(a));
@@ -39,9 +39,9 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
 {
     const auto ast = ast::generate_ast("a { b c d }");
     const auto fcp = FieldCallParams{};
-    auto b = field_with_one_primitive_access(PrimitiveInt{1});
-    auto c = field_with_one_primitive_access(PrimitiveInt{2});
-    auto d = field_with_one_primitive_access(PrimitiveInt{3});
+    auto b = field_with_one_primitive_access(1);
+    auto c = field_with_one_primitive_access(2);
+    auto d = field_with_one_primitive_access(3);
     auto a = field_with_accesses(
         "b", fcp, std::move(b),
         "c", fcp, std::move(c),
@@ -73,7 +73,7 @@ void test_minimal_system_calls_with_element_access(
     ss << "a[" << index << "]";
     const auto ast = ast::generate_ast(ss.str());
 
-    auto a0 = field_with_one_primitive_access(PrimitiveInt{1});
+    auto a0 = field_with_one_primitive_access(1);
     auto mfg = testing::StrictMock<MockFieldGenerator>{};
     const auto normalized_index = (index >= 0)? index : (size + index);
     EXPECT_CALL(mfg, get(normalized_index))
@@ -142,7 +142,7 @@ void test_minimal_system_calls_with_slice(
     {
         EXPECT_CALL(mfg, get(i))
             .WillOnce(Return(ByMove(
-                field_with_one_primitive_access(PrimitiveInt{1})
+                field_with_one_primitive_access(1)
             )));
     }
     auto arange = FieldRange<Cat>{
@@ -185,7 +185,7 @@ TEST(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
     auto root = ResultView{std::make_unique<FakeField>()};
     const auto results = ResultTree{ast, std::move(root)};
 
-    auto c = ResultTree{PrimitiveInt{0}};
+    auto c = primitive_tree(0);
     auto b = obj_data_tree("c", std::move(c));
     auto a = obj_data_tree("b", std::move(b));
     const auto expected = obj_data_tree("a", std::move(a));
@@ -198,9 +198,9 @@ TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
     auto root = ResultView{std::make_unique<FakeField>()};
     const auto results = ResultTree{ast, std::move(root)};
 
-    auto b = ResultTree{PrimitiveInt{0}};
-    auto c = ResultTree{PrimitiveInt{0}};
-    auto d = ResultTree{PrimitiveInt{0}};
+    auto b = primitive_tree(0);
+    auto c = primitive_tree(0);
+    auto d = primitive_tree(0);
     auto a = obj_data_tree(
         "b", std::move(b),
         "c", std::move(c),
@@ -223,7 +223,7 @@ TEST_P(ResultTreeParamTest, TestParamPassing)
 {
     const auto [ query, params ] = GetParam();
     const auto ast = ast::generate_ast(query);
-    auto a = field_with_one_primitive_access(PrimitiveInt{0});
+    auto a = field_with_one_primitive_access(0);
     auto root = field_with_accesses("a", params, std::move(a));
     const auto results = ResultTree(ast, std::move(root));
 }
