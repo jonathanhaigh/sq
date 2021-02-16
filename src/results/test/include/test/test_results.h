@@ -6,6 +6,8 @@
 #include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <range/v3/view/cartesian_product.hpp>
+#include <range/v3/view/concat.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
 #include <utility>
@@ -54,21 +56,6 @@ struct MockFieldGenerator
     MOCK_METHOD(FieldPtr, get, (std::ptrdiff_t index), (const));
 };
 
-template <typename T>
-struct TestWithFieldRangeType : testing::Test { };
-
-using FieldRangeTypes = testing::Types<
-    FieldRange<input>,
-    FieldRange<forward>,
-    FieldRange<bidirectional>,
-    FieldRange<random_access>,
-    FieldRange<input | sized>,
-    FieldRange<forward | sized>,
-    FieldRange<bidirectional | sized>,
-    FieldRange<random_access | sized>
->;
-TYPED_TEST_SUITE(TestWithFieldRangeType, FieldRangeTypes,);
-
 template <ranges::category Cat>
 void test_minimal_system_calls_with_element_access(
     std::ptrdiff_t index,
@@ -95,7 +82,7 @@ void test_minimal_system_calls_with_element_access(
     auto arange = FieldRange<Cat>{
         ranges::views::iota(std::ptrdiff_t{0}, size) |
         ranges::views::transform(
-            [&](int i) { return mfg.get(i); }
+            [&](auto i) { return mfg.get(i); }
         )
     };
     const auto fcp = FieldCallParams{};
@@ -161,7 +148,7 @@ void test_minimal_system_calls_with_slice(
     auto arange = FieldRange<Cat>{
         ranges::views::iota(std::ptrdiff_t{0}, size) |
         ranges::views::transform(
-            [&](int index) { return mfg.get(index); }
+            [&](auto index) { return mfg.get(index); }
         )
     };
     const auto fcp = FieldCallParams{};
@@ -268,5 +255,145 @@ INSTANTIATE_TEST_SUITE_P(
         }
     )
 );
+
+// -----------------------------------------------------------------------------
+// Filter tests
+// -----------------------------------------------------------------------------
+
+void test_element_access(
+    const ranges::category cat,
+    const std::ptrdiff_t index,
+    const std::ptrdiff_t size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_element_access("
+        << "cat=" << cat << ", "
+        << "index=" << index << ", "
+        << "size=" << size << ")"
+    );
+    auto ss = std::stringstream{};
+    ss << "a[" << index << "]";
+    const auto ast = ast::generate_ast(ss.str());
+
+    const auto normalized_index = (index >= 0)? index : (size + index);
+    auto arange = to_field_range(cat,
+        ranges::views::iota(PrimitiveInt{0}, size) |
+        ranges::views::transform(
+            [](auto i) {
+                return std::make_unique<FakeField>(i);
+            }
+        )
+    );
+    auto root = std::make_unique<FakeField>(std::move(arange));
+    const auto results = ResultTree(ast, std::move(root));
+    ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
+    const auto& res_root = std::get<ObjData>(results.data());
+    EXPECT_EQ(res_root.size(), 1);
+    EXPECT_EQ(res_root[0].first, "a");
+    ASSERT_TRUE(std::holds_alternative<Primitive>(res_root[0].second.data()));
+    const auto& res_a_prim = std::get<Primitive>(res_root[0].second.data());
+    ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(res_a_prim));
+    const auto& res_a = std::get<PrimitiveInt>(res_a_prim);
+    EXPECT_EQ(res_a, normalized_index);
+}
+
+TEST(ResultTreeTest, TestElementAccess)
+{
+    static constexpr auto size = std::ptrdiff_t{10};
+
+    for (const auto cat : all_categories)
+    {
+        for (const auto index : ranges::views::iota(-size, size))
+        {
+            test_element_access(cat, index, size);
+        }
+    }
+}
+
+static void test_slice(
+    const ranges::category cat,
+    const std::optional<std::ptrdiff_t> start,
+    const std::optional<std::ptrdiff_t> stop,
+    const std::optional<std::ptrdiff_t> step,
+    const std::ptrdiff_t size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_slice("
+        << "cat=" << cat << ", "
+        << "start=" << util::optional_to_str(start) << ", "
+        << "stop=" << util::optional_to_str(stop) << ", "
+        << "step=" << util::optional_to_str(step) << ", "
+        << "size=" << size << ")"
+    );
+    auto ss = std::ostringstream{};
+    ss << "a["
+       << util::optional_to_str(start) << ":"
+       << util::optional_to_str(stop) << ":"
+       << util::optional_to_str(step) << "]";
+    const auto ast = ast::generate_ast(ss.str());
+    auto step_v = step.value_or(1);
+    auto start_v = start.value_or(0);
+    auto stop_v = stop.value_or(size);
+    auto compare = [=](auto i, auto e) {
+        return (step_v > 0)? (i < e) : (i > e);
+    };
+    if (step_v < 0)
+    {
+        start_v = start.value_or(size - 1);
+        stop_v = stop.value_or(-1);
+    }
+    if (start_v < 0) { start_v += size; }
+    if (stop && stop_v < 0) { stop_v += size; }
+
+    auto expected_a_data = ArrayData{};
+    for (auto i = start_v; compare(i, stop_v); i += step_v)
+    {
+        expected_a_data.emplace_back(PrimitiveInt{i});
+    }
+    auto expected_a = ResultTree{std::move(expected_a_data)};
+    auto expected_root = obj_data_tree("a", std::move(expected_a));
+
+    auto system_a = to_field_range(cat,
+        ranges::views::iota(PrimitiveInt{0}, size) |
+        ranges::views::transform(
+            [](auto i) {
+                return std::make_unique<FakeField>(i);
+            }
+        )
+    );
+
+    auto system_root = std::make_unique<FakeField>(std::move(system_a));
+    const auto root = ResultTree(ast, std::move(system_root));
+    ASSERT_EQ(root, expected_root);
+}
+
+TEST(ResultTreeTest, TestSlice)
+{
+    using OIL = std::initializer_list<std::optional<std::ptrdiff_t>>;
+    auto starts = OIL{ std::nullopt, 5, -15 };
+    auto stops = OIL{ std::nullopt, 15, -5 };
+    auto steps_p = OIL{ std::nullopt, 1, 2, 3 };
+    auto steps_n = OIL{ -1, -2, -3 };
+    auto arg_packs_p = ranges::views::cartesian_product(
+        all_categories, starts, stops, steps_p
+    );
+    auto arg_packs_n = ranges::views::cartesian_product(
+        all_categories, stops, starts, steps_n
+    );
+    auto arg_packs = ranges::views::concat(arg_packs_p, arg_packs_n);
+
+    for (auto arg_pack : arg_packs)
+    {
+        test_slice(
+            std::get<0>(arg_pack),
+            std::get<1>(arg_pack),
+            std::get<2>(arg_pack),
+            std::get<3>(arg_pack),
+            20
+        );
+    }
+}
 
 } // namespace sq::test
