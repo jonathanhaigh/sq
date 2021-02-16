@@ -15,7 +15,7 @@ static std::string make_invalid_field_error_message(
 }
 
 InvalidFieldError::InvalidFieldError(const std::string_view sq_type, const std::string_view field)
-    : SqException{make_invalid_field_error_message(sq_type, field)}
+    : Exception{make_invalid_field_error_message(sq_type, field)}
 {}
 
 } // namespace sq

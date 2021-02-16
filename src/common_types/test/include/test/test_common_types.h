@@ -1,7 +1,7 @@
 #include "common_types/FieldCallParams.h"
 #include "common_types/Primitive.h"
-#include "common_types/SqArgumentTypeError.h"
-#include "common_types/SqArgumentMissingError.h"
+#include "common_types/ArgumentTypeError.h"
+#include "common_types/ArgumentMissingError.h"
 
 #include <gtest/gtest.h>
 
@@ -124,27 +124,27 @@ TEST_F(FieldCallParamsTest, TestGetWithInvalidType)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(0, "s1"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(1, "i1"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(2, "s2"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(3, "i2"), SqArgumentTypeError);
+    EXPECT_THROW(fcp_.get<PrimitiveBool>(0, "s1"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get<PrimitiveBool>(1, "i1"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get<PrimitiveBool>(2, "s2"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get<PrimitiveBool>(3, "i2"), ArgumentTypeError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetOptionalWithInvalidType)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(0, "s1"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(1, "i1"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(2, "s2"), SqArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(3, "i2"), SqArgumentTypeError);
+    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(0, "s1"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(1, "i1"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(2, "s2"), ArgumentTypeError);
+    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(3, "i2"), ArgumentTypeError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetWithMissingArgument)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(4, "s3"), SqArgumentMissingError);
+    EXPECT_THROW(fcp_.get<PrimitiveBool>(4, "s3"), ArgumentMissingError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetOptionalWithMissingArgument)

@@ -1,8 +1,8 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
 #define SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
 
-#include "common_types/SqArgumentMissingError.h"
-#include "common_types/SqArgumentTypeError.h"
+#include "common_types/ArgumentMissingError.h"
+#include "common_types/ArgumentTypeError.h"
 
 #include <stdexcept>
 
@@ -20,7 +20,7 @@ const ParamType& FieldCallParams::get(const size_t index, const std::string_view
         }
         catch (const std::bad_variant_access&)
         {
-            throw SqArgumentTypeError{value, primitive_type_name_v<ParamType>};
+            throw ArgumentTypeError{value, primitive_type_name_v<ParamType>};
         }
     }
     try
@@ -32,12 +32,12 @@ const ParamType& FieldCallParams::get(const size_t index, const std::string_view
         }
         catch (const std::bad_variant_access&)
         {
-            throw SqArgumentTypeError{value, primitive_type_name_v<ParamType>};
+            throw ArgumentTypeError{value, primitive_type_name_v<ParamType>};
         }
     }
     catch(const std::out_of_range&)
     {
-        throw SqArgumentMissingError{name, primitive_type_name_v<ParamType>};
+        throw ArgumentMissingError{name, primitive_type_name_v<ParamType>};
     }
 }
 
@@ -48,7 +48,7 @@ const ParamType* FieldCallParams::get_optional(const size_t index, const std::st
     {
         return &(get<ParamType>(index, name));
     }
-    catch (const SqArgumentMissingError&)
+    catch (const ArgumentMissingError&)
     {
         return nullptr;
     }

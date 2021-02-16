@@ -1,4 +1,4 @@
-#include "common_types/SqArgumentMissingError.h"
+#include "common_types/ArgumentMissingError.h"
 
 #include <sstream>
 
@@ -15,11 +15,11 @@ static std::string create_error_message(
     return ss.str();
 }
 
-SqArgumentMissingError::SqArgumentMissingError(
+ArgumentMissingError::ArgumentMissingError(
     const std::string_view arg_name,
     const std::string_view arg_type
 )
-    : SqException(create_error_message(arg_name, arg_type))
+    : Exception(create_error_message(arg_name, arg_type))
 { }
 
 } // namespace sq

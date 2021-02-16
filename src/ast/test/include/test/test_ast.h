@@ -289,9 +289,9 @@ TEST_P(InvalidQueryTest, InvalidQuery)
 {
     try {
         const auto ast = generate_ast(GetParam());
-        FAIL() << "Expected SqParseError; ast = " << ast;
+        FAIL() << "Expected ParseError; ast = " << ast;
     }
-    catch(const SqParseError& e)
+    catch(const ParseError& e)
     {
     }
 }

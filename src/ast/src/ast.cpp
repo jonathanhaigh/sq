@@ -163,7 +163,7 @@ static void parse_parameter(Ast& parent, Parameter& p)
         auto ss = std::ostringstream{};
         ss << "named parameter \"" << np_ptr->ID()->getText()
            << "\" given multiple times in one call";
-        throw SqParseError(np_ptr->ID()->getSymbol(), ss.str());
+        throw ParseError(np_ptr->ID()->getSymbol(), ss.str());
     }
 }
 
@@ -274,13 +274,13 @@ static T parse_integer(TerminalNode& i)
     {
         auto ss = std::ostringstream{};
         ss << "integer \"" << str << "\" is out of range";
-        throw SqParseError(i.getSymbol(), ss.str());
+        throw ParseError(i.getSymbol(), ss.str());
     }
     if (ec != std::errc() || ptr != end)
     {
         auto ss = std::ostringstream{};
         ss << "failed to parse \"" << str << "\" as integer";
-        throw SqParseError(i.getSymbol(), ss.str());
+        throw ParseError(i.getSymbol(), ss.str());
     }
     return value;
 }
@@ -316,7 +316,7 @@ public:
         [[maybe_unused]] std::exception_ptr e
     ) override
     {
-        throw SqParseError(symbol, msg);
+        throw ParseError(symbol, msg);
     }
 };
 
