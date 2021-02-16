@@ -18,8 +18,8 @@ public:
     MoveOnlyTree(const MoveOnlyTree&) = delete;
     MoveOnlyTree& operator=(const MoveOnlyTree&) = delete;
 
-    MoveOnlyTree(MoveOnlyTree&&) = default;
-    MoveOnlyTree& operator=(MoveOnlyTree&&) = default;
+    MoveOnlyTree(MoveOnlyTree&&) noexcept = default;
+    MoveOnlyTree& operator=(MoveOnlyTree&&) noexcept = default;
     ~MoveOnlyTree() noexcept = default;
 
     template <typename... Args>

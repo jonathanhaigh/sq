@@ -9,14 +9,12 @@
 
 namespace sq::test {
 
-using namespace serialization;
-
-static bool isspace(char c)
+inline bool isspace(char c)
 {
     return std::isspace(static_cast<unsigned char>(c));
 }
 
-void test_serialization(const std::string_view expected, ResultTree&& tree)
+inline void test_serialization(const std::string_view expected, ResultTree&& tree)
 {
     SCOPED_TRACE(testing::Message()
         << "test_serialization("
@@ -24,7 +22,7 @@ void test_serialization(const std::string_view expected, ResultTree&& tree)
         << "tree)"
     );
     auto ss = std::ostringstream{};
-    serialize_results(ss, tree);
+    serialization::serialize_results(ss, tree);
 
     auto serialized = ss.str();
     serialized |= ranges::actions::remove_if(isspace);

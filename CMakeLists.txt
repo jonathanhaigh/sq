@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(3rdparty)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(Sq
     VERSION 0.0.1
@@ -52,7 +53,6 @@ add_compile_options(${SQ_WARNING_FLAGS})
 
 option(FORCE_COLOR "Force coloured compiler output" TRUE)
 if("${FORCE_COLOR}" OR "$ENV{CLICOLOR_FORCE}")
-    string(APPEND CMAKE_CXX_CLANG_TIDY ";--use-color")
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL GNU)
         add_compile_options(-fdiagnostics-color=always)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL Clang)

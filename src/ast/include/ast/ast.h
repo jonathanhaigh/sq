@@ -21,9 +21,8 @@ public:
     AstData& operator=(AstData&&) = default;
     ~AstData() noexcept = default;
 
-    template <typename String>
-    explicit AstData(String&& name)
-        : name_(std::forward<String>(name))
+    explicit AstData(std::string_view name)
+        : name_(name)
     { }
 
     const std::string& name() const { return name_; }

@@ -35,13 +35,15 @@ using Result = std::variant<
 class Field
 {
 public:
-    virtual ~Field() noexcept = default;
-
     virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
     virtual Primitive to_primitive() const = 0;
 
-protected:
-    Field() = default;
+    Field(const Field&) = delete;
+    Field(Field&&) = delete;
+    Field& operator=(const Field&) = delete;
+    Field& operator=(Field&&) = delete;
+    Field() noexcept = default;
+    virtual ~Field() noexcept = default;
 };
 
 } // namespace sq
