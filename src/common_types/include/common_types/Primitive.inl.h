@@ -6,16 +6,16 @@
 namespace sq {
 
 template <>
-const char* const primitive_type_name_v<PrimitiveString> = "PrimitiveString";
+inline constexpr const char* primitive_type_name_v<PrimitiveString> = "PrimitiveString";
 
 template <>
-const char* const primitive_type_name_v<PrimitiveInt> = "PrimitiveInt";
+inline constexpr const char* primitive_type_name_v<PrimitiveInt> = "PrimitiveInt";
 
 template <>
-const char* const primitive_type_name_v<PrimitiveFloat> = "PrimitiveFloat";
+inline constexpr const char* primitive_type_name_v<PrimitiveFloat> = "PrimitiveFloat";
 
 template <>
-const char* const primitive_type_name_v<PrimitiveBool> = "PrimitiveBool";
+inline constexpr const char* primitive_type_name_v<PrimitiveBool> = "PrimitiveBool";
 
 namespace detail {
 

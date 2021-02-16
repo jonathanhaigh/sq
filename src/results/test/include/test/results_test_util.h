@@ -75,10 +75,11 @@ struct FakeField
     FakeField(Result&& result);
     FakeField(ResultGenerator result_generator);
     FakeField();
-    FakeField(const FakeField&) = default;
-    FakeField(FakeField&&) = default;
-    FakeField& operator=(const FakeField&) = default;
-    FakeField& operator=(FakeField&&) = default;
+    FakeField(const FakeField&) = delete;
+    FakeField(FakeField&&) = delete;
+    FakeField& operator=(const FakeField&) = delete;
+    FakeField& operator=(FakeField&&) = delete;
+    ~FakeField() noexcept = default;
 
     Result get(
         const std::string_view member,

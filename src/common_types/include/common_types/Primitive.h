@@ -20,7 +20,7 @@ using Primitive = std::variant<
 >;
 
 template <typename T>
-static const char* const primitive_type_name_v = nullptr;
+inline constexpr const char* primitive_type_name_v = nullptr;
 
 template <typename T>
 static const char* primitive_type_name(const T& value);
