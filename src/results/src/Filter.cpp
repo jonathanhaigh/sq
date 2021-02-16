@@ -392,7 +392,7 @@ private:
         assert(step < 0);
         assert(start >= 0);
         assert(stop >= 0);
-        assert(start >= 0 || stop >= 0);
+        if (stop > start) { stop = start; }
         return get_reversed_range(
             rng |
             ranges::views::drop(stop + 1) |

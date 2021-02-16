@@ -334,18 +334,31 @@ static void test_slice(
        << util::optional_to_str(step) << "]";
     const auto ast = ast::generate_ast(ss.str());
     auto step_v = step.value_or(1);
-    auto start_v = start.value_or(0);
-    auto stop_v = stop.value_or(size);
+    auto start_v = std::ptrdiff_t{0};
+    auto stop_v = std::ptrdiff_t{0};
     auto compare = [=](auto i, auto e) {
-        return (step_v > 0)? (i < e) : (i > e);
+        return (step_v > 0)? (i < e && i < size) : (i > e && i > -1);
     };
     if (step_v < 0)
     {
         start_v = start.value_or(size - 1);
+        if (start_v < 0) { start_v += size; }
+        if (start_v >= size) { start_v = size - 1; }
+
         stop_v = stop.value_or(-1);
+        if (stop && stop_v < 0) { stop_v += size; }
+        if (stop_v < -1) { stop_v = -1; }
     }
-    if (start_v < 0) { start_v += size; }
-    if (stop && stop_v < 0) { stop_v += size; }
+    else 
+    {
+        start_v = start.value_or(0);
+        if (start_v < 0) { start_v += size; }
+        if (start_v < 0) { start_v = 0; }
+
+        stop_v = stop.value_or(size);
+        if (stop && stop_v < 0) { stop_v += size; }
+        if (stop_v > size) { stop_v = size; }
+    }
 
     auto expected_a_data = ArrayData{};
     for (auto i = start_v; compare(i, stop_v); i += step_v)
@@ -372,17 +385,14 @@ static void test_slice(
 TEST(ResultTreeTest, TestSlice)
 {
     using OIL = std::initializer_list<std::optional<std::ptrdiff_t>>;
-    auto starts = OIL{ std::nullopt, 5, -15 };
-    auto stops = OIL{ std::nullopt, 15, -5 };
-    auto steps_p = OIL{ std::nullopt, 1, 2, 3 };
-    auto steps_n = OIL{ -1, -2, -3 };
-    auto arg_packs_p = ranges::views::cartesian_product(
-        all_categories, starts, stops, steps_p
+    auto indeces = OIL{
+        std::nullopt, 0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5, -6
+    };
+    auto steps = OIL{ std::nullopt, -3, -2, -1, 1, 2, 3 };
+
+    auto arg_packs = ranges::views::cartesian_product(
+        all_categories, indeces, indeces, steps
     );
-    auto arg_packs_n = ranges::views::cartesian_product(
-        all_categories, stops, starts, steps_n
-    );
-    auto arg_packs = ranges::views::concat(arg_packs_p, arg_packs_n);
 
     for (auto arg_pack : arg_packs)
     {
@@ -391,7 +401,7 @@ TEST(ResultTreeTest, TestSlice)
             std::get<1>(arg_pack),
             std::get<2>(arg_pack),
             std::get<3>(arg_pack),
-            20
+            5
         );
     }
 }
