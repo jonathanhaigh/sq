@@ -1,6 +1,7 @@
 #include "results/Filter.h"
 
-#include "common_types/Exception.h"
+#include "common_types/InternalError.h"
+#include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
 #include "util/typeutil.h"
 
@@ -56,7 +57,7 @@ struct SlurpRangeIntoVector
 
     FieldVector operator()([[maybe_unused]] const FieldPtr& fp) const
     {
-        throw Exception("Cannot apply array filter to non-array field");
+        throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
@@ -77,7 +78,9 @@ Int get_range_size(R& rng)
 {
     if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
     {
-        throw Exception{"get_range_size: internal error: bad range category"};
+        throw InternalError{
+            "get_range_size: internal error: bad range category"
+        };
         return 0;
     }
     else
@@ -91,7 +94,9 @@ auto get_reversed_range(R&& rng)
 {
     if constexpr (!ranges::bidirectional_range<R>)
     {
-        throw Exception{"get_reversed_range: internal error: bad range category"};
+        throw InternalError{
+            "get_reversed_range: internal error: bad range category"
+        };
         return std::forward<R>(rng);
     }
     else
@@ -149,7 +154,7 @@ struct FilterImpl<ast::ElementAccessSpec>
 
     ResultView operator()([[maybe_unused]] FieldPtr&& fp) const
     {
-        throw Exception("Cannot apply array filter to non-array field");
+        throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
@@ -244,7 +249,7 @@ struct FilterImpl<ast::SliceSpec>
 
     ResultView operator()([[maybe_unused]] const FieldPtr& fp) const
     {
-        throw Exception("Cannot apply array filter to non-array field");
+        throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
