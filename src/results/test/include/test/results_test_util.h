@@ -3,7 +3,10 @@
 
 #include "results/results.h"
 
+#include <cassert>
+#include <functional>
 #include <gmock/gmock.h>
+#include <optional>
 
 namespace sq::test {
 
@@ -15,6 +18,7 @@ using testing::ByMove;
 using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
 using ObjDataField = ObjData::value_type;
+using ArrayData = ResultTree::ArrayData;
 
 /**
  * Represents a Field upon whose accesses we have expectations.
@@ -46,18 +50,57 @@ using StrictMockFieldPtr = std::unique_ptr<StrictMockField>;
 struct FakeField
     : Field
 {
+    using ResultGenerator = std::function<
+        Result(std::string_view, const FieldCallParams&)
+    >;
+
+    FakeField(ResultGenerator result_generator, const Primitive& primitive)
+        : result_generator_{result_generator}
+        , primitive_{primitive}
+    { }
+
+    FakeField(Result&& result)
+        : result_generator_{
+            [&](auto, auto) { return std::move(result); }
+        }
+    { }
+
+    FakeField(const Primitive& primitive)
+        : result_generator_{
+            [&](auto, auto) { return std::make_unique<FakeField>(); }
+        }
+        , primitive_{primitive}
+    { }
+
+    FakeField(ResultGenerator result_generator)
+        : result_generator_{result_generator}
+    { }
+
+    FakeField()
+        : FakeField{PrimitiveInt{0}}
+    { }
+
+    FakeField(const FakeField&) = default;
+    FakeField(FakeField&&) = default;
+    FakeField& operator=(const FakeField&) = default;
+    FakeField& operator=(FakeField&&) = default;
+
     Result get(
-        [[maybe_unused]] std::string_view member,
-        [[maybe_unused]] const FieldCallParams& params
+        const std::string_view member,
+        const FieldCallParams& params
     ) const override
     {
-        return std::make_unique<FakeField>();
+        return result_generator_(member, params);
     }
 
     Primitive to_primitive() const override
     {
-        return PrimitiveInt{0};
+        return primitive_;
     }
+
+private:
+    ResultGenerator result_generator_;
+    Primitive primitive_ = PrimitiveInt{0};
 };
 
 /**
@@ -167,6 +210,52 @@ static constexpr auto forward = ranges::category::forward;
 static constexpr auto bidirectional = ranges::category::bidirectional;
 static constexpr auto random_access = ranges::category::random_access;
 static constexpr auto sized = ranges::category::sized;
+
+static constexpr auto all_categories = {
+    input, input|sized,
+    forward, forward|sized,
+    bidirectional, bidirectional|sized,
+    random_access, random_access|sized
+};
+
+template <typename T>
+Result to_field_range(const ranges::category cat, T&& rng)
+{
+    if (cat == input)
+    {
+        return FieldRange<input>{std::forward<T>(rng)};
+    }
+    if (cat == (input|sized))
+    {
+        return FieldRange<input|sized>{std::forward<T>(rng)};
+    }
+    if (cat == forward)
+    {
+        return FieldRange<forward>{std::forward<T>(rng)};
+    }
+    if (cat == (forward|sized))
+    {
+        return FieldRange<forward|sized>{std::forward<T>(rng)};
+    }
+    if (cat == bidirectional)
+    {
+        return FieldRange<bidirectional>{std::forward<T>(rng)};
+    }
+    if (cat == (bidirectional|sized))
+    {
+        return FieldRange<bidirectional|sized>{std::forward<T>(rng)};
+    }
+    if (cat == random_access)
+    {
+        return FieldRange<random_access>{std::forward<T>(rng)};
+    }
+    if (cat == (random_access|sized))
+    {
+        return FieldRange<random_access|sized>{std::forward<T>(rng)};
+    }
+    assert(false);
+    return FieldRange<input>{std::forward<T>(rng)};
+}
 
 } // namespace sq::test
 
