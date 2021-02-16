@@ -172,6 +172,12 @@ std::ostream& operator<<(std::ostream& os, const category& cat);
 
 } // namespace ranges
 
+namespace sq::results {
+
+std::ostream& operator<<(std::ostream& os, const ResultTree& tree);
+
+} // namespace sq::results
+
 #include "results_test_util.inl.h"
 
 #endif // SQ_INCLUDE_GUARD_results_test_results_test_util_h_

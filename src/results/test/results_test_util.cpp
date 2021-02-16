@@ -1,5 +1,7 @@
 #include "test/results_test_util.h"
 
+#include "serialization/serialize.h"
+
 namespace sq::test {
 
 FakeField::FakeField(Result&& result)
@@ -100,3 +102,14 @@ std::ostream& operator<<(std::ostream& os, const category& cat)
 }
 
 } // namespace ranges
+
+
+namespace sq::results {
+
+std::ostream& operator<<(std::ostream& os, const ResultTree& tree)
+{
+    serialization::serialize_results(os, tree);
+    return os;
+}
+
+} // namespace sq::results
