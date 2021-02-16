@@ -1,6 +1,7 @@
 #include "results/results.h"
 
 #include "ast/ast.h"
+#include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
 #include "results_test_util.h"
 #include "test/FieldCallParams_test_util.h"
@@ -423,6 +424,21 @@ TEST(ResultTreeTest, TestSlice)
             std::get<3>(arg_pack),
             5
         );
+    }
+}
+
+TEST(ResultTreeTest, TestNotAnArrayError)
+{
+    for (const auto& query : { "a[0]", "a[::]" })
+    {
+        SCOPED_TRACE(testing::Message() << "query=" << query);
+
+        const auto ast = ast::generate_ast(query);
+        auto root = std::make_unique<FakeField>();
+
+        EXPECT_THROW({
+            auto results = ResultTree(ast, std::move(root));
+        }, NotAnArrayError);
     }
 }
 
