@@ -1,6 +1,7 @@
 #include "results/results.h"
 
 #include "ast/ast.h"
+#include "common_types/SqOutOfRangeError.h"
 #include "results_test_util.h"
 #include "test/FieldCallParams_test_util.h"
 #include "util/strutil.h"
@@ -308,6 +309,25 @@ TEST(ResultTreeTest, TestElementAccess)
         {
             test_element_access(cat, index, size);
         }
+    }
+}
+
+TEST(ResultTreeTest, TestElementAccessOutOfRange)
+{
+    for (const auto cat : all_categories)
+    {
+        EXPECT_THROW({
+            test_element_access(cat, 10, 10);
+        }, SqOutOfRangeError);
+        EXPECT_THROW({
+            test_element_access(cat, 11, 10);
+        }, SqOutOfRangeError);
+        EXPECT_THROW({
+            test_element_access(cat, -11, 10);
+        }, SqOutOfRangeError);
+        EXPECT_THROW({
+            test_element_access(cat, -12, 10);
+        }, SqOutOfRangeError);
     }
 }
 
