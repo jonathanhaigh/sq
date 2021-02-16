@@ -1,7 +1,7 @@
 #ifndef SQ_INCLUDE_GUARD_ast_ParseError_h_
 #define SQ_INCLUDE_GUARD_ast_ParseError_h_
 
-#include "common_types/SqException.h"
+#include "common_types/Exception.h"
 
 #include <string_view>
 
@@ -11,11 +11,11 @@ class Token;
 
 namespace sq {
 
-class SqParseError
-    : public SqException
+class ParseError
+    : public Exception
 {
 public:
-    SqParseError(const antlr4::Token* token, std::string_view message);
+    ParseError(const antlr4::Token* token, std::string_view message);
 };
 
 } // namespace sq

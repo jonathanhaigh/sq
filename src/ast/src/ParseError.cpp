@@ -25,11 +25,11 @@ static std::string create_parse_error_message(
     return ss.str();
 }
 
-SqParseError::SqParseError(
+ParseError::ParseError(
     const antlr4::Token* const token,
     const std::string_view message
 )
-    : SqException{create_parse_error_message(token, message)}
+    : Exception{create_parse_error_message(token, message)}
 { }
 
 } // namespace sq

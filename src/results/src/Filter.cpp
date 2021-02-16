@@ -1,7 +1,7 @@
 #include "results/Filter.h"
 
-#include "common_types/SqException.h"
-#include "common_types/SqOutOfRangeError.h"
+#include "common_types/Exception.h"
+#include "common_types/OutOfRangeError.h"
 #include "util/typeutil.h"
 
 #include <cstddef>
@@ -56,7 +56,7 @@ struct SlurpRangeIntoVector
 
     FieldVector operator()([[maybe_unused]] const FieldPtr& fp) const
     {
-        throw SqException("Cannot apply array filter to non-array field");
+        throw Exception("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
@@ -77,7 +77,7 @@ Int get_range_size(R& rng)
 {
     if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
     {
-        throw SqException{"get_range_size: internal error: bad range category"};
+        throw Exception{"get_range_size: internal error: bad range category"};
         return 0;
     }
     else
@@ -91,7 +91,7 @@ auto get_reversed_range(R&& rng)
 {
     if constexpr (!ranges::bidirectional_range<R>)
     {
-        throw SqException{"get_reversed_range: internal error: bad range category"};
+        throw Exception{"get_reversed_range: internal error: bad range category"};
         return std::forward<R>(rng);
     }
     else
@@ -149,7 +149,7 @@ struct FilterImpl<ast::ElementAccessSpec>
 
     ResultView operator()([[maybe_unused]] FieldPtr&& fp) const
     {
-        throw SqException("Cannot apply array filter to non-array field");
+        throw Exception("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
@@ -182,7 +182,7 @@ private:
             }
             // clang-tidy bug: https://reviews.llvm.org/D72333
             // NOLINTNEXTLINE(readability-misleading-indentation)
-            throw SqOutOfRangeError(ss.str());
+            throw OutOfRangeError(ss.str());
         }
         return std::move(*it);
     }
@@ -196,7 +196,7 @@ private:
         {
             std::ostringstream ss;
             ss << "array element access (\"[" << index_ << "]\"): out of range (size=" << size << ")";
-            throw SqOutOfRangeError(ss.str());
+            throw OutOfRangeError(ss.str());
         }
         return nonnegative_index_access(std::move(rng), nonneg_index);
     }
@@ -244,7 +244,7 @@ struct FilterImpl<ast::SliceSpec>
 
     ResultView operator()([[maybe_unused]] const FieldPtr& fp) const
     {
-        throw SqException("Cannot apply array filter to non-array field");
+        throw Exception("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>

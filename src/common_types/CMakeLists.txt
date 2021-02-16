@@ -2,6 +2,15 @@ set(SQ_COMMON_TYPES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(SQ_COMMON_TYPES_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 add_library(sq_common_types
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/ArgumentMissingError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/ArgumentMissingError.cpp"
+
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/ArgumentTypeError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/ArgumentTypeError.cpp"
+
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/Exception.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/Exception.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/FieldCallParams.h"
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/FieldCallParams.inl.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/FieldCallParams.cpp"
@@ -15,20 +24,11 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/NotImplementedError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/NotImplementedError.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/OutOfRangeError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/OutOfRangeError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/Primitive.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/Primitive.cpp"
-
-    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqArgumentMissingError.h"
-    "${SQ_COMMON_TYPES_SRC_DIR}/SqArgumentMissingError.cpp"
-
-    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqArgumentTypeError.h"
-    "${SQ_COMMON_TYPES_SRC_DIR}/SqArgumentTypeError.cpp"
-
-    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqOutOfRangeError.h"
-    "${SQ_COMMON_TYPES_SRC_DIR}/SqOutOfRangeError.cpp"
-
-    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/SqException.h"
-    "${SQ_COMMON_TYPES_SRC_DIR}/SqException.cpp"
 )
 target_include_directories(sq_common_types PUBLIC "${SQ_COMMON_TYPES_INCLUDE_DIR}")
 target_Link_libraries(sq_common_types PUBLIC sq_util)

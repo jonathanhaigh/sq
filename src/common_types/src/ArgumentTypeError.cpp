@@ -1,4 +1,4 @@
-#include "common_types/SqArgumentTypeError.h"
+#include "common_types/ArgumentTypeError.h"
 
 #include <sstream>
 
@@ -16,11 +16,11 @@ static std::string create_error_message(
     return ss.str();
 }
 
-SqArgumentTypeError::SqArgumentTypeError(
+ArgumentTypeError::ArgumentTypeError(
     const Primitive& received,
     const std::string_view type_expected
 )
-    : SqException(create_error_message(received, type_expected))
+    : Exception(create_error_message(received, type_expected))
 { }
 
 } // namespace sq
