@@ -7,6 +7,8 @@ add_library(sq_results_test
     "${SQ_RT_SRC_DIR}/test_results.cpp"
 
     "${SQ_RT_HEADERS_DIR}/results_test_util.h"
+    "${SQ_RT_HEADERS_DIR}/results_test_util.inl.h"
+    "${SQ_RT_SRC_DIR}/results_test_util.cpp"
 )
 
 set_target_properties(sq_results_test PROPERTIES CXX_CLANG_TIDY "")

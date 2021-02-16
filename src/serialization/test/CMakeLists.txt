@@ -8,4 +8,6 @@ add_library(sq_serialization_test
 )
 target_include_directories(sq_serialization_test PUBLIC "${SQ_ST_INCLUDE_DIR}")
 set_target_properties(sq_serialization_test PROPERTIES CXX_CLANG_TIDY "")
+target_link_libraries(sq_serialization_test PUBLIC sq_serialization)
+target_link_libraries(sq_serialization_test PUBLIC sq_results_test)
 target_link_libraries(sq_serialization_test PUBLIC gtest)
