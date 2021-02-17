@@ -12,9 +12,9 @@ namespace sq::test {
 using namespace sq::ast;
 using Size = Ast::Children::size_type;
 
-static const auto no_filter_spec = FilterSpec{NoFilterSpec{}};
+inline const auto no_filter_spec = FilterSpec{NoFilterSpec{}};
 
-void expect_node(
+inline void expect_node(
     const Ast& node,
     const char* const name,
     const FieldCallParams& params,
@@ -36,25 +36,25 @@ void expect_node(
     EXPECT_EQ(node.children().size(), noof_children);
 }
 
-void expect_plain_node(const Ast& node, const char*const name, const Size noof_children)
+inline void expect_plain_node(const Ast& node, const char*const name, const Size noof_children)
 {
     SCOPED_TRACE("expect_plain_node");
     expect_node(node, name, no_params, no_filter_spec, noof_children);
 }
 
-void expect_plain_leaf(const Ast& node, const char*const name)
+inline void expect_plain_leaf(const Ast& node, const char*const name)
 {
     SCOPED_TRACE("expect_plain_leaf");
     expect_plain_node(node, name, 0);
 }
 
-void expect_root(const Ast& node, const Size noof_children)
+inline void expect_root(const Ast& node, const Size noof_children)
 {
     SCOPED_TRACE("expect_root");
     return expect_plain_node(node, "", noof_children);
 }
 
-void expect_equivalent_query(const char* const q1, const char* const q2)
+inline void expect_equivalent_query(const char* const q1, const char* const q2)
 {
     SCOPED_TRACE(testing::Message()
         << "expect_equivalent_query("
