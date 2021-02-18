@@ -5,7 +5,7 @@
 
 namespace sq::system {
 
-FieldPtr root();
+[[nodiscard]] FieldPtr root();
 
 } // namespace sq::system
 

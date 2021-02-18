@@ -10,7 +10,7 @@ class {{ sq_type.name }}
     : public Field
 {
 public:
-    Result get(std::string_view member, const FieldCallParams& params) const override;
+    [[nodiscard]] Result get(std::string_view member, const FieldCallParams& params) const override;
 };
 
 } // namespace sq::system

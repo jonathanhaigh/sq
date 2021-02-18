@@ -9,7 +9,7 @@
 namespace sq {
 
 template <typename ParamType>
-const ParamType& FieldCallParams::get(const size_t index, const std::string_view name) const
+const ParamType& FieldCallParams::get(size_t index, std::string_view name) const
 {
     if (index < pos_params_.size())
     {
@@ -42,7 +42,7 @@ const ParamType& FieldCallParams::get(const size_t index, const std::string_view
 }
 
 template <typename ParamType>
-const ParamType* FieldCallParams::get_optional(const size_t index, const std::string_view name) const
+const ParamType* FieldCallParams::get_optional(size_t index, std::string_view name) const
 {
     try
     {

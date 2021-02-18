@@ -4,9 +4,11 @@
 
 namespace sq {
 
-static std::string create_error_message(
+namespace {
+
+std::string create_error_message(
     const Primitive& received,
-    const std::string_view type_expected
+    std::string_view type_expected
 )
 {
     auto ss = std::ostringstream{};
@@ -16,9 +18,11 @@ static std::string create_error_message(
     return ss.str();
 }
 
+} // namespace
+
 ArgumentTypeError::ArgumentTypeError(
     const Primitive& received,
-    const std::string_view type_expected
+    std::string_view type_expected
 )
     : Exception(create_error_message(received, type_expected))
 { }

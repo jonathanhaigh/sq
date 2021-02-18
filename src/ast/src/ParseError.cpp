@@ -6,9 +6,11 @@
 
 namespace sq {
 
-static std::string create_parse_error_message(
+namespace {
+
+[[nodiscard]] std::string create_parse_error_message(
     const antlr4::Token* const token,
-    const std::string_view message
+    std::string_view message
 )
 {
     auto ss = std::ostringstream{};
@@ -25,9 +27,11 @@ static std::string create_parse_error_message(
     return ss.str();
 }
 
+} // namespace
+
 ParseError::ParseError(
     const antlr4::Token* const token,
-    const std::string_view message
+    std::string_view message
 )
     : Exception{create_parse_error_message(token, message)}
 { }

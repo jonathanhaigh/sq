@@ -1,9 +1,10 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Primitive_h_
 #define SQ_INCLUDE_GUARD_common_types_Primitive_h_
 
-#include <string>
-#include <variant>
 #include <cstdint>
+#include <string>
+#include <type_traits>
+#include <variant>
 
 namespace sq {
 
@@ -19,14 +20,25 @@ using Primitive = std::variant<
     PrimitiveBool
 >;
 
-template <typename T>
-inline constexpr const char* primitive_type_name_v = nullptr;
+namespace detail {
 
 template <typename T>
-static const char* primitive_type_name(const T& value);
+struct PrimitiveTraits;
+
+} // namespace detail
 
 template <typename T>
-std::string primitive_to_str(const T& value);
+inline constexpr bool is_sq_primitive_v = detail::PrimitiveTraits<T>::is_primitive;
+
+template <typename T>
+inline constexpr const char* primitive_type_name_v = detail::PrimitiveTraits<T>::name;
+
+[[nodiscard]] const char* primitive_type_name(const Primitive& value);
+
+[[nodiscard]] std::string primitive_to_str(const Primitive& value);
+
+template <typename T, typename = std::enable_if_t<is_sq_primitive_v<T>>>
+[[nodiscard]] std::string primitive_to_str(const T& value);
 
 } // namespace sq
 

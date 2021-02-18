@@ -10,6 +10,8 @@
 
 namespace sq::ast {
 
+inline constexpr const char* ast_root_node_name = "root";
+
 class AstData
 {
 public:
@@ -25,13 +27,13 @@ public:
         : name_(name)
     { }
 
-    const std::string& name() const { return name_; }
+    [[nodiscard]] const std::string& name() const { return name_; }
 
-    const FieldCallParams& params() const { return params_; }
-    FieldCallParams& params() { return params_; }
+    [[nodiscard]] const FieldCallParams& params() const { return params_; }
+    [[nodiscard]] FieldCallParams& params() { return params_; }
 
-    const FilterSpec& filter_spec() const { return filter_spec_; }
-    FilterSpec& filter_spec() { return filter_spec_; }
+    [[nodiscard]] const FilterSpec& filter_spec() const { return filter_spec_; }
+    [[nodiscard]] FilterSpec& filter_spec() { return filter_spec_; }
 
 private:
     std::string name_;
@@ -39,12 +41,12 @@ private:
     FilterSpec filter_spec_;
 };
 std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
-bool operator==(const AstData& lhs, const AstData& rhs);
-bool operator!=(const AstData& lhs, const AstData& rhs);
+[[nodiscard]] bool operator==(const AstData& lhs, const AstData& rhs);
+[[nodiscard]] bool operator!=(const AstData& lhs, const AstData& rhs);
 
 using Ast = util::MoveOnlyTree<AstData>;
 
-Ast generate_ast(const std::string& sq_command);
+[[nodiscard]] Ast generate_ast(const std::string& sq_command);
 
 } // namespace sq::ast
 

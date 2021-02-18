@@ -4,24 +4,28 @@
 
 namespace sq::results {
 
+namespace {
+
 struct GetResultViewVisitor
 {
-    ResultView operator()(FieldPtr& fp)
+    [[nodiscard]] ResultView operator()(FieldPtr& fp)
     {
         return std::move(fp);
     }
 
     template <ranges::category Cat>
-    ResultView operator()(FieldRange<Cat>& rng)
+    [[nodiscard]] ResultView operator()(FieldRange<Cat>& rng)
     {
         return std::move(rng);
     }
 
-    ResultView operator()(FieldVector& vec)
+    [[nodiscard]] ResultView operator()(FieldVector& vec)
     {
         return FieldRange<ranges::get_categories<FieldVector>()>{vec | ranges::views::move};
     }
 };
+
+} // namespace
 
 ResultView get_result_view(Result& result)
 {

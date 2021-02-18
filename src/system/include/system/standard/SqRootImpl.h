@@ -8,14 +8,12 @@ namespace sq::system::standard {
 class SqRootImpl
     : public SqRoot<SqRootImpl>
 {
-private:
-    friend class SqRoot<SqRootImpl>;
-
-    static Result get_path(const PrimitiveString* path);
-    static Result get_int(const PrimitiveInt* value);
-    static Result get_ints(const PrimitiveInt* start, const PrimitiveInt* stop);
-    static Result get_bool(const PrimitiveBool* value);
-    Primitive to_primitive() const override;
+public:
+    [[nodiscard]] static Result get_path(const PrimitiveString* path);
+    [[nodiscard]] static Result get_int(const PrimitiveInt* value);
+    [[nodiscard]] static Result get_ints(const PrimitiveInt* start, const PrimitiveInt* stop);
+    [[nodiscard]] static Result get_bool(const PrimitiveBool* value);
+    [[nodiscard]] Primitive to_primitive() const override;
 };
 
 } // namespace sq::system::standard

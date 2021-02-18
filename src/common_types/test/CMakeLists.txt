@@ -10,6 +10,7 @@ add_library(sq_common_types_test_util
     "${SQ_CTT_SRC_DIR}/Primitive_test_util.cpp"
     "${SQ_CTT_HEADERS_DIR}/Primitive_test_util.h"
 )
+set_target_properties(sq_common_types_test_util PROPERTIES CXX_CLANG_TIDY "")
 target_include_directories(
     sq_common_types_test_util PUBLIC "${SQ_CTT_INCLUDE_DIR}"
 )

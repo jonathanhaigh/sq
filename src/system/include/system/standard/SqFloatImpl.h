@@ -11,11 +11,9 @@ class SqFloatImpl
 public:
     explicit SqFloatImpl(PrimitiveFloat value);
 
+    [[nodiscard]] Primitive to_primitive() const override;
+
 private:
-    friend class SqFloat<SqFloatImpl>;
-
-    Primitive to_primitive() const;
-
     PrimitiveFloat value_;
 };
 

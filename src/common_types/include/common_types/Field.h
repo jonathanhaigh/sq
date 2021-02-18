@@ -35,8 +35,8 @@ using Result = std::variant<
 class Field
 {
 public:
-    virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
-    virtual Primitive to_primitive() const = 0;
+    [[nodiscard]] virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
+    [[nodiscard]] virtual Primitive to_primitive() const = 0;
 
     Field(const Field&) = delete;
     Field(Field&&) = delete;

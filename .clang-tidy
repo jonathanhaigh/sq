@@ -1,0 +1,13 @@
+---
+Checks: >-
+    *,
+    -fuchsia-default-arguments-calls,
+    -fuchsia-overloaded-operator,
+    -fuchsia-trailing-return,
+    -google-runtime-references,
+    -llvm-header-guard,
+    -modernize-use-trailing-return-type,
+    -modernize-pass-by-value,
+
+WarningsAsErrors: "*"
+HeaderFilterRegex: ".*/sq/src/.*"

@@ -23,17 +23,17 @@ public:
     FieldCallParams& operator=(FieldCallParams&&) = default;
     ~FieldCallParams() noexcept = default;
 
-    PosParams& pos_params();
-    const PosParams& pos_params() const;
+    [[nodiscard]] PosParams& pos_params();
+    [[nodiscard]] const PosParams& pos_params() const;
 
-    NamedParams& named_params();
-    const NamedParams& named_params() const;
-
-    template <typename ParamType>
-    const ParamType& get(const size_t index, const std::string_view name) const;
+    [[nodiscard]] NamedParams& named_params();
+    [[nodiscard]] const NamedParams& named_params() const;
 
     template <typename ParamType>
-    const ParamType* get_optional(const size_t index, const std::string_view name) const;
+    [[nodiscard]] const ParamType& get(size_t index, std::string_view name) const;
+
+    template <typename ParamType>
+    [[nodiscard]] const ParamType* get_optional(size_t index, std::string_view name) const;
 
 private:
 
@@ -42,8 +42,8 @@ private:
 };
 
 std::ostream& operator <<(std::ostream& os, const FieldCallParams& params);
-bool operator==(const FieldCallParams& lhs, const FieldCallParams& rhs);
-bool operator!=(const FieldCallParams& lhs, const FieldCallParams& rhs);
+[[nodiscard]] bool operator==(const FieldCallParams& lhs, const FieldCallParams& rhs);
+[[nodiscard]] bool operator!=(const FieldCallParams& lhs, const FieldCallParams& rhs);
 
 } // namespace sq
 

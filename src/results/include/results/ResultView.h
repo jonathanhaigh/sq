@@ -3,7 +3,6 @@
 
 #include "common_types/Field.h"
 
-#include <functional>
 #include <range/v3/view/any_view.hpp>
 #include <variant>
 
@@ -21,7 +20,7 @@ using ResultView = std::variant<
     FieldRange<ranges::category::random_access | ranges::category::sized>
 >;
 
-ResultView get_result_view(Result& result);
+[[nodiscard]] ResultView get_result_view(Result& result);
 
 } // namespace sq::results
 

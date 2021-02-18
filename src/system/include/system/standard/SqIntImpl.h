@@ -11,11 +11,9 @@ class SqIntImpl
 public:
     explicit SqIntImpl(PrimitiveInt value);
 
+    [[nodiscard]] Primitive to_primitive() const override;
+
 private:
-    friend class SqInt<SqIntImpl>;
-
-    Primitive to_primitive() const;
-
     PrimitiveInt value_;
 };
 

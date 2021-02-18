@@ -4,9 +4,11 @@
 
 namespace sq {
 
-static std::string make_invalid_field_error_message(
-    const std::string_view sq_type,
-    const std::string_view field
+namespace {
+
+std::string make_invalid_field_error_message(
+    std::string_view sq_type,
+    std::string_view field
 )
 {
     auto os = std::ostringstream{};
@@ -14,7 +16,12 @@ static std::string make_invalid_field_error_message(
     return os.str();
 }
 
-InvalidFieldError::InvalidFieldError(const std::string_view sq_type, const std::string_view field)
+} // namespace
+
+InvalidFieldError::InvalidFieldError(
+    std::string_view sq_type,
+    std::string_view field
+)
     : Exception{make_invalid_field_error_message(sq_type, field)}
 {}
 

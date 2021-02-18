@@ -5,16 +5,16 @@
 
 namespace sq::test {
 
-Primitive to_primitive(PrimitiveString&& v);
-Primitive to_primitive(const PrimitiveString& v);
-Primitive to_primitive(const char* v);
-Primitive to_primitive(PrimitiveInt v);
-Primitive to_primitive(int v);
-Primitive to_primitive(PrimitiveFloat v);
-Primitive to_primitive(PrimitiveBool v);
+[[nodiscard]] Primitive to_primitive(PrimitiveString&& v);
+[[nodiscard]] Primitive to_primitive(const PrimitiveString& v);
+[[nodiscard]] Primitive to_primitive(const char* v);
+[[nodiscard]] Primitive to_primitive(PrimitiveInt v);
+[[nodiscard]] Primitive to_primitive(int v);
+[[nodiscard]] Primitive to_primitive(PrimitiveFloat v);
+[[nodiscard]] Primitive to_primitive(PrimitiveBool v);
 
 template <typename T>
-static constexpr bool is_primitive_like_v = std::disjunction_v<
+inline constexpr bool is_primitive_like_v = std::disjunction_v<
     std::is_convertible<T, PrimitiveString>,
     std::is_convertible<T, PrimitiveInt>,
     std::is_convertible<T, PrimitiveFloat>,

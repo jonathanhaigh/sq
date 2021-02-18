@@ -3,6 +3,8 @@
 
 #include "test/Primitive_test_util.h"
 
+#include <utility>
+
 namespace sq::test {
 
 namespace detail {
@@ -13,7 +15,7 @@ void add_params(FieldCallParams& fcp, T&& p)
     fcp.pos_params().emplace_back(to_primitive(std::forward<T>(p)));
 }
 
-static inline void add_params(FieldCallParams& fcp, NamedParam&& p)
+inline void add_params(FieldCallParams& fcp, NamedParam&& p)
 {
     fcp.named_params().emplace(std::move(p));
 }

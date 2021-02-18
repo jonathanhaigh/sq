@@ -4,9 +4,11 @@
 
 namespace sq {
 
-static std::string create_error_message(
-    const std::string_view arg_name,
-    const std::string_view arg_type
+namespace {
+
+std::string create_error_message(
+    std::string_view arg_name,
+    std::string_view arg_type
 )
 {
     auto ss = std::ostringstream{};
@@ -15,9 +17,11 @@ static std::string create_error_message(
     return ss.str();
 }
 
+} // namespace
+
 ArgumentMissingError::ArgumentMissingError(
-    const std::string_view arg_name,
-    const std::string_view arg_type
+    std::string_view arg_name,
+    std::string_view arg_type
 )
     : Exception(create_error_message(arg_name, arg_type))
 { }
