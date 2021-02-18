@@ -14,7 +14,7 @@ inline bool isspace(char c)
     return std::isspace(static_cast<unsigned char>(c));
 }
 
-inline void test_serialization(const std::string_view expected, ResultTree&& tree)
+inline void test_serialization(std::string_view expected, ResultTree&& tree)
 {
     SCOPED_TRACE(testing::Message()
         << "test_serialization("

@@ -8,7 +8,8 @@
 #include <gsl/span>
 #include <iostream>
 
-static int run_sq(int argc, char** argv)
+namespace {
+int run_sq(int argc, char** argv)
 {
     const auto args = gsl::span{argv, gsl::narrow<std::size_t>(argc)};
     if (args.size() < 2) {
@@ -28,6 +29,7 @@ static int run_sq(int argc, char** argv)
 
     return 0;
 }
+} // namespace
 
 int main(int argc, char** argv)
 {

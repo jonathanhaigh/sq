@@ -2,6 +2,7 @@
 #define SQ_INCLUDE_GUARD_results_test_results_test_util_inl_h_
 
 #include "test/Primitive_test_util.h"
+#include "util/ASSERT.h"
 
 namespace sq::test {
 
@@ -30,7 +31,7 @@ void expect_one_primitive_access(MockField& mf, T&& retval)
 template <typename... Args>
 void expect_field_accesses(
     MockField& mf,
-    const std::string_view field_name,
+    std::string_view field_name,
     const FieldCallParams& params,
     Result&& retval,
     Args&&... args
@@ -49,7 +50,7 @@ StrictMockFieldPtr field_with_one_primitive_access(T&& retval)
 }
 
 template <typename... Args>
-static StrictMockFieldPtr field_with_accesses(Args&&... args)
+StrictMockFieldPtr field_with_accesses(Args&&... args)
 {
     auto mf = std::make_unique<StrictMockField>();
     expect_field_accesses(*mf, std::forward<Args>(args)...);
@@ -99,7 +100,7 @@ void add_fields_to_obj_data(
 template <typename T, typename... Args>
 void add_fields_to_obj_data(
     ObjData& obj,
-    const std::string_view field_name,
+    std::string_view field_name,
     T&& field_data,
     Args&&... args
 )
@@ -165,7 +166,7 @@ ResultTree primitive_tree(T&& primitive)
 }
 
 template <typename T>
-Result to_field_range(const ranges::category cat, T&& rng)
+Result to_field_range(ranges::category cat, T&& rng)
 {
     if (cat == input)
     {
@@ -199,7 +200,7 @@ Result to_field_range(const ranges::category cat, T&& rng)
     {
         return FieldRange<random_access|sized>{std::forward<T>(rng)};
     }
-    assert(false);
+    ASSERT(false);
     return FieldRange<input>{std::forward<T>(rng)};
 }
 

@@ -2,8 +2,8 @@
 
 #include "util/strutil.h"
 
-#include <algorithm>
-#include <iterator>
+#include <range/v3/view/concat.hpp>
+#include <range/v3/view/transform.hpp>
 #include <sstream>
 
 namespace sq
@@ -31,29 +31,26 @@ const FieldCallParams::NamedParams& FieldCallParams::named_params() const
 
 std::ostream& operator <<(std::ostream& os, const FieldCallParams& params)
 {
-    // TODO: Something better... Especially when we have ranges or
-    // std::ostream_joiner
-    auto param_strs = std::vector<std::string>{};
-    const auto& pos_params = params.pos_params();
-    std::transform(
-        std::begin(pos_params),
-        std::end(pos_params),
-        std::back_inserter(param_strs),
-        [](const auto& p) { return util::variant_to_str(p); }
-    );
+    auto named_param_to_str = [](const auto& np) {
+        std::ostringstream oss;
+        oss << np.first << "=" << util::variant_to_str(np.second);
+        return oss.str();
+    };
 
-    const auto& named_params = params.named_params();
-    std::transform(
-        std::begin(named_params),
-        std::end(named_params),
-        std::back_inserter(param_strs),
-        [](const auto& p) {
-            std::ostringstream oss;
-            oss << p.first << "=" << util::variant_to_str(p.second);
-            return oss.str();
-        }
-    );
-    os << util::join(param_strs);
+
+    auto pos =
+        params.pos_params() |
+        ranges::views::transform(util::variant_to_str);
+
+    auto named =
+        params.named_params() |
+        ranges::views::transform(named_param_to_str);
+
+    auto all = ranges::concat_view(pos, named);
+
+    auto joined = util::join(all, ", ");
+
+    os << joined;
     return os;
 }
 

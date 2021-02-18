@@ -2,11 +2,9 @@
 
 #include "results/Filter.h"
 
-#include <iostream>
-
-using namespace std::string_literals;
-
 namespace sq::results {
+
+namespace {
 
 using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
@@ -19,10 +17,10 @@ public:
         : ast_{&ast}
     { }
 
-    Data operator()(FieldPtr&& field) const;
+    [[nodiscard]] Data operator()(FieldPtr&& field) const;
 
     template <ranges::category Cat> 
-    Data operator()(FieldRange<Cat>&& rng) const;
+    [[nodiscard]] Data operator()(FieldRange<Cat>&& rng) const;
 
 private:
     const ast::Ast* ast_;
@@ -66,6 +64,8 @@ Data ResultViewToDataVisitor::operator()(FieldRange<Cat>&& rng) const
     }
     return arr;
 }
+
+} // namespace
 
 ResultTree::ResultTree(const ast::Ast& ast, ResultView&& result_view)
     : ResultTree{std::visit(ResultViewToDataVisitor{ast}, std::move(result_view))}

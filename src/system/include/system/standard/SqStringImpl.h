@@ -11,11 +11,9 @@ class SqStringImpl
 public:
     explicit SqStringImpl(const PrimitiveString& value);
 
+    [[nodiscard]] Primitive to_primitive() const override;
+
 private:
-    friend class SqString<SqStringImpl>;
-
-    Primitive to_primitive() const;
-
     PrimitiveString value_;
 };
 

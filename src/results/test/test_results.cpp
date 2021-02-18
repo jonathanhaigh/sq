@@ -9,13 +9,13 @@
 
 #include <gtest/gtest.h>
 #include <range/v3/view/cartesian_product.hpp>
-#include <range/v3/view/concat.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
 #include <utility>
 #include <sstream>
 
 namespace sq::test {
+namespace {
 
 using namespace sq::results;
 
@@ -263,9 +263,9 @@ INSTANTIATE_TEST_SUITE_P(
 // -----------------------------------------------------------------------------
 
 void test_element_access(
-    const ranges::category cat,
-    const std::ptrdiff_t index,
-    const std::ptrdiff_t size
+    ranges::category cat,
+    std::ptrdiff_t index,
+    std::ptrdiff_t size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -332,12 +332,12 @@ TEST(ResultTreeTest, TestElementAccessOutOfRange)
     }
 }
 
-static void test_slice(
-    const ranges::category cat,
-    const std::optional<std::ptrdiff_t> start,
-    const std::optional<std::ptrdiff_t> stop,
-    const std::optional<std::ptrdiff_t> step,
-    const std::ptrdiff_t size
+void test_slice(
+    ranges::category cat,
+    std::optional<std::ptrdiff_t> start,
+    std::optional<std::ptrdiff_t> stop,
+    std::optional<std::ptrdiff_t> step,
+    std::ptrdiff_t size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -442,4 +442,5 @@ TEST(ResultTreeTest, TestNotAnArrayError)
     }
 }
 
+} // namespace
 } // namespace sq::test

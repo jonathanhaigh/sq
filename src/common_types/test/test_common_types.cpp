@@ -7,6 +7,8 @@
 
 namespace sq::test {
 
+namespace {
+
 template <typename T>
 void test_primitive_type()
 {
@@ -16,9 +18,11 @@ void test_primitive_type()
         << ">()"
     );
     EXPECT_NE(primitive_type_name_v<T>, nullptr);
-    EXPECT_EQ(primitive_type_name(T{}), primitive_type_name_v<T>);
-    EXPECT_EQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
+    EXPECT_STREQ(primitive_type_name(T{}), primitive_type_name_v<T>);
+    EXPECT_STREQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
 }
+
+} // namespace
 
 TEST(CommonTypesTest, TestPrimitive)
 {
@@ -124,27 +128,27 @@ TEST_F(FieldCallParamsTest, TestGetWithInvalidType)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(0, "s1"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(1, "i1"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(2, "s2"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(3, "i2"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get<PrimitiveBool>(0, "s1"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get<PrimitiveBool>(1, "i1"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get<PrimitiveBool>(2, "s2"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get<PrimitiveBool>(3, "i2"), ArgumentTypeError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetOptionalWithInvalidType)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(0, "s1"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(1, "i1"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(2, "s2"), ArgumentTypeError);
-    EXPECT_THROW(fcp_.get_optional<PrimitiveBool>(3, "i2"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get_optional<PrimitiveBool>(0, "s1"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get_optional<PrimitiveBool>(1, "i1"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get_optional<PrimitiveBool>(2, "s2"), ArgumentTypeError);
+    EXPECT_THROW((void)fcp_.get_optional<PrimitiveBool>(3, "i2"), ArgumentTypeError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetWithMissingArgument)
 {
     SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-    EXPECT_THROW(fcp_.get<PrimitiveBool>(4, "s3"), ArgumentMissingError);
+    EXPECT_THROW((void)fcp_.get<PrimitiveBool>(4, "s3"), ArgumentMissingError);
 }
 
 TEST_F(FieldCallParamsTest, TestGetOptionalWithMissingArgument)

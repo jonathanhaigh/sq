@@ -11,25 +11,23 @@ class SqPathImpl
     : public SqPath<SqPathImpl>
 {
 public:
-    SqPathImpl(const std::filesystem::path& value);
-    SqPathImpl(std::filesystem::path&& value);
+    explicit SqPathImpl(const std::filesystem::path& value);
+    explicit SqPathImpl(std::filesystem::path&& value);
+
+    [[nodiscard]] Result get_string() const;
+    [[nodiscard]] Result get_parent() const;
+    [[nodiscard]] Result get_filename() const;
+    [[nodiscard]] Result get_extension() const;
+    [[nodiscard]] Result get_stem() const;
+    [[nodiscard]] Result get_children() const;
+    [[nodiscard]] Result get_parts() const;
+    [[nodiscard]] Result get_absolute() const;
+    [[nodiscard]] Result get_canonical() const;
+    [[nodiscard]] Result get_is_absolute() const;
+    [[nodiscard]] Result get_size() const;
+    [[nodiscard]] Primitive to_primitive() const override;
 
 private:
-    friend class SqPath<SqPathImpl>;
-
-    Result get_string() const;
-    Result get_parent() const;
-    Result get_filename() const;
-    Result get_extension() const;
-    Result get_stem() const;
-    Result get_children() const;
-    Result get_parts() const;
-    Result get_absolute() const;
-    Result get_canonical() const;
-    Result get_is_absolute() const;
-    Result get_size() const;
-    Primitive to_primitive() const;
-
     std::filesystem::path value_;
 };
 

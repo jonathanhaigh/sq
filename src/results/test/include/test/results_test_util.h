@@ -4,25 +4,23 @@
 #include "results/results.h"
 #include "test/Primitive_test_util.h"
 
-#include <cassert>
 #include <functional>
 #include <gmock/gmock.h>
 #include <optional>
 
 namespace sq::test {
 
-using namespace sq::results;
-
 using testing::Return;
 using testing::ByMove;
 
+using sq::results::ResultTree;
 using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
 using ObjDataField = ObjData::value_type;
 using ArrayData = ResultTree::ArrayData;
 
 template <typename T>
-static constexpr bool is_result_tree_data_v = std::disjunction_v<
+inline constexpr bool is_result_tree_data_v = std::disjunction_v<
     std::is_same<T, Data>,
     std::is_same<T, ObjData>,
     std::is_same<T, ArrayData>,
@@ -81,12 +79,12 @@ struct FakeField
     FakeField& operator=(FakeField&&) = delete;
     ~FakeField() noexcept = default;
 
-    Result get(
-        const std::string_view member,
+    [[nodiscard]] Result get(
+        std::string_view member,
         const FieldCallParams& params
     ) const override;
 
-    Primitive to_primitive() const override;
+    [[nodiscard]] Primitive to_primitive() const override;
 
 private:
     ResultGenerator result_generator_;
@@ -106,7 +104,7 @@ void expect_one_primitive_access(MockField& mf, T&& retval);
  */
 void expect_field_accesses(
     MockField& mf,
-    const std::string_view field_name,
+    std::string_view field_name,
     const FieldCallParams& params,
     Result&& retval
 );
@@ -118,7 +116,7 @@ void expect_field_accesses(
 template <typename... Args>
 void expect_field_accesses(
     MockField& mf,
-    const std::string_view field_name,
+    std::string_view field_name,
     const FieldCallParams& params,
     Result&& retval,
     Args&&... args
@@ -129,41 +127,47 @@ void expect_field_accesses(
  * to_primitive().
  */
 template <typename T, typename = enable_if_primitive_like_t<T>>
-StrictMockFieldPtr field_with_one_primitive_access(T&& retval);
+[[nodiscard]] StrictMockFieldPtr field_with_one_primitive_access(T&& retval);
 
 /**
  * Create a MockField whose only accesses are expected to be the calls in the
  * given specs.
  */
 template <typename... Args>
-static StrictMockFieldPtr field_with_accesses(Args&&... args);
+[[nodiscard]] StrictMockFieldPtr field_with_accesses(Args&&... args);
 
 /**
  * Create a ResultTree representing an object with the given field names and
  * values.
  */
 template <typename... Args>
-ResultTree obj_data_tree(Args&&... args);
+[[nodiscard]] ResultTree obj_data_tree(Args&&... args);
 
 /**
  * Create a ResultTree representing an array with the given values.
  */
 template <typename... Args>
-ResultTree array_data_tree(Args&&... args);
+[[nodiscard]] ResultTree array_data_tree(Args&&... args);
 
 template <typename T, typename = enable_if_primitive_like_t<T>>
-ResultTree primitive_tree(T&& primitive);
+[[nodiscard]] ResultTree primitive_tree(T&& primitive);
 
-static constexpr auto input = ranges::category::input;
-static constexpr auto forward = ranges::category::forward;
-static constexpr auto bidirectional = ranges::category::bidirectional;
-static constexpr auto random_access = ranges::category::random_access;
-static constexpr auto sized = ranges::category::sized;
+inline constexpr auto input = ranges::category::input;
+inline constexpr auto forward = ranges::category::forward;
+inline constexpr auto bidirectional = ranges::category::bidirectional;
+inline constexpr auto random_access = ranges::category::random_access;
+inline constexpr auto sized = ranges::category::sized;
 
-extern const std::initializer_list<ranges::category> all_categories;
+inline constexpr auto all_categories = {
+    input, input|sized,
+    forward, forward|sized,
+    bidirectional, bidirectional|sized,
+    random_access, random_access|sized
+};
+
 
 template <typename T>
-Result to_field_range(const ranges::category cat, T&& rng);
+[[nodiscard]] Result to_field_range(ranges::category cat, T&& rng);
 
 } // namespace sq::test
 

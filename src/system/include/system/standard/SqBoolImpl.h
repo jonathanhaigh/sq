@@ -11,11 +11,9 @@ class SqBoolImpl
 public:
     explicit SqBoolImpl(PrimitiveBool value);
 
+    [[nodiscard]] Primitive to_primitive() const override;
+
 private:
-    friend class SqBool<SqBoolImpl>;
-
-    Primitive to_primitive() const override;
-
     PrimitiveBool value_;
 };
 

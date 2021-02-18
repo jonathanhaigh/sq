@@ -8,13 +8,11 @@ namespace sq::test {
 using PosParam = FieldCallParams::PosParams::value_type;
 using NamedParam = FieldCallParams::NamedParams::value_type;
 
-static const auto no_params = FieldCallParams{};
-
 template <typename... Args>
-FieldCallParams params(Args&&... args);
+[[nodiscard]] FieldCallParams params(Args&&... args);
 
 template <typename T>
-NamedParam named(const char* name, T&& np);
+[[nodiscard]] NamedParam named(const char* name, T&& np);
 
 } // namespace sq::test
 

@@ -8,18 +8,19 @@
 #include <utility>
 
 namespace sq::test {
+namespace {
 
 using namespace sq::ast;
 using Size = Ast::Children::size_type;
 
-inline const auto no_filter_spec = FilterSpec{NoFilterSpec{}};
+inline constexpr auto no_filter_spec = FilterSpec{NoFilterSpec{}};
 
-inline void expect_node(
+void expect_node(
     const Ast& node,
-    const char* const name,
+    const char* name,
     const FieldCallParams& params,
     const FilterSpec& filter_spec,
-    const Size noof_children
+    Size noof_children
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -36,25 +37,25 @@ inline void expect_node(
     EXPECT_EQ(node.children().size(), noof_children);
 }
 
-inline void expect_plain_node(const Ast& node, const char*const name, const Size noof_children)
+void expect_plain_node(const Ast& node, const char*name, Size noof_children)
 {
     SCOPED_TRACE("expect_plain_node");
-    expect_node(node, name, no_params, no_filter_spec, noof_children);
+    expect_node(node, name, FieldCallParams{}, no_filter_spec, noof_children);
 }
 
-inline void expect_plain_leaf(const Ast& node, const char*const name)
+void expect_plain_leaf(const Ast& node, const char*name)
 {
     SCOPED_TRACE("expect_plain_leaf");
     expect_plain_node(node, name, 0);
 }
 
-inline void expect_root(const Ast& node, const Size noof_children)
+void expect_root(const Ast& node, Size noof_children)
 {
     SCOPED_TRACE("expect_root");
-    return expect_plain_node(node, "", noof_children);
+    return expect_plain_node(node, ast_root_node_name, noof_children);
 }
 
-inline void expect_equivalent_query(const char* const q1, const char* const q2)
+void expect_equivalent_query(const char* q1, const char* q2)
 {
     SCOPED_TRACE(testing::Message()
         << "expect_equivalent_query("
@@ -132,87 +133,87 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values(
         SimpleTestCase{
             "a",
-            no_params,
+            FieldCallParams{},
             no_filter_spec
         },
         SimpleTestCase{
             "a[0]",
-            no_params,
+            FieldCallParams{},
             ElementAccessSpec{0}
         },
         SimpleTestCase{
             "a[99]",
-            no_params,
+            FieldCallParams{},
             ElementAccessSpec{99}
         },
         SimpleTestCase{
             "a[-1]",
-            no_params,
+            FieldCallParams{},
             ElementAccessSpec{-1}
         },
         SimpleTestCase{
             "a[-50]",
-            no_params,
+            FieldCallParams{},
             ElementAccessSpec{-50}
         },
         SimpleTestCase{
             "a[:]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, std::nullopt, std::nullopt}
         },
         SimpleTestCase{
             "a[1:]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, std::nullopt, std::nullopt}
         },
         SimpleTestCase{
             "a[:1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, 1, std::nullopt}
         },
         SimpleTestCase{
             "a[1:1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, 1, std::nullopt}
         },
         SimpleTestCase{
             "a[::]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, std::nullopt, std::nullopt}
         },
         SimpleTestCase{
             "a[1::]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, std::nullopt, std::nullopt}
         },
         SimpleTestCase{
             "a[:1:]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, 1, std::nullopt}
         },
         SimpleTestCase{
             "a[1:1:]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, 1, std::nullopt}
         },
         SimpleTestCase{
             "a[::1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, std::nullopt, 1}
         },
         SimpleTestCase{
             "a[1::1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, std::nullopt, 1}
         },
         SimpleTestCase{
             "a[:1:1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{std::nullopt, 1, 1}
         },
         SimpleTestCase{
             "a[1:1:1]",
-            no_params,
+            FieldCallParams{},
             SliceSpec{1, 1, 1}
         },
         SimpleTestCase{
@@ -321,4 +322,5 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 
+} // namespace
 } // namespace sq::test

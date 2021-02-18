@@ -5,7 +5,6 @@
 #include "common_types/Field.h"
 #include "results/ResultView.h"
 
-#include <functional>
 #include <memory>
 
 namespace sq::results {
@@ -18,7 +17,7 @@ struct Filter
     /**
      * Create a Filter for the given spec.
      */
-    static FilterPtr create(const ast::FilterSpec& spec);
+    [[nodiscard]] static FilterPtr create(const ast::FilterSpec& spec);
 
     /**
      * Transform a Result so that it satisfies the requirements of this filter.
@@ -31,18 +30,15 @@ struct Filter
      * FieldRange<ranges::category::input> into a FieldVector and return that
      * vector.
      */
-    virtual Result transform_result_for_requirements(Result&& result) const = 0;
+    [[nodiscard]] virtual Result transform_result_for_requirements(Result&& result) const = 0;
 
     /**
      * Apply this filter to a ResultView.
      */
-    virtual ResultView view(ResultView&& result) const = 0;
+    [[nodiscard]] virtual ResultView view(ResultView&& result) const = 0;
 
     virtual ~Filter() = default;
-
-protected:
     Filter() = default;
-
     Filter(const Filter&) = delete;
     Filter(Filter&&) = delete;
     Filter& operator=(const Filter&) = delete;

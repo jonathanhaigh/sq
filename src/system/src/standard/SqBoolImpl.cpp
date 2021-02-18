@@ -2,7 +2,7 @@
 
 namespace sq::system::standard {
 
-SqBoolImpl::SqBoolImpl(const PrimitiveBool value)
+SqBoolImpl::SqBoolImpl(PrimitiveBool value)
     : value_{value}
 {
 }

@@ -1,10 +1,8 @@
 #ifndef SQ_INCLUDE_GUARD_util_MoveOnlyTree_h_
 #define SQ_INCLUDE_GUARD_util_MoveOnlyTree_h_
 
-#include <iterator>
-#include <vector>
-
 #include <iostream>
+#include <vector>
 
 namespace sq::util {
 
@@ -27,16 +25,16 @@ public:
         : data_{std::forward<Args>(args)...}
     { }
 
-    const T& data() const noexcept { return data_; }
-    T& data() noexcept { return data_; }
+    [[nodiscard]] const T& data() const noexcept { return data_; }
+    [[nodiscard]] T& data() noexcept { return data_; }
 
-    const Children& children() const noexcept { return children_; }
-    Children& children() noexcept { return children_; }
+    [[nodiscard]] const Children& children() const noexcept { return children_; }
+    [[nodiscard]] Children& children() noexcept { return children_; }
 
-    friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
+    [[nodiscard]] friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
         return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;
     }
-    friend bool operator!=(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
+    [[nodiscard]] friend bool operator!=(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
         return !(lhs == rhs);
     }
  

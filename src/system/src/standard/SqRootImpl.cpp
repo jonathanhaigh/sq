@@ -11,7 +11,7 @@
 
 namespace sq::system::standard {
 
-Result SqRootImpl::get_path(const PrimitiveString* const path)
+Result SqRootImpl::get_path(const PrimitiveString* path)
 {
     if (path != nullptr)
     {
@@ -20,7 +20,7 @@ Result SqRootImpl::get_path(const PrimitiveString* const path)
     return std::make_unique<SqPathImpl>(std::filesystem::current_path());
 }
 
-Result SqRootImpl::get_int(const PrimitiveInt* const value)
+Result SqRootImpl::get_int(const PrimitiveInt* value)
 {
     if (value != nullptr)
     {
@@ -30,8 +30,8 @@ Result SqRootImpl::get_int(const PrimitiveInt* const value)
 }
 
 Result SqRootImpl::get_ints(
-    const PrimitiveInt* const start,
-    const PrimitiveInt* const stop
+    const PrimitiveInt* start,
+    const PrimitiveInt* stop
 )
 {
     auto start_v = (start != nullptr)? *start : 0;
@@ -49,7 +49,7 @@ Result SqRootImpl::get_ints(
     };
 }
 
-Result SqRootImpl::get_bool(const PrimitiveBool* const value)
+Result SqRootImpl::get_bool(const PrimitiveBool* value)
 {
     if (value != nullptr)
     {

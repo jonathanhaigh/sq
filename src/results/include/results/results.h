@@ -30,15 +30,15 @@ public:
     ResultTree(const ast::Ast& ast, ResultView&& result);
     explicit ResultTree(Data&& data);
 
-    const Data& data() const { return data_; }
-    Data& data() { return data_; }
+    [[nodiscard]] const Data& data() const { return data_; }
+    [[nodiscard]] Data& data() { return data_; }
 
 private:
     Data data_;
 };
 
-bool operator==(const ResultTree& lhs, const ResultTree& rhs);
-bool operator!=(const ResultTree& lhs, const ResultTree& rhs);
+[[nodiscard]] bool operator==(const ResultTree& lhs, const ResultTree& rhs);
+[[nodiscard]] bool operator!=(const ResultTree& lhs, const ResultTree& rhs);
 
 } // namespace sq::results
 

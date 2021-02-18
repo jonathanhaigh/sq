@@ -13,24 +13,22 @@ class SqDataSizeImpl
 public:
     explicit SqDataSizeImpl(std::size_t value);
 
+    [[nodiscard]] Result get_B() const;
+    [[nodiscard]] Result get_KiB() const;
+    [[nodiscard]] Result get_kB() const;
+    [[nodiscard]] Result get_MiB() const;
+    [[nodiscard]] Result get_MB() const;
+    [[nodiscard]] Result get_GiB() const;
+    [[nodiscard]] Result get_GB() const;
+    [[nodiscard]] Result get_TiB() const;
+    [[nodiscard]] Result get_TB() const;
+    [[nodiscard]] Result get_PiB() const;
+    [[nodiscard]] Result get_PB() const;
+    [[nodiscard]] Result get_EiB() const;
+    [[nodiscard]] Result get_EB() const;
+    [[nodiscard]] Primitive to_primitive() const override;
+
 private:
-    friend class SqDataSize<SqDataSizeImpl>;
-
-    Result get_B() const;
-    Result get_KiB() const;
-    Result get_kB() const;
-    Result get_MiB() const;
-    Result get_MB() const;
-    Result get_GiB() const;
-    Result get_GB() const;
-    Result get_TiB() const;
-    Result get_TB() const;
-    Result get_PiB() const;
-    Result get_PB() const;
-    Result get_EiB() const;
-    Result get_EB() const;
-    Primitive to_primitive() const;
-
     std::size_t value_;
 };
 

@@ -19,7 +19,7 @@ FakeField::FakeField()
 { }
 
 Result FakeField::get(
-    const std::string_view member,
+    std::string_view member,
     const FieldCallParams& params
 ) const
 {
@@ -33,7 +33,7 @@ Primitive FakeField::to_primitive() const
 
 void expect_field_accesses(
     MockField& mf,
-    const std::string_view field_name,
+    std::string_view field_name,
     const FieldCallParams& params,
     Result&& retval
 )
@@ -47,7 +47,7 @@ namespace detail {
 
 void add_fields_to_obj_data(
     ObjData& obj,
-    const std::string_view field_name,
+    std::string_view field_name,
     ResultTree&& field_data
 )
 {
@@ -60,13 +60,6 @@ void add_items_to_array_data(ArrayData& arr, ResultTree&& field_data)
 }
 
 } // namespace detail
-
-constexpr std::initializer_list<ranges::category> all_categories = {
-    input, input|sized,
-    forward, forward|sized,
-    bidirectional, bidirectional|sized,
-    random_access, random_access|sized
-};
 
 } // namespace sq::test
 

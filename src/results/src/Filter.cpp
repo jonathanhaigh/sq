@@ -3,43 +3,44 @@
 #include "common_types/InternalError.h"
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
+#include "util/ASSERT.h"
 #include "util/typeutil.h"
 
 #include <cstddef>
 #include <gsl/narrow>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_access.hpp>
-#include <range/v3/view/all.hpp>
 #include <range/v3/view/drop.hpp>
 #include <range/v3/view/move.hpp>
 #include <range/v3/view/reverse.hpp>
-#include <range/v3/view/slice.hpp>
 #include <range/v3/view/stride.hpp>
 #include <range/v3/view/take.hpp>
 #include <sstream>
 
 namespace sq::results {
 
+namespace {
+
 using Int = std::ptrdiff_t;
 
 struct HasRangeCategory
 {
-    explicit HasRangeCategory(const ranges::category cat)
+    explicit HasRangeCategory(ranges::category cat)
         : cat_{cat}
     { }
 
-    bool operator()(const Result& result) const
+    [[nodiscard]] bool operator()(const Result& result) const
     {
         return std::visit(*this, result);
     }
 
-    bool operator()([[maybe_unused]] const FieldPtr& fp) const
+    [[nodiscard]] bool operator()([[maybe_unused]] const FieldPtr& fp) const
     {
         return false;
     }
 
     template <typename R>
-    bool operator()([[maybe_unused]] const R& rng) const
+    [[nodiscard]] bool operator()([[maybe_unused]] const R& rng) const
     {
         return (ranges::get_categories<R>() & cat_) == cat_;
     }
@@ -50,23 +51,23 @@ private:
 
 struct SlurpRangeIntoVector
 {
-    FieldVector operator()(Result&& result) const
+    [[nodiscard]] FieldVector operator()(Result&& result) const
     {
         return std::visit(*this, std::move(result));
     }
 
-    FieldVector operator()([[maybe_unused]] const FieldPtr& fp) const
+    [[nodiscard]] FieldVector operator()([[maybe_unused]] const FieldPtr& fp) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
-    FieldVector operator()(FieldRange<Cat>&& rng) const
+    [[nodiscard]] FieldVector operator()(FieldRange<Cat>&& rng) const
     {
         return std::move(rng) | ranges::views::move | ranges::to<std::vector>;
     }
 
-    FieldVector operator()(FieldVector&& vec) const
+    [[nodiscard]] FieldVector operator()(FieldVector&& vec) const
     {
         return std::move(vec);
     }
@@ -74,7 +75,7 @@ struct SlurpRangeIntoVector
 constexpr auto slurp_range_into_vector = SlurpRangeIntoVector{};
 
 template <typename R>
-Int get_range_size(R& rng)
+[[nodiscard]] Int get_range_size(R& rng)
 {
     if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
     {
@@ -90,7 +91,7 @@ Int get_range_size(R& rng)
 }
 
 template <typename R, typename = util::disable_lvalues_t<R>>
-auto get_reversed_range(R&& rng)
+[[nodiscard]] auto get_reversed_range(R&& rng)
 {
     if constexpr (!ranges::bidirectional_range<R>)
     {
@@ -115,12 +116,12 @@ struct FilterImpl<ast::NoFilterSpec>
     explicit FilterImpl([[maybe_unused]] const ast::NoFilterSpec& spec)
     { }
 
-    Result transform_result_for_requirements(Result&& result) const override
+    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
     {
         return std::move(result);
     }
 
-    ResultView view(ResultView&& result) const override
+    [[nodiscard]] ResultView view(ResultView&& result) const override
     {
         return std::move(result);
     }
@@ -134,7 +135,7 @@ struct FilterImpl<ast::ElementAccessSpec>
         : index_{spec.index_}
     { }
 
-    Result transform_result_for_requirements(Result&& result) const override
+    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
     {
         if (
             index_ >= 0 ||
@@ -147,18 +148,18 @@ struct FilterImpl<ast::ElementAccessSpec>
         return slurp_range_into_vector(std::move(result));
     }
 
-    ResultView view(ResultView&& result) const override
+    [[nodiscard]] ResultView view(ResultView&& result) const override
     {
         return std::visit(*this, std::move(result));
     }
 
-    ResultView operator()([[maybe_unused]] FieldPtr&& fp) const
+    [[nodiscard]] ResultView operator()([[maybe_unused]] FieldPtr&& fp) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
-    ResultView operator()(FieldRange<Cat>&& rng) const
+    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
     {
         if (index_ >= 0)
         {
@@ -171,9 +172,9 @@ struct FilterImpl<ast::ElementAccessSpec>
 private:
 
     template <ranges::category Cat>
-    ResultView nonnegative_index_access(FieldRange<Cat>&& rng, const Int index) const
+    [[nodiscard]] ResultView nonnegative_index_access(FieldRange<Cat>&& rng, Int index) const
     {
-        assert(index >= 0);
+        ASSERT(index >= 0);
         auto it = ranges::begin(rng);
         auto end = ranges::end(rng);
         ranges::advance(it, index, end);
@@ -193,9 +194,9 @@ private:
     }
 
     template <ranges::category Cat>
-    ResultView negative_index_access(FieldRange<Cat>&& rng, const Int index, const Int size) const
+    [[nodiscard]] ResultView negative_index_access(FieldRange<Cat>&& rng, Int index, Int size) const
     {
-        assert(index < 0);
+        ASSERT(index < 0);
         auto nonneg_index = size + index;
         if (nonneg_index < 0)
         {
@@ -213,13 +214,13 @@ template <>
 struct FilterImpl<ast::SliceSpec>
     : Filter
 {
-    explicit FilterImpl(const ast::SliceSpec spec)
+    explicit FilterImpl(ast::SliceSpec spec)
         : start_{spec.start_}
         , stop_{spec.stop_}
         , step_{spec.step_}
     { }
 
-    Result transform_result_for_requirements(Result&& result) const override
+    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
     {
         auto step = step_.value_or(1);
         if (step < 0)
@@ -242,18 +243,18 @@ struct FilterImpl<ast::SliceSpec>
         return std::move(result);
     }
 
-    ResultView view(ResultView&& result) const override
+    [[nodiscard]] ResultView view(ResultView&& result) const override
     {
         return std::visit(*this, std::move(result));
     }
 
-    ResultView operator()([[maybe_unused]] const FieldPtr& fp) const
+    [[nodiscard]] ResultView operator()([[maybe_unused]] const FieldPtr& fp) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
     template <ranges::category Cat>
-    ResultView operator()(FieldRange<Cat>&& rng) const
+    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
     {
         auto step = step_.value_or(1);
         if (step > 0)
@@ -297,18 +298,18 @@ struct FilterImpl<ast::SliceSpec>
 private:
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static ResultView to_result_view(R&& rng)
+    [[nodiscard]] static ResultView to_result_view(R&& rng)
     {
         return FieldRange<ranges::get_categories<R>()>(std::forward<R>(rng));
     }
 
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto pos_index_pos_step(R&& rng, Int start, Int stop, Int step)
+    [[nodiscard]] static auto pos_index_pos_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(step > 0);
-        assert(start >= 0);
-        assert(stop >= 0);
+        ASSERT(step > 0);
+        ASSERT(start >= 0);
+        ASSERT(stop >= 0);
         if (stop < start) { stop = start; }
         return std::forward<R>(rng) |
                ranges::views::drop(start) |
@@ -317,21 +318,21 @@ private:
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto pos_index_no_stop_pos_step(R&& rng, Int start, Int step)
+    [[nodiscard]] static auto pos_index_no_stop_pos_step(R&& rng, Int start, Int step)
     {
-        assert(start >= 0);
-        assert(step > 0);
+        ASSERT(start >= 0);
+        ASSERT(step > 0);
         return std::forward<R>(rng) |
                ranges::views::drop(start) |
                ranges::views::stride(step);
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto mixed_index_pos_step(R&& rng, Int start, Int stop, Int step)
+    [[nodiscard]] static auto mixed_index_pos_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(ranges::forward_range<R> || ranges::sized_range<R>);
-        assert(step > 0);
-        assert(start < 0 || stop < 0);
+        ASSERT(ranges::forward_range<R> || ranges::sized_range<R>);
+        ASSERT(step > 0);
+        ASSERT(start < 0 || stop < 0);
         auto size = get_range_size(rng);
 
         if (start < 0) { start += size; };
@@ -342,23 +343,23 @@ private:
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto neg_index_no_stop_pos_step(R&& rng, Int start, Int step)
+    [[nodiscard]] static auto neg_index_no_stop_pos_step(R&& rng, Int start, Int step)
     {
-        assert(ranges::forward_range<R> || ranges::sized_range<R>);
-        assert(step > 0);
-        assert(start < 0);
+        ASSERT(ranges::forward_range<R> || ranges::sized_range<R>);
+        ASSERT(step > 0);
+        ASSERT(start < 0);
         start += get_range_size(rng);
         if (start < 0) { start = 0; }
         return pos_index_no_stop_pos_step(std::forward<R>(rng), start, step);
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto neg_index_neg_step(R&& rng, Int start, Int stop, Int step)
+    [[nodiscard]] static auto neg_index_neg_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(ranges::bidirectional_range<R>);
-        assert(step < 0);
-        assert(start < 0);
-        assert(stop < 0);
+        ASSERT(ranges::bidirectional_range<R>);
+        ASSERT(step < 0);
+        ASSERT(start < 0);
+        ASSERT(stop < 0);
         start = -start - 1;
         stop = -stop - 1;
         step *= -1;
@@ -366,22 +367,22 @@ private:
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto neg_index_no_stop_neg_step(R&& rng, Int start, Int step)
+    [[nodiscard]] static auto neg_index_no_stop_neg_step(R&& rng, Int start, Int step)
     {
-        assert(ranges::bidirectional_range<R>);
-        assert(step < 0);
-        assert(start < 0);
+        ASSERT(ranges::bidirectional_range<R>);
+        ASSERT(step < 0);
+        ASSERT(start < 0);
         start = -start -1;
         step *= -1;
         return pos_index_no_stop_pos_step(get_reversed_range(std::forward<R>(rng)), start, step);
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto mixed_index_neg_step(R&& rng, Int start, Int stop, Int step)
+    [[nodiscard]] static auto mixed_index_neg_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(ranges::bidirectional_range<R>);
-        assert(step < 0);
-        assert(start >= 0 || stop >= 0);
+        ASSERT(ranges::bidirectional_range<R>);
+        ASSERT(step < 0);
+        ASSERT(start >= 0 || stop >= 0);
         auto size = get_range_size(rng);
 
         if (start >= 0) { start -= size; };
@@ -392,12 +393,12 @@ private:
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto pos_index_neg_step(R&& rng, Int start, Int stop, Int step)
+    [[nodiscard]] static auto pos_index_neg_step(R&& rng, Int start, Int stop, Int step)
     {
-        assert(ranges::bidirectional_range<R>);
-        assert(step < 0);
-        assert(start >= 0);
-        assert(stop >= 0);
+        ASSERT(ranges::bidirectional_range<R>);
+        ASSERT(step < 0);
+        ASSERT(start >= 0);
+        ASSERT(stop >= 0);
         if (stop > start) { stop = start; }
         return get_reversed_range(
             rng |
@@ -407,11 +408,11 @@ private:
     }
 
     template <typename R, typename = util::disable_lvalues_t<R>>
-    static auto pos_index_no_stop_neg_step(R&& rng, Int start, Int step)
+    [[nodiscard]] static auto pos_index_no_stop_neg_step(R&& rng, Int start, Int step)
     {
-        assert(ranges::bidirectional_range<R>);
-        assert(step < 0);
-        assert(start >= 0);
+        ASSERT(ranges::bidirectional_range<R>);
+        ASSERT(step < 0);
+        ASSERT(start >= 0);
         return get_reversed_range(
             rng | ranges::views::take(start + 1)
         ) | ranges::views::stride(-step);
@@ -425,11 +426,13 @@ private:
 struct FilterCreatorVisitor
 {
     template <typename T>
-    FilterPtr operator()(const T& spec) const
+    [[nodiscard]] FilterPtr operator()(const T& spec) const
     {
         return std::make_unique<FilterImpl<T>>(spec);
     }
 };
+
+} // namespace
 
 FilterPtr Filter::create(const ast::FilterSpec& spec)
 {

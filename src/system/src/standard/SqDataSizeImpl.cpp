@@ -8,28 +8,31 @@
 #include <memory>
 
 namespace sq::system::standard {
+namespace {
 
 using Multiplier = std::int64_t;
-static constexpr Multiplier multiplier_k = 1000;
-static constexpr Multiplier multiplier_M = multiplier_k * multiplier_k;
-static constexpr Multiplier multiplier_G = multiplier_M * multiplier_k;
-static constexpr Multiplier multiplier_T = multiplier_G * multiplier_k;
-static constexpr Multiplier multiplier_P = multiplier_T * multiplier_k;
-static constexpr Multiplier multiplier_E = multiplier_P * multiplier_k;
+inline constexpr Multiplier multiplier_k = 1000;
+inline constexpr Multiplier multiplier_M = multiplier_k * multiplier_k;
+inline constexpr Multiplier multiplier_G = multiplier_M * multiplier_k;
+inline constexpr Multiplier multiplier_T = multiplier_G * multiplier_k;
+inline constexpr Multiplier multiplier_P = multiplier_T * multiplier_k;
+inline constexpr Multiplier multiplier_E = multiplier_P * multiplier_k;
 
-static constexpr Multiplier multiplier_Ki = 1024;
-static constexpr Multiplier multiplier_Mi = multiplier_Ki * multiplier_Ki;
-static constexpr Multiplier multiplier_Gi = multiplier_Mi * multiplier_Ki;
-static constexpr Multiplier multiplier_Ti = multiplier_Gi * multiplier_Ki;
-static constexpr Multiplier multiplier_Pi = multiplier_Ti * multiplier_Ki;
-static constexpr Multiplier multiplier_Ei = multiplier_Pi * multiplier_Ki;
+inline constexpr Multiplier multiplier_Ki = 1024;
+inline constexpr Multiplier multiplier_Mi = multiplier_Ki * multiplier_Ki;
+inline constexpr Multiplier multiplier_Gi = multiplier_Mi * multiplier_Ki;
+inline constexpr Multiplier multiplier_Ti = multiplier_Gi * multiplier_Ki;
+inline constexpr Multiplier multiplier_Pi = multiplier_Ti * multiplier_Ki;
+inline constexpr Multiplier multiplier_Ei = multiplier_Pi * multiplier_Ki;
 
-static Result size_in_units(const std::size_t size, const Multiplier multiplier)
+Result size_in_units(std::size_t size, Multiplier multiplier)
 {
     return std::make_unique<SqFloatImpl>(
         gsl::narrow<PrimitiveFloat>(size) / gsl::narrow<PrimitiveFloat>(multiplier)
     );
 }
+
+} // namespace
 
 SqDataSizeImpl::SqDataSizeImpl(std::size_t value)
     : value_{value}
