@@ -19,7 +19,9 @@ project(Sq
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+if("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
+    set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+endif()
 
 set(SQ_GCC_STYLE_WARNING_FLAGS
     -Wall
