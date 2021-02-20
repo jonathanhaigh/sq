@@ -1,0 +1,36 @@
+#ifndef SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
+#define SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
+
+#include "common_types/FieldCallParams.h"
+#include "common_types/InvalidFieldError.h"
+
+namespace sq::system {
+
+template <typename Impl>
+Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const FieldCallParams& params) const
+{
+{{ for _, field in ipairs(fields) do
+    param_strs = {}
+    for _, param in ipairs(field.params) do
+        table.insert(param_strs, string.format(
+            "params.%s<%s>(%d, \"%s\")",
+            param.required and "get" or "get_optional",
+            param.base_type,
+            param.index,
+            param.name
+        ))
+    end
+}}
+    if (member.compare("{{= field.name }}") == 0)
+    {
+        return static_cast<const Impl&>(*this).get_{{= field.name }}({{= table.concat(param_strs, ", ") }});
+    }
+{{ end }}
+
+    throw InvalidFieldError("{{= name }}", member);
+    return nullptr;
+}
+
+} // namespace sq::system
+
+#endif // SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_

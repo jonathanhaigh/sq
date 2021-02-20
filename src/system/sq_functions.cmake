@@ -18,15 +18,30 @@ endfunction()
 
 function(sq_generate_system_files TEMPLATE_NAME OUTPUT_PATH_FORMAT OUTPUT_PATHS_VAR)
     sq_expand_for_each_type(${OUTPUT_PATH_FORMAT} GENERATED_FILES)
+
+    set(OUTPUT_DIRS)
+    foreach(GENERATED_FILE ${GENERATED_FILES})
+        get_filename_component(OUTPUT_DIR "${GENERATED_FILE}" DIRECTORY)
+        list(APPEND OUTPUT_DIRS "${OUTPUT_DIR}")
+    endforeach()
+
+    get_target_property(LUA_EXE lua LOCATION)
     add_custom_command(
         OUTPUT ${GENERATED_FILES}
-        COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate_system_files.py"
-            "${TEMPLATE_NAME}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${OUTPUT_DIRS}
+        COMMAND "${LUA_EXE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/generate_system_files.lua"
+            "${CMAKE_CURRENT_SOURCE_DIR}/schema.json"
+            "${CMAKE_CURRENT_SOURCE_DIR}/templates/${TEMPLATE_NAME}.template"
             "${OUTPUT_PATH_FORMAT}"
         DEPENDS
+            lua
+            lua_lunajson
+            lua_liluat
+            "generate_system_files.lua"
             "schema.json"
-            "generate_system_files.py"
-            "templates/${TEMPLATE_NAME}.jinja"
+            "templates/${TEMPLATE_NAME}.template"
         VERBATIM
     )
     set(${OUTPUT_PATHS_VAR} ${GENERATED_FILES} PARENT_SCOPE)
