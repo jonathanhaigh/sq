@@ -38,4 +38,4 @@ add_library(sq_common_types
 )
 target_include_directories(sq_common_types PUBLIC "${SQ_COMMON_TYPES_INCLUDE_DIR}")
 target_Link_libraries(sq_common_types PUBLIC sq_util)
-target_link_libraries(sq_common_types PUBLIC range-v3)
+target_link_libraries(sq_common_types PUBLIC range_v3)

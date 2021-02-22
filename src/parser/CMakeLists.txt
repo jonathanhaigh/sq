@@ -1,13 +1,3 @@
-find_path(ANTLR4_CPP_RUNTIME_INCLUDE_DIR
-    NAMES "antlr4-runtime.h"
-    PATH_SUFFIXES "antlr4-runtime"
-    DOC "Path to the ANTLR4 C++ runtime include directory"
-)
-
-if (NOT ANTLR4_CPP_RUNTIME_INCLUDE_DIR)
-    message(FATAL_ERROR "Failed to find ANTLR4 C++ runtime include directory")
-endif()
-
 set(SQ_ANTLR4_GEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 set(SQ_ANTLR4_GEN_DIR "${SQ_ANTLR4_GEN_INCLUDE_DIR}/parser")
 
@@ -21,10 +11,12 @@ set (SQ_ANTLR4_GEN_SRC
     "${SQ_ANTLR4_GEN_DIR}/SqParser.cpp"
 )
 
+get_target_property(ANTLR4_JAR antlr4_jar LOCATION)
+get_target_property(JAVA_EXE java_exe LOCATION)
 add_custom_command(
     OUTPUT ${SQ_ANTLR4_GEN_HEADERS} ${SQ_ANTLR4_GEN_SRC}
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${SQ_ANTLR4_GEN_DIR}"
-    COMMAND "antlr4"
+    COMMAND "${JAVA_EXE}" -jar "${ANTLR4_JAR}"
         -o "${SQ_ANTLR4_GEN_DIR}"
         -Dlanguage=Cpp
         -Werror
@@ -32,7 +24,10 @@ add_custom_command(
         -no-visitor
         -package "sq::parser"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sq.g4"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Sq.g4"
+    DEPENDS
+        antlr4_jar
+        java_exe
+        "${CMAKE_CURRENT_SOURCE_DIR}/Sq.g4"
     VERBATIM
 )
 
@@ -52,7 +47,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" IN_LIST SQ_GCC_STYLE_COMPILERS)
      )
 endif()
 
-# Antlr4 doesn't seem to compile as c++20 yet
+# Antlr4 generated code doesn't seem to compile as c++20 yet
 set_property(TARGET sq_parser PROPERTY CXX_STANDARD 17)
 
 # Use "SYSTEM" for the generated headers so that clang-tidy and the compiler
@@ -61,6 +56,4 @@ set_property(TARGET sq_parser PROPERTY CXX_STANDARD 17)
 # analysis.
 target_include_directories(sq_parser SYSTEM PUBLIC ${SQ_ANTLR4_GEN_INCLUDE_DIR})
 
-target_include_directories(sq_parser PUBLIC ${ANTLR4_CPP_RUNTIME_INCLUDE_DIR})
-
-target_link_libraries(sq_parser PUBLIC antlr4-runtime)
+target_link_libraries(sq_parser PUBLIC antlr4_runtime)

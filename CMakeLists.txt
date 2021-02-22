@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.15)
 
-if(${CMAKE_VERSION} VERSION_LESS 3.15)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
+project(Sq
+    VERSION 0.0.1
+    DESCRIPTION "Command line tool to obtain system information in JSON"
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,11 +15,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 enable_testing()
 include(GoogleTest)
 
-project(Sq
-    VERSION 0.0.1
-    DESCRIPTION "Command line tool to obtain system information in JSON"
-    LANGUAGES CXX
-)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
     set(CMAKE_CXX_CLANG_TIDY clang-tidy)

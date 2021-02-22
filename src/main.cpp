@@ -4,8 +4,7 @@
 #include "system/root.h"
 
 #include <cstddef>
-#include <gsl/narrow>
-#include <gsl/span>
+#include <gsl/gsl>
 #include <iostream>
 
 namespace {
