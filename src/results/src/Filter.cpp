@@ -7,7 +7,7 @@
 #include "util/typeutil.h"
 
 #include <cstddef>
-#include <gsl/narrow>
+#include <gsl/gsl>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_access.hpp>
 #include <range/v3/view/drop.hpp>

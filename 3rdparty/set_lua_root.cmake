@@ -1,4 +1,4 @@
-# Set the LUA_ROOT macro (used to generate DEFAULT_LUA_PATH) in the lua config
+# Set the LUA_ROOT macro (used to generate DEFAULT_LUA_PATH) in the Lua config
 # header file so that lua looks for libraries in our build environment rather
 # than the host system.
 

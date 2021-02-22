@@ -4,7 +4,7 @@
 #include "system/standard/SqIntImpl.h"
 
 #include <cstdint>
-#include <gsl/narrow>
+#include <gsl/gsl>
 #include <memory>
 
 namespace sq::system::standard {

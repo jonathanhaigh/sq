@@ -5,7 +5,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include <gsl/narrow>
+#include <gsl/gsl>
 #include <string>
 
 namespace rj = rapidjson;

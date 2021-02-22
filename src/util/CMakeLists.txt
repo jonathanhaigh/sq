@@ -15,4 +15,4 @@ add_library(sq_util
     "${SQ_UTIL_SRC_DIR}/typeutil.cpp"
 )
 target_include_directories(sq_util PUBLIC "${SQ_UTIL_INCLUDE_DIR}")
-target_link_libraries(sq_util PUBLIC range-v3)
+target_link_libraries(sq_util PUBLIC range_v3)

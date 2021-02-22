@@ -4,7 +4,7 @@
 #include "system/standard/SqDataSizeImpl.h"
 #include "system/standard/SqStringImpl.h"
 
-#include <gsl/narrow>
+#include <gsl/gsl>
 #include <memory>
 #include <range/v3/iterator_range.hpp>
 #include <range/v3/view/transform.hpp>
