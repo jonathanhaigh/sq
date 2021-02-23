@@ -15,6 +15,7 @@ endif()
 
 ExternalProject_Add(lua_project
     URL https://www.lua.org/ftp/lua-${SQ_LUA_VER}.tar.gz
+    DOWNLOAD_NO_PROGRESS TRUE
     INSTALL_DIR "${SQ_HOST_TOOLS_PREFIX}"
     CONFIGURE_COMMAND
         ${CMAKE_COMMAND}

@@ -2,6 +2,7 @@ include(FetchContent)
 
 FetchContent_Declare(get_gsl
     URL https://github.com/microsoft/GSL/archive/v3.1.0.tar.gz
+    DOWNLOAD_NO_PROGRESS TRUE
 )
 FetchContent_Populate(get_gsl)
 

@@ -2,6 +2,7 @@ include(ExternalProject)
 
 ExternalProject_Add(lua_liluat
     URL https://github.com/FSMaxB/liluat/raw/v1.2.0/liluat.lua
+    DOWNLOAD_NO_PROGRESS TRUE
     DOWNLOAD_NO_EXTRACT TRUE
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
