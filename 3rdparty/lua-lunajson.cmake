@@ -2,6 +2,7 @@ include(ExternalProject)
 
 ExternalProject_Add(lua_lunajson
     URL https://github.com/grafi-tt/lunajson/archive/1.2.3.tar.gz
+    DOWNLOAD_NO_PROGRESS TRUE
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND

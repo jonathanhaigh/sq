@@ -2,6 +2,7 @@ include(FetchContent)
 
 FetchContent_Declare(get_googletest
     URL https://github.com/google/googletest/archive/v1.10.x.tar.gz
+    DOWNLOAD_NO_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(get_googletest)
 
