@@ -1,0 +1,44 @@
+version: 2.1
+
+executors:
+  ubuntu-docker-executor:
+    docker:
+      - image: jonathanhaigh/sq-docker-build:latest
+
+jobs:
+  build:
+    executor: ubuntu-docker-executor
+    steps:
+      - checkout
+      - run:
+          name: Configure
+          command: |
+            mkdir build
+            cd build
+            cmake ..
+      - run:
+          name: Build
+          command: |
+            cmake --build .
+      - persist_to_workspace:
+          root: .
+          paths: build
+  test:
+    executor: ubuntu-docker-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run tests
+          command: |
+            cd build
+            cmake --build --target test .
+      - store_test_results:
+          path: build
+workflows:
+  build-and-test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
