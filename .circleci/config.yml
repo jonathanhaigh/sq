@@ -11,14 +11,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure
+          name: Configure and Build
           command: |
             mkdir build
             cd build
             cmake ..
-      - run:
-          name: Build
-          command: |
             cmake --build .
       - persist_to_workspace:
           root: .
