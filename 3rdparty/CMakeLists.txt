@@ -10,8 +10,6 @@ set(SQ_LUA_MAJMIN_VER "${SQ_LUA_MAJOR_VER}.${SQ_LUA_MINOR_VER}")
 set(SQ_LUA_VER "${SQ_LUA_MAJMIN_VER}.${SQ_LUA_PATCH_VER}")
 set(SQ_LUA_LIB_DIR "${SQ_HOST_TOOLS_LIB_DIR}/lua/${SQ_LUA_MAJMIN_VER}")
 
-include(antlr4.cmake)
-include(antlr4-runtime.cmake)
 include(googletest.cmake)
 include(gsl.cmake)
 include(lua.cmake)

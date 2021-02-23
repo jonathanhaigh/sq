@@ -86,7 +86,7 @@ template <typename R>
     }
     else
     {
-        return gsl::narrow<Int>(ranges::distance(rng));
+        return util::to_ptrdiff_t(ranges::distance(rng));
     }
 }
 
@@ -110,10 +110,10 @@ template <typename Spec>
 struct FilterImpl;
 
 template <>
-struct FilterImpl<ast::NoFilterSpec>
+struct FilterImpl<parser::NoFilterSpec>
     : Filter
 {
-    explicit FilterImpl([[maybe_unused]] const ast::NoFilterSpec& spec)
+    explicit FilterImpl([[maybe_unused]] const parser::NoFilterSpec& spec)
     { }
 
     [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
@@ -128,10 +128,10 @@ struct FilterImpl<ast::NoFilterSpec>
 };
 
 template <>
-struct FilterImpl<ast::ElementAccessSpec>
+struct FilterImpl<parser::ElementAccessSpec>
     : Filter
 {
-    explicit FilterImpl(ast::ElementAccessSpec spec)
+    explicit FilterImpl(parser::ElementAccessSpec spec)
         : index_{spec.index_}
     { }
 
@@ -211,10 +211,10 @@ private:
 };
 
 template <>
-struct FilterImpl<ast::SliceSpec>
+struct FilterImpl<parser::SliceSpec>
     : Filter
 {
-    explicit FilterImpl(ast::SliceSpec spec)
+    explicit FilterImpl(parser::SliceSpec spec)
         : start_{spec.start_}
         , stop_{spec.stop_}
         , step_{spec.step_}
@@ -434,7 +434,7 @@ struct FilterCreatorVisitor
 
 } // namespace
 
-FilterPtr Filter::create(const ast::FilterSpec& spec)
+FilterPtr Filter::create(const parser::FilterSpec& spec)
 {
     return std::visit(FilterCreatorVisitor{}, spec);
 }

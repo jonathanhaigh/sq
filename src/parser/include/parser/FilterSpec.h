@@ -1,5 +1,5 @@
-#ifndef SQ_INCLUDE_GUARD_ast_FilterSpec_h_
-#define SQ_INCLUDE_GUARD_ast_FilterSpec_h_
+#ifndef SQ_INCLUDE_GUARD_parser_FilterSpec_h_
+#define SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 
 #include <cstddef>
 #include <optional>
@@ -7,7 +7,7 @@
 
 #include <iosfwd>
 
-namespace sq::ast {
+namespace sq::parser {
 
 struct NoFilterSpec { };
 std::ostream& operator<<(std::ostream& os, NoFilterSpec nlfs);
@@ -38,6 +38,6 @@ using FilterSpec = std::variant<
     SliceSpec
 >;
 
-} // namespace sq::ast
+} // namespace sq::parser
 
-#endif // SQ_INCLUDE_GUARD_ast_FilterSpec_h_
+#endif // SQ_INCLUDE_GUARD_parser_FilterSpec_h_

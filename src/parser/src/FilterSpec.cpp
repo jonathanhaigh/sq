@@ -1,10 +1,10 @@
-#include "ast/FilterSpec.h"
+#include "parser/FilterSpec.h"
 
 #include "util/strutil.h"
 
 #include <iostream>
 
-namespace sq::ast {
+namespace sq::parser {
 
 std::ostream& operator<<(std::ostream& os, [[maybe_unused]] NoFilterSpec nlfs)
 {
@@ -60,4 +60,4 @@ bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs)
     return !(lhs == rhs);
 }
 
-} // namespace sq::ast
+} // namespace sq::parser

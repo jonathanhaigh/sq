@@ -1,7 +1,9 @@
-#include "ast/ast.h"
+#include "parser/Parser.h"
+#include "parser/TokenView.h"
 #include "results/results.h"
 #include "serialization/serialize.h"
 #include "system/root.h"
+#include "util/typeutil.h"
 
 #include <cstddef>
 #include <gsl/gsl>
@@ -10,7 +12,7 @@
 namespace {
 int run_sq(int argc, char** argv)
 {
-    const auto args = gsl::span{argv, gsl::narrow<std::size_t>(argc)};
+    const auto args = gsl::span{argv, sq::util::to_size_t(argc)};
     if (args.size() < 2) {
         std::cerr << "Not enough args\n";
         return 1;
@@ -20,7 +22,9 @@ int run_sq(int argc, char** argv)
         return 1;
     }
     const auto sq_command = std::string{args[1]};
-    const auto ast = sq::ast::generate_ast(sq_command);
+    auto tokens = sq::parser::TokenView{sq_command};
+    auto parser = sq::parser::Parser(tokens);
+    const auto ast = parser.parse();
     auto root = sq::results::ResultView{sq::system::root()};
     const auto results = sq::results::ResultTree(ast, std::move(root));
 
