@@ -1,6 +1,8 @@
-#include "ast/ast.h"
-#include "ast/FilterSpec.h"
-#include "ast/ParseError.h"
+#include "parser/Ast.h"
+#include "parser/FilterSpec.h"
+#include "parser/Parser.h"
+#include "parser/TokenView.h"
+#include "common_types/ParseError.h"
 #include "test/FieldCallParams_test_util.h"
 #include "util/strutil.h"
 
@@ -10,10 +12,17 @@
 namespace sq::test {
 namespace {
 
-using namespace sq::ast;
+using namespace sq::parser;
 using Size = Ast::Children::size_type;
 
 inline constexpr auto no_filter_spec = FilterSpec{NoFilterSpec{}};
+
+parser::Ast generate_ast(std::string_view query)
+{
+    auto tokens = parser::TokenView{query};
+    auto parser = parser::Parser{tokens};
+    return parser.parse();
+}
 
 void expect_node(
     const Ast& node,
@@ -318,7 +327,10 @@ INSTANTIATE_TEST_SUITE_P(
         "a(p=)",
         "a(p)",
         "a(p=1,2)"
-        "a(p-x)"
+        "a(p-x)",
+        "a[",
+        "a]",
+        "a[]"
     )
 );
 

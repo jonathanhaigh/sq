@@ -24,6 +24,9 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/InvalidFieldError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/InvalidFieldError.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/LexError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/LexError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/NotAnArrayError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/NotAnArrayError.cpp"
 
@@ -33,9 +36,16 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/OutOfRangeError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/OutOfRangeError.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/ParseError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/ParseError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/Primitive.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/Primitive.cpp"
+
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/Token.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/Token.cpp"
 )
 target_include_directories(sq_common_types PUBLIC "${SQ_COMMON_TYPES_INCLUDE_DIR}")
 target_Link_libraries(sq_common_types PUBLIC sq_util)
 target_link_libraries(sq_common_types PUBLIC range_v3)
+target_link_libraries(sq_common_types PUBLIC gsl)

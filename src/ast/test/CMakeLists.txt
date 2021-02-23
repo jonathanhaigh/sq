@@ -1,6 +1,0 @@
-add_executable(sq-ast-test "${CMAKE_CURRENT_SOURCE_DIR}/test_ast.cpp")
-set_target_properties(sq-ast-test PROPERTIES CXX_CLANG_TIDY "")
-target_link_libraries(sq-ast-test sq_ast)
-target_link_libraries(sq-ast-test sq_common_types_test_util)
-target_link_libraries(sq-ast-test gtest_main)
-gtest_discover_tests(sq-ast-test)

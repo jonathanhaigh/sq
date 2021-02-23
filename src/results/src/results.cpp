@@ -13,7 +13,7 @@ using ArrayData = ResultTree::ArrayData;
 class ResultViewToDataVisitor
 {
 public:
-    explicit ResultViewToDataVisitor(const ast::Ast& ast)
+    explicit ResultViewToDataVisitor(const parser::Ast& ast)
         : ast_{&ast}
     { }
 
@@ -23,7 +23,7 @@ public:
     [[nodiscard]] Data operator()(FieldRange<Cat>&& rng) const;
 
 private:
-    const ast::Ast* ast_;
+    const parser::Ast* ast_;
 };
 
 Data ResultViewToDataVisitor::operator()(FieldPtr&& field) const
@@ -67,7 +67,7 @@ Data ResultViewToDataVisitor::operator()(FieldRange<Cat>&& rng) const
 
 } // namespace
 
-ResultTree::ResultTree(const ast::Ast& ast, ResultView&& result_view)
+ResultTree::ResultTree(const parser::Ast& ast, ResultView&& result_view)
     : ResultTree{std::visit(ResultViewToDataVisitor{ast}, std::move(result_view))}
 { }
 

@@ -1,5 +1,4 @@
 set(SQ_ALL_LIBS
-    ast
     common_types
     parser
     results

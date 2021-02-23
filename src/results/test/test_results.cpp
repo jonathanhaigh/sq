@@ -1,6 +1,8 @@
 #include "results/results.h"
 
-#include "ast/ast.h"
+#include "parser/Ast.h"
+#include "parser/Parser.h"
+#include "parser/TokenView.h"
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
 #include "test/FieldCallParams_test_util.h"
@@ -19,6 +21,13 @@ namespace {
 
 using namespace sq::results;
 
+parser::Ast generate_ast(std::string_view query)
+{
+    auto tokens = parser::TokenView{query};
+    auto parser = parser::Parser{tokens};
+    return parser.parse();
+}
+
 // -----------------------------------------------------------------------------
 // Minimal system call tests:
 // Ensure that the results gathering library doesn't call into the system more
@@ -28,7 +37,7 @@ using namespace sq::results;
 // -----------------------------------------------------------------------------
 TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
 {
-    const auto ast = ast::generate_ast("a.b.c");
+    const auto ast = generate_ast("a.b.c");
     const auto fcp = FieldCallParams{};
     auto c = field_with_one_primitive_access(1);
     auto b = field_with_accesses("c", fcp, std::move(c));
@@ -39,7 +48,7 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
 
 TEST(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
 {
-    const auto ast = ast::generate_ast("a { b c d }");
+    const auto ast = generate_ast("a { b c d }");
     const auto fcp = FieldCallParams{};
     auto b = field_with_one_primitive_access(1);
     auto c = field_with_one_primitive_access(2);
@@ -73,7 +82,7 @@ void test_minimal_system_calls_with_element_access(
 
     auto ss = std::stringstream{};
     ss << "a[" << index << "]";
-    const auto ast = ast::generate_ast(ss.str());
+    const auto ast = generate_ast(ss.str());
 
     auto a0 = field_with_one_primitive_access(1);
     auto mfg = testing::StrictMock<MockFieldGenerator>{};
@@ -124,7 +133,7 @@ void test_minimal_system_calls_with_slice(
        << util::optional_to_str(start) << ":"
        << util::optional_to_str(stop) << ":"
        << util::optional_to_str(step) << "]";
-    const auto ast = ast::generate_ast(ss.str());
+    const auto ast = generate_ast(ss.str());
     auto mfg = testing::StrictMock<MockFieldGenerator>{};
     auto step_v = step.value_or(1);
     auto start_v = start.value_or(0);
@@ -183,7 +192,7 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithSlice)
 // -----------------------------------------------------------------------------
 TEST(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
 {
-    const auto ast = ast::generate_ast("a.b.c");
+    const auto ast = generate_ast("a.b.c");
     auto root = ResultView{std::make_unique<FakeField>()};
     const auto results = ResultTree{ast, std::move(root)};
 
@@ -196,7 +205,7 @@ TEST(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
 
 TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
 {
-    const auto ast = ast::generate_ast("a {b c d}");
+    const auto ast = generate_ast("a {b c d}");
     auto root = ResultView{std::make_unique<FakeField>()};
     const auto results = ResultTree{ast, std::move(root)};
 
@@ -224,7 +233,7 @@ class ResultTreeParamTest
 TEST_P(ResultTreeParamTest, TestParamPassing)
 {
     const auto [ query, params ] = GetParam();
-    const auto ast = ast::generate_ast(query);
+    const auto ast = generate_ast(query);
     auto a = field_with_one_primitive_access(0);
     auto root = field_with_accesses("a", params, std::move(a));
     const auto results = ResultTree(ast, std::move(root));
@@ -276,7 +285,7 @@ void test_element_access(
     );
     auto ss = std::stringstream{};
     ss << "a[" << index << "]";
-    const auto ast = ast::generate_ast(ss.str());
+    const auto ast = generate_ast(ss.str());
 
     const auto normalized_index = (index >= 0)? index : (size + index);
     auto arange = to_field_range(cat,
@@ -353,7 +362,7 @@ void test_slice(
        << util::optional_to_str(start) << ":"
        << util::optional_to_str(stop) << ":"
        << util::optional_to_str(step) << "]";
-    const auto ast = ast::generate_ast(ss.str());
+    const auto ast = generate_ast(ss.str());
     auto step_v = step.value_or(1);
     auto start_v = std::ptrdiff_t{0};
     auto stop_v = std::ptrdiff_t{0};
@@ -433,7 +442,7 @@ TEST(ResultTreeTest, TestNotAnArrayError)
     {
         SCOPED_TRACE(testing::Message() << "query=" << query);
 
-        const auto ast = ast::generate_ast(query);
+        const auto ast = generate_ast(query);
         auto root = std::make_unique<FakeField>();
 
         EXPECT_THROW({

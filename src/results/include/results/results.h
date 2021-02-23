@@ -1,9 +1,9 @@
 #ifndef SQ_INCLUDE_GUARD_results_generate_results_h_
 #define SQ_INCLUDE_GUARD_results_generate_results_h_
 
-#include "ast/ast.h"
 #include "common_types/Field.h"
 #include "common_types/Primitive.h"
+#include "parser/Ast.h"
 #include "results/ResultView.h"
 
 #include <string>
@@ -27,7 +27,7 @@ public:
     ResultTree& operator=(ResultTree&& other) = default;
     ~ResultTree() noexcept = default;
 
-    ResultTree(const ast::Ast& ast, ResultView&& result);
+    ResultTree(const parser::Ast& ast, ResultView&& result);
     explicit ResultTree(Data&& data);
 
     [[nodiscard]] const Data& data() const { return data_; }

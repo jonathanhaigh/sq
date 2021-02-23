@@ -1,14 +1,15 @@
-#ifndef SQ_INCLUDE_GUARD_ast_ast_h_
-#define SQ_INCLUDE_GUARD_ast_ast_h_
+#ifndef SQ_INCLUDE_GUARD_parser_Ast_h_
+#define SQ_INCLUDE_GUARD_parser_Ast_h_
 
-#include "ast/FilterSpec.h"
 #include "common_types/FieldCallParams.h"
+#include "parser/FilterSpec.h"
 #include "util/MoveOnlyTree.h"
 
 #include <iosfwd>
 #include <string>
+#include <string_view>
 
-namespace sq::ast {
+namespace sq::parser {
 
 inline constexpr const char* ast_root_node_name = "root";
 
@@ -46,8 +47,6 @@ std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
 
 using Ast = util::MoveOnlyTree<AstData>;
 
-[[nodiscard]] Ast generate_ast(const std::string& sq_command);
+} // namespace sq::parser
 
-} // namespace sq::ast
-
-#endif // SQ_INCLUDE_GUARD_ast_ast_h_
+#endif // SQ_INCLUDE_GUARD_parser_Ast_h_

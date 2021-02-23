@@ -1,8 +1,8 @@
 #ifndef SQ_INCLUDE_GUARD_results_Filter_h_
 #define SQ_INCLUDE_GUARD_results_Filter_h_
 
-#include "ast/FilterSpec.h"
 #include "common_types/Field.h"
+#include "parser/FilterSpec.h"
 #include "results/ResultView.h"
 
 #include <memory>
@@ -17,7 +17,7 @@ struct Filter
     /**
      * Create a Filter for the given spec.
      */
-    [[nodiscard]] static FilterPtr create(const ast::FilterSpec& spec);
+    [[nodiscard]] static FilterPtr create(const parser::FilterSpec& spec);
 
     /**
      * Transform a Result so that it satisfies the requirements of this filter.
