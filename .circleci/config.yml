@@ -3,7 +3,7 @@ version: 2.1
 executors:
   ubuntu-docker-executor:
     docker:
-      - image: jonathanhaigh/sq-docker-build:latest
+      - image: jonathanhaigh/build:latest
 
 jobs:
   build:
