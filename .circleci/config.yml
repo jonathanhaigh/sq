@@ -6,7 +6,7 @@ executors:
       - image: jonathanhaigh/builder:20210224
 
 jobs:
-  sq-build-and-test:
+  sq-debug-build-using-clang-and-make:
     executor: ubuntu-docker-executor
     parameters:
       compiler:
@@ -30,4 +30,4 @@ jobs:
 workflows:
   SQ Debug build using clang++ and make:
     jobs:
-      - sq-build-and-test
+      - sq-debug-build-using-clang-and-make
