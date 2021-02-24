@@ -1,0 +1,37 @@
+version: 2.1
+
+executors:
+  ubuntu-docker-executor:
+    docker:
+      - image: jonathanhaigh/builder:20210224
+
+jobs:
+  build-and-test:
+    executor: ubuntu-docker-executor
+    parameters:
+      compiler:
+        type: enum
+        default: "clang++"
+        enum: ["clang++", "g++"]
+      build-type:
+        type: enum
+        default: "Debug"
+        enum: ["Debug", "Release"]
+    steps:
+      - checkout
+      - run:
+          name: Configure and Build
+          command: |
+            mkdir build
+            cd build
+            cmake "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
+            make -j16
+            make test
+workflows:
+  build-and-test:
+    jobs:
+      - build-and-test:
+        matrix:
+          parameters:
+            compiler: ["g++", "clang++"]
+            build-type: ["Debug", "Release"]
