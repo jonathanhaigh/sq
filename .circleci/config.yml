@@ -3,7 +3,7 @@ version: 2.1
 executors:
   ubuntu-docker-executor:
     docker:
-      - image: jonathanhaigh/builder:f6abfcaee6232caad23c9a70d3ce95a1571c6288409bdf20b606ee65b0da1c92
+      - image: jonathanhaigh/builder:20210224
 
 jobs:
   build-and-test:
@@ -11,8 +11,8 @@ jobs:
     parameters:
       compiler:
         type: enum
-        default: "clang++-11"
-        enum: ["clang++-11", "g++-10"]
+        default: "clang++"
+        enum: ["clang++", "g++"]
       build-type:
         type: enum
         default: "Debug"
