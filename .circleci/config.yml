@@ -24,14 +24,10 @@ jobs:
           command: |
             mkdir build
             cd build
-            cmake -GNinja "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
-            cmake --build .
-            make --build . --target test
+            cmake "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
+            make -j8
+            make test
 workflows:
   build-and-test-all:
     jobs:
-      - build-and-test:
-        matrix:
-          parameters:
-            compiler: ["g++", "clang++"]
-            build-type: ["Debug", "Release"]
+      - build-and-test
