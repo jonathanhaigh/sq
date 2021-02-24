@@ -6,8 +6,17 @@ executors:
       - image: jonathanhaigh/builder:latest
 
 jobs:
-  build:
+  build-and-test:
     executor: ubuntu-docker-executor
+    parameters:
+      compiler:
+        type: enum
+        default: "clang++-11"
+        enum: ["clang++-11", "g++-10"]
+      build-type:
+        type: enum
+        default: "Debug"
+        enum: ["Debug", "Release"]
     steps:
       - checkout
       - run:
@@ -15,27 +24,14 @@ jobs:
           command: |
             mkdir build
             cd build
-            cmake ..
+            cmake "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
             make -j16
-      - persist_to_workspace:
-          root: .
-          paths: build
-  test:
-    executor: ubuntu-docker-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Run tests
-          command: |
-            cd build
             make test
-      - store_test_results:
-          path: build
 workflows:
   build-and-test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - build-and-test:
+        matrix:
+          parameters:
+            compiler: ["g++", "clang++"]
+            build-type: ["Debug", "Release"]
