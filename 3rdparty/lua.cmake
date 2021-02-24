@@ -15,6 +15,9 @@ endif()
 
 ExternalProject_Add(lua_project
     URL https://www.lua.org/ftp/lua-${SQ_LUA_VER}.tar.gz
+    BUILD_BYPRODUCTS
+        "${SQ_HOST_TOOLS_BIN_DIR}/lua"
+        "${SQ_HOST_TOOLS_BIN_DIR}/luac"
     DOWNLOAD_NO_PROGRESS TRUE
     INSTALL_DIR "${SQ_HOST_TOOLS_PREFIX}"
     CONFIGURE_COMMAND
