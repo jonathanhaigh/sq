@@ -5,7 +5,9 @@ Checks: >-
     -fuchsia-overloaded-operator,
     -fuchsia-trailing-return,
     -google-runtime-references,
+    -llvmlibc-*,
     -llvm-header-guard,
+    -misc-no-recursion,
     -modernize-use-trailing-return-type,
     -modernize-pass-by-value,
 
