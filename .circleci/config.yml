@@ -6,7 +6,7 @@ executors:
       - image: jonathanhaigh/builder:20210224
 
 jobs:
-  build-and-test:
+  sq-build-and-test:
     executor: ubuntu-docker-executor
     parameters:
       compiler:
@@ -28,6 +28,6 @@ jobs:
             make -j8
             make test
 workflows:
-  build-and-test-all:
+  SQ Debug build using clang++ and make:
     jobs:
-      - build-and-test
+      - sq-build-and-test
