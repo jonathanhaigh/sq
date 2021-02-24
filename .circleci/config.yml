@@ -24,11 +24,11 @@ jobs:
           command: |
             mkdir build
             cd build
-            cmake "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
-            make -j16
-            make test
+            cmake -GNinja "-DCMAKE_BUILD_TYPE=<< parameters.build-type >>" "-DCMAKE_CXX_COMPILER=<< parameters.compiler >>" ..
+            cmake --build .
+            make --build . --target test
 workflows:
-  build-and-test:
+  build-and-test-all:
     jobs:
       - build-and-test:
         matrix:
