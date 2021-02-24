@@ -6,7 +6,7 @@ agent:
     os_image: ubuntu1804
   containers:
     - name: main
-      image: 'hub.docker.com/jonathanhaigh:20210224_2'
+      image: 'jonathanhaigh/builder:20210224_2'
 blocks:
   - name: Build and Test Block
     task:
