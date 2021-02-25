@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 include(FetchContent)
 
 FetchContent_Declare(get_googletest

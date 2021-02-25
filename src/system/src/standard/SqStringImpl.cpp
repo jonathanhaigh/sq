@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #include "system/standard/SqStringImpl.h"
 
 namespace sq::system::standard {

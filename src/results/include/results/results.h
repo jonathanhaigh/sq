@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #ifndef SQ_INCLUDE_GUARD_results_generate_results_h_
 #define SQ_INCLUDE_GUARD_results_generate_results_h_
 

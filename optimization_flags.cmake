@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 set(SQ_OPTIMIZATION_FLAGS)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL Clang OR

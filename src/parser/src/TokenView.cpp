@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #include "parser/TokenView.h"
 
 #include "common_types/LexError.h"

@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 set(SQ_UTIL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(SQ_UTIL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 

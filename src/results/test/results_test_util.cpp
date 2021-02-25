@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #include "test/results_test_util.h"
 
 #include "serialization/serialize.h"
