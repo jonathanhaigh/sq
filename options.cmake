@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 option(SQ_FORCE_COLOR "Force coloured compiler output" FALSE)
 set(SQ_COLOR_FLAGS)
 if("${SQ_FORCE_COLOR}" OR "$ENV{CLICOLOR_FORCE}")

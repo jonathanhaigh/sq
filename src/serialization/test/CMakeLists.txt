@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 add_executable(sq-serialization-test
     "${CMAKE_CURRENT_SOURCE_DIR}/test_serialization.cpp"
 )

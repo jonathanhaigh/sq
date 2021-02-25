@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 # Set where we install tools/libs that are to be used on the host
 set(SQ_HOST_TOOLS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/sq-host-tools")
 set(SQ_HOST_TOOLS_BIN_DIR "${SQ_HOST_TOOLS_PREFIX}/bin")
