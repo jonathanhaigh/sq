@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #ifndef SQ_INCLUDE_GUARD_serialization_serialize_h_
 #define SQ_INCLUDE_GUARD_serialization_serialize_h_
 

@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #include "common_types/FieldCallParams.h"
 #include "common_types/Primitive.h"
 #include "common_types/ArgumentTypeError.h"

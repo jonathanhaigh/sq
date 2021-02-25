@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 find_program(
     SQ_CLANG_TIDY_PATH
     NAMES clang-tidy clang-tidy-10 clang-tidy-11

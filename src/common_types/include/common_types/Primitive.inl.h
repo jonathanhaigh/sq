@@ -1,3 +1,8 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
 #ifndef SQ_INCLUDE_GUARD_common_types_Primitive_inl_h_
 #define SQ_INCLUDE_GUARD_common_types_Primitive_inl_h_
 

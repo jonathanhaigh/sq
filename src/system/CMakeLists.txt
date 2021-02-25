@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Jonathan Haigh
+# SPDX-License-Identifier: MIT
+# ------------------------------------------------------------------------------
+
 # The system directory is split into several libraries:
 #
 # * The platform sq_system_dispatch library that contains classes for
