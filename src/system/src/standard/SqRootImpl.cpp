@@ -8,6 +8,7 @@
 #include "system/standard/SqBoolImpl.h"
 #include "system/standard/SqIntImpl.h"
 #include "system/standard/SqPathImpl.h"
+#include "system/standard/SqSchemaImpl.h"
 
 #include <memory>
 #include <range/v3/view/iota.hpp>
@@ -15,6 +16,11 @@
 #include <string>
 
 namespace sq::system::standard {
+
+Result SqRootImpl::get_schema()
+{
+    return std::make_unique<SqSchemaImpl>();
+}
 
 Result SqRootImpl::get_path(const PrimitiveString* path)
 {

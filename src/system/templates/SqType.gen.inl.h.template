@@ -19,7 +19,7 @@ Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const Fi
         table.insert(param_strs, string.format(
             "params.%s<%s>(%d, \"%s\")",
             param.required and "get" or "get_optional",
-            param.base_type,
+            param.type,
             param.index,
             param.name
         ))

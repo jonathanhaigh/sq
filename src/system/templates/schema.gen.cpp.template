@@ -1,0 +1,139 @@
+/* -----------------------------------------------------------------------------
+ * Copyright 2021 Jonathan Haigh
+ * SPDX-License-Identifier: MIT
+ * ---------------------------------------------------------------------------*/
+
+{{
+    -- We're going to create four std::arrays to contain the schema data. One
+    -- array for each of:
+    -- * TypeSchema
+    -- * FieldSchema
+    -- * ParamSchema
+    -- * PrimitiveTypeSchema
+    --
+    -- In order for parts of the schema data to be able to reference other
+    -- parts of the schema data we're going to work out the index for each
+    -- schema element within its array before we start writing any data.
+    --
+    -- param schemas already have "index" members so use "global_index" for the
+    -- name of a param's index into the ParamSchema array.
+
+    local type_index_by_name = {}
+    local type_index = 0
+    local field_index = 0
+    local param_index = 0
+
+    for _, type_schema in ipairs(types) do
+
+        type_schema.index = type_index
+        type_schema.first_field_index = field_index
+        type_index_by_name[type_schema.name] = type_index
+        type_index = type_index + 1
+
+        for _, field_schema in ipairs(type_schema.fields) do
+
+            field_schema.index = field_index
+            field_schema.first_param_index = param_index
+            if string.sub(field_schema["return"], 1, 1) == "[" then
+                field_schema.return_list = "true"
+                field_schema.return_type = string.sub(field_schema["return"], 2, -2)
+            else
+                field_schema.return_list = "false"
+                field_schema.return_type = field_schema["return"]
+            end
+
+            field_index = field_index + 1
+
+            for _, param_schema in ipairs(field_schema.params) do
+
+                param_schema.global_index = param_index
+                param_index = param_index + 1
+
+            end
+            field_schema.noof_params = param_index - field_schema.first_param_index
+        end
+        type_schema.noof_fields = field_index - type_schema.first_field_index
+    end
+    local noof_types = type_index
+    local noof_fields = field_index
+    local noof_params = param_index
+
+    local pt_index_by_name = {}
+    local pt_index = 0
+    for _, pt_schema in ipairs(primitive_types) do
+        pt_schema.index = pt_index
+        pt_index_by_name[pt_schema.name] = pt_index
+        pt_index = pt_index + 1
+    end
+    local noof_pts = pt_index
+}}
+#include "system/schema.h"
+
+namespace sq::system {
+namespace {
+
+struct SchemaImpl
+{
+    consteval SchemaImpl() noexcept;
+    constexpr ~SchemaImpl() noexcept = default;
+
+    SchemaImpl(const SchemaImpl&) = delete;
+    SchemaImpl(SchemaImpl&&) = delete;
+    SchemaImpl& operator=(const SchemaImpl&) = delete;
+    SchemaImpl& operator=(SchemaImpl&&) = delete;
+
+    std::array<TypeSchema, {{= noof_types }}> types;
+    std::array<FieldSchema, {{= noof_fields }}> fields;
+    std::array<ParamSchema, {{= noof_params }}> params;
+    std::array<PrimitiveTypeSchema, {{= noof_pts }}> primitive_types;
+};
+
+consteval SchemaImpl::SchemaImpl() noexcept
+{
+{{ for _, type_schema in ipairs(types) do }}
+    types[{{= type_schema.index }}].name = "{{= type_schema.name }}";
+    types[{{= type_schema.index }}].fields = std::span{fields}.subspan(
+        {{= type_schema.first_field_index }},
+        {{= type_schema.noof_fields}}
+    );
+{{ for _, field_schema in ipairs(type_schema.fields) do }}
+    fields[{{= field_schema.index }}].name = "{{= field_schema.name }}";
+    fields[{{= field_schema.index }}].return_type = std::addressof(
+        types[{{= type_index_by_name[field_schema.return_type] }}]
+    );
+    fields[{{= field_schema.index }}].return_list = {{= field_schema.return_list }};
+    fields[{{= field_schema.index }}].params = std::span{params}.subspan(
+        {{= field_schema.first_param_index }},
+        {{= field_schema.noof_params }}
+    );
+{{ for _, param_schema in ipairs(field_schema.params) do }}
+    params[{{= param_schema.global_index }}].index = {{= param_schema.index }};
+    params[{{= param_schema.global_index }}].name = "{{= param_schema.name }}";
+    params[{{= param_schema.global_index }}].type = std::addressof(
+        primitive_types[{{= pt_index_by_name[param_schema.type] }}]
+    );
+{{ end }}
+{{ end }}
+{{ end }}
+
+{{ for _, pt_schema in ipairs(primitive_types) do }}
+    primitive_types[{{= pt_schema.index }}].name = "{{= pt_schema.name }}";
+{{ end }}
+}
+
+constinit SchemaImpl g_schema_impl{};
+
+constinit auto g_schema = Schema{
+    g_schema_impl.types,
+    g_schema_impl.primitive_types,
+    std::addressof(g_schema_impl.types[{{= type_index_by_name[root_type] }}])
+};
+
+} // namespace
+
+const Schema& schema()
+{
+    return g_schema;
+}
+
+} // namespace sq::system
