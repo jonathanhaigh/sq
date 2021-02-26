@@ -14,6 +14,7 @@ class SqRootImpl
     : public SqRoot<SqRootImpl>
 {
 public:
+    [[nodiscard]] static Result get_schema();
     [[nodiscard]] static Result get_path(const PrimitiveString* path);
     [[nodiscard]] static Result get_int(const PrimitiveInt* value);
     [[nodiscard]] static Result get_ints(const PrimitiveInt* start, const PrimitiveInt* stop);

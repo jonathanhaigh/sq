@@ -21,6 +21,7 @@ add_library(sq_system_standard
     ${SQ_SYSTEM_STANDARD_HEADERS}
     ${SQ_SYSTEM_STANDARD_SRC}
 )
+target_link_libraries(sq_system_standard PUBLIC sq_system_schema)
 target_link_libraries(sq_system_standard PUBLIC sq_common_types)
 target_link_libraries(sq_system_standard PUBLIC sq_util)
 target_link_libraries(sq_system_standard PUBLIC sq_system_dispatch)

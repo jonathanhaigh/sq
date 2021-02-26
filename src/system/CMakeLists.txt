@@ -5,20 +5,23 @@
 
 # The system directory is split into several libraries:
 #
-# * The platform sq_system_dispatch library that contains classes for
-#   each SQ type, automatically generated from the schema. These classes handle
-#   dispatching calls into the system to the implementation libraries.
-#   Essentially, these classes are for resolving SQ type field names into
-#   actual method calls.
+# * The sq_system_dispatch library that contains classes for each SQ type,
+#   automatically generated from the schema. These classes handle dispatching
+#   calls into the system to the implementation libraries.  Essentially, these
+#   classes are for resolving SQ type field names into actual method calls.
 #
 # * The platform specific sq_system_* implementation libraries that actually
 #   provide the data from the system.
+#
+# * The sq_system_schema library that contains binary schema information
+#   generated from the schema JSON file.
 #
 # * The sq_system library that provides a handle to the system.
 
 include(sq_functions.cmake)
 include(sq_system_dispatch.cmake)
 include(sq_system_standard.cmake)
+include(sq_system_schema.cmake)
 
 set(SQ_SYSTEM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(SQ_SYSTEM_HEADERS_DIR "${SQ_SYSTEM_INCLUDE_DIR}/system")
