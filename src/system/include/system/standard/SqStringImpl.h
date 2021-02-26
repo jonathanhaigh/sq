@@ -8,13 +8,16 @@
 
 #include "system/SqString.gen.h"
 
+#include <string_view>
+
 namespace sq::system::standard {
 
 class SqStringImpl
     : public SqString<SqStringImpl>
 {
 public:
-    explicit SqStringImpl(const PrimitiveString& value);
+    explicit SqStringImpl(std::string_view value);
+    explicit SqStringImpl(PrimitiveString&& value);
 
     [[nodiscard]] Primitive to_primitive() const override;
 
