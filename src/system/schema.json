@@ -1,163 +1,312 @@
 {
-    "SqBool": {
-    },
-
-    "SqDataSize": {
-        "B": {
-            "return": "SqInt",
-            "params": []
+    "primitive_types": [
+        { "name": "PrimitiveString" },
+        { "name": "PrimitiveInt" },
+        { "name": "PrimitiveFloat" },
+        { "name": "PrimitiveBool" }
+    ],
+    "root_type": "SqRoot",
+    "types": [
+        {
+            "name": "SqBool",
+            "fields": []
         },
-        "KiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "kB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "MiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "MB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "GiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "GB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "TiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "TB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "PiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "PB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "EiB": {
-            "return": "SqFloat",
-            "params": []
-        },
-        "EB": {
-            "return": "SqFloat",
-            "params": []
-        }
-    },
-
-    "SqFloat": {
-    },
-
-    "SqInt": {
-    },
-
-    "SqPath": {
-        "string": {
-            "return": "SqString",
-            "params": []
-         },
-        "parent": {
-            "return": "SqPath",
-            "params": []
-        },
-        "filename": {
-            "return": "SqString",
-            "params": []
-        },
-        "stem": {
-            "return": "SqString",
-            "params": []
-        },
-        "extension": {
-            "return": "SqString",
-            "params": []
-        },
-        "children": {
-            "return": "[SqPath]",
-            "params": []
-        },
-        "parts": {
-            "return": "[SqString]",
-            "params": []
-        },
-        "absolute": {
-            "return": "SqPath",
-            "params": []
-        },
-        "canonical": {
-            "return": "SqPath",
-            "params": []
-        },
-        "is_absolute": {
-            "return": "SqBool",
-            "params": []
-        },
-        "size": {
-            "return": "SqDataSize",
-            "params": []
-        }
-    },
-
-    "SqRoot": {
-        "path": {
-            "return":  "SqPath",
-            "params": [ 
+        {
+            "name": "SqDataSize",
+            "fields": [
                 {
-                    "name": "path",
-                    "type": "PrimitiveString",
-                    "required": false
-                }
-            ]
-        },
-        "int": {
-            "return": "SqInt",
-            "params": [
-                {
-                    "name": "value",
-                    "type": "PrimitiveInt",
-                    "required": false
-                }
-            ]
-        },
-        "ints": {
-            "return": "[SqInt]",
-            "params": [
-                {
-                    "name": "start",
-                    "type": "PrimitiveInt",
-                    "required": false
+                    "name": "B",
+                    "return": "SqInt",
+                    "params": []
                 },
                 {
-                    "name": "stop",
-                    "type": "PrimitiveInt",
-                    "required": false
+                    "name": "KiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "kB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "MiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "MB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "GiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "GB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "TiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "TB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "PiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "PB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "EiB",
+                    "return": "SqFloat",
+                    "params": []
+                },
+                {
+                    "name": "EB",
+                    "return": "SqFloat",
+                    "params": []
                 }
             ]
         },
-        "bool": {
-            "return": "SqBool",
-            "params": [
+        {
+            "name": "SqFieldSchema",
+            "fields": [
                 {
-                    "name": "value",
-                    "type": "PrimitiveBool",
-                    "required": false
+                    "name": "name",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "params",
+                    "return": "[SqParamSchema]",
+                    "params": []
+                },
+                {
+                    "name": "return_type",
+                    "return": "SqTypeSchema",
+                    "params": []
+                },
+                {
+                    "name": "return_list",
+                    "return": "SqBool",
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqFloat",
+            "fields": []
+        },
+
+        {
+            "name": "SqInt",
+            "fields": []
+        },
+        {
+            "name": "SqParamSchema",
+            "fields": [
+                {
+                    "name": "name",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "index",
+                    "return": "SqInt",
+                    "params": []
+                },
+                {
+                    "name": "type",
+                    "return": "SqPrimitiveTypeSchema",
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqPath",
+            "fields": [
+                {
+                    "name": "string",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "parent",
+                    "return": "SqPath",
+                    "params": []
+                },
+                {
+                    "name": "filename",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "stem",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "extension",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "children",
+                    "return": "[SqPath]",
+                    "params": []
+                },
+                {
+                    "name": "parts",
+                    "return": "[SqString]",
+                    "params": []
+                },
+                {
+                    "name": "absolute",
+                    "return": "SqPath",
+                    "params": []
+                },
+                {
+                    "name": "canonical",
+                    "return": "SqPath",
+                    "params": []
+                },
+                {
+                    "name": "is_absolute",
+                    "return": "SqBool",
+                    "params": []
+                },
+                {
+                    "name": "size",
+                    "return": "SqDataSize",
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqPrimitiveTypeSchema",
+            "fields": [
+                {
+                    "name": "name",
+                    "return": "SqString",
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqRoot",
+            "fields": [
+                {
+                    "name": "schema",
+                    "return": "SqSchema",
+                    "params": []
+                },
+                {
+                    "name": "path",
+                    "return":  "SqPath",
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "path",
+                            "type": "PrimitiveString",
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "int",
+                    "return": "SqInt",
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "value",
+                            "type": "PrimitiveInt",
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "ints",
+                    "return": "[SqInt]",
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "start",
+                            "type": "PrimitiveInt",
+                            "required": false
+                        },
+                        {
+                            "index": 1,
+                            "name": "stop",
+                            "type": "PrimitiveInt",
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "bool",
+                    "return": "SqBool",
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "value",
+                            "type": "PrimitiveBool",
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "SqSchema",
+            "fields": [
+                {
+                    "name": "root_type",
+                    "return": "SqTypeSchema",
+                    "params": []
+                },
+                {
+                    "name": "primitive_types",
+                    "return": "[SqPrimitiveTypeSchema]",
+                    "params": []
+                },
+                {
+                    "name": "types",
+                    "return": "[SqTypeSchema]",
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqString",
+            "fields": [ ]
+        },
+        {
+            "name": "SqTypeSchema",
+            "fields": [
+                {
+                    "name": "name",
+                    "return": "SqString",
+                    "params": []
+                },
+                {
+                    "name": "fields",
+                    "return": "[SqFieldSchema]",
+                    "params": []
                 }
             ]
         }
-    },
-
-    "SqString": {
-    }
+    ]
 }

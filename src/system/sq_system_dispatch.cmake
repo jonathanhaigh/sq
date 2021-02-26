@@ -7,17 +7,17 @@ set(SQ_SYSTEM_DISPATCH_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 set(SQ_SYSTEM_DISPATCH_HEADERS_DIR "${SQ_SYSTEM_DISPATCH_INCLUDE_DIR}/system")
 set(SQ_SYSTEM_DISPATCH_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/src")
 
-sq_generate_system_files(
+sq_generate_file_for_each_type(
     "SqType.gen.h"
     "${SQ_SYSTEM_DISPATCH_HEADERS_DIR}/%s.gen.h"
     SQ_SYSTEM_DISPATCH_HEADERS
 )
-sq_generate_system_files(
+sq_generate_file_for_each_type(
     "SqType.gen.inl.h"
     "${SQ_SYSTEM_DISPATCH_HEADERS_DIR}/%s.gen.inl.h"
     SQ_SYSTEM_DISPATCH_INL_HEADERS
 )
-sq_generate_system_files(
+sq_generate_file_for_each_type(
     "SqType.gen.cpp"
     "${SQ_SYSTEM_DISPATCH_SRC_DIR}/%s.gen.cpp"
     SQ_SYSTEM_DISPATCH_SRC

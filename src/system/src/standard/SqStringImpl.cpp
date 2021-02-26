@@ -7,8 +7,13 @@
 
 namespace sq::system::standard {
 
-SqStringImpl::SqStringImpl(const PrimitiveString& value)
+SqStringImpl::SqStringImpl(std::string_view value)
     : value_{value}
+{
+}
+
+SqStringImpl::SqStringImpl(PrimitiveString&& value)
+    : value_{std::move(value)}
 {
 }
 
