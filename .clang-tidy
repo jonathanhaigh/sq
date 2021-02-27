@@ -1,6 +1,7 @@
 ---
 Checks: >-
     *,
+    -altera-struct-pack-align,
     -fuchsia-default-arguments-calls,
     -fuchsia-overloaded-operator,
     -fuchsia-trailing-return,
