@@ -10,6 +10,8 @@
 
 #include "system/schema.h"
 
+#include <gsl/gsl>
+
 namespace sq::system::standard {
 
 class SqFieldSchemaImpl
@@ -26,7 +28,7 @@ public:
     [[nodiscard]] Primitive to_primitive() const override;
 
 private:
-    const FieldSchema* field_schema_;
+    gsl::not_null<const FieldSchema*> field_schema_;
 };
 
 } // namespace sq::system::standard

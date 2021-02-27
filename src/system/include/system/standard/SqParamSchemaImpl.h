@@ -10,6 +10,8 @@
 
 #include "system/schema.h"
 
+#include <gsl/gsl>
+
 namespace sq::system::standard {
 
 class SqParamSchemaImpl
@@ -25,7 +27,7 @@ public:
     [[nodiscard]] Primitive to_primitive() const override;
 
 private:
-    const ParamSchema* param_schema_;
+    gsl::not_null<const ParamSchema*> param_schema_;
 };
 
 } // namespace sq::system::standard

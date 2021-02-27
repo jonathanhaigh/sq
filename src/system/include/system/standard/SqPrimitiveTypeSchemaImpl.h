@@ -10,6 +10,8 @@
 
 #include "system/schema.h"
 
+#include <gsl/gsl>
+
 namespace sq::system::standard {
 
 class SqPrimitiveTypeSchemaImpl
@@ -23,7 +25,7 @@ public:
     [[nodiscard]] Primitive to_primitive() const override;
 
 private:
-    const PrimitiveTypeSchema* primitive_type_schema_;
+    gsl::not_null<const PrimitiveTypeSchema*> primitive_type_schema_;
 };
 
 } // namespace sq::system::standard
