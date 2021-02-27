@@ -8,6 +8,7 @@
 
 #include "test/Primitive_test_util.h"
 
+#include <string_view>
 #include <utility>
 
 namespace sq::test {
@@ -43,7 +44,7 @@ FieldCallParams params(Args&&... args)
 }
 
 template <typename T>
-NamedParam named(const char* name, T&& np)
+NamedParam named(std::string_view name, T&& np)
 {
     return NamedParam{name, to_primitive(std::forward<T>(np))};
 }

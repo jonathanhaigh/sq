@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    Writer* writer_;
+    gsl::not_null<Writer*> writer_;
 };
 
 template <typename Writer>
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    Writer* writer_; 
+    gsl::not_null<Writer*> writer_; 
 };
 
 void serialize_results(std::ostream& os, const results::ResultTree& results)

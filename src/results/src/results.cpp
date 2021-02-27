@@ -7,6 +7,8 @@
 
 #include "results/Filter.h"
 
+#include <gsl/gsl>
+
 namespace sq::results {
 
 namespace {
@@ -28,7 +30,7 @@ public:
     [[nodiscard]] Data operator()(FieldRange<Cat>&& rng) const;
 
 private:
-    const parser::Ast* ast_;
+    gsl::not_null<const parser::Ast*> ast_;
 };
 
 Data ResultViewToDataVisitor::operator()(FieldPtr&& field) const

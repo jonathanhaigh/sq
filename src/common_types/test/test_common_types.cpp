@@ -23,8 +23,8 @@ void test_primitive_type()
         << ">()"
     );
     EXPECT_NE(primitive_type_name_v<T>, nullptr);
-    EXPECT_STREQ(primitive_type_name(T{}), primitive_type_name_v<T>);
-    EXPECT_STREQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
+    EXPECT_EQ(primitive_type_name(T{}), primitive_type_name_v<T>);
+    EXPECT_EQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
 }
 
 } // namespace

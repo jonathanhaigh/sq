@@ -16,7 +16,7 @@
 
 namespace sq::parser {
 
-inline constexpr const char* ast_root_node_name = "root";
+inline constexpr std::string_view ast_root_node_name = "root";
 
 class AstData
 {

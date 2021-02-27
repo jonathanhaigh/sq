@@ -32,7 +32,6 @@ Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const Fi
 {{ end }}
 
     throw InvalidFieldError("{{= name }}", member);
-    return nullptr;
 }
 
 } // namespace sq::system
