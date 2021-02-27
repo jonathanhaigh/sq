@@ -20,8 +20,8 @@ struct PrimitiveTypeSchema
 struct ParamSchema
 {
     std::string_view name;
-    std::ptrdiff_t index;
-    const PrimitiveTypeSchema* type;
+    std::ptrdiff_t index = 0;
+    const PrimitiveTypeSchema* type = nullptr;
 };
 
 struct TypeSchema;
@@ -30,8 +30,8 @@ struct FieldSchema
 {
     std::string_view name;
     std::span<const ParamSchema> params;
-    const TypeSchema* return_type;
-    bool return_list;
+    const TypeSchema* return_type = nullptr;
+    bool return_list = false;
 };
 
 struct TypeSchema
@@ -44,7 +44,7 @@ struct Schema
 {
     std::span<const TypeSchema> types;
     std::span<const PrimitiveTypeSchema> primitive_types;
-    const TypeSchema* root_type;
+    const TypeSchema* root_type = nullptr;
 };
 
 const Schema& schema();
