@@ -12,6 +12,7 @@
 #include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <string_view>
 #include <utility>
 
 namespace sq::test {
@@ -31,7 +32,7 @@ parser::Ast generate_ast(std::string_view query)
 
 void expect_node(
     const Ast& node,
-    const char* name,
+    std::string_view name,
     const FieldCallParams& params,
     const FilterSpec& filter_spec,
     Size noof_children
@@ -51,13 +52,13 @@ void expect_node(
     EXPECT_EQ(node.children().size(), noof_children);
 }
 
-void expect_plain_node(const Ast& node, const char*name, Size noof_children)
+void expect_plain_node(const Ast& node, std::string_view name, Size noof_children)
 {
     SCOPED_TRACE("expect_plain_node");
     expect_node(node, name, FieldCallParams{}, no_filter_spec, noof_children);
 }
 
-void expect_plain_leaf(const Ast& node, const char*name)
+void expect_plain_leaf(const Ast& node, std::string_view name)
 {
     SCOPED_TRACE("expect_plain_leaf");
     expect_plain_node(node, name, 0);
@@ -69,7 +70,7 @@ void expect_root(const Ast& node, Size noof_children)
     return expect_plain_node(node, ast_root_node_name, noof_children);
 }
 
-void expect_equivalent_query(const char* q1, const char* q2)
+void expect_equivalent_query(std::string_view q1, std::string_view q2)
 {
     SCOPED_TRACE(testing::Message()
         << "expect_equivalent_query("
@@ -125,7 +126,7 @@ TEST(AstTest, MultipleEntrypoints)
     expect_plain_leaf(b, "b");
 }
 
-using SimpleTestCase = std::tuple<const char*, FieldCallParams, FilterSpec>;
+using SimpleTestCase = std::tuple<std::string_view, FieldCallParams, FilterSpec>;
 class SimpleAstTest : public testing::TestWithParam<SimpleTestCase> { };
 
 TEST_P(SimpleAstTest, SimpleTest)
@@ -298,7 +299,7 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 
-class InvalidQueryTest : public testing::TestWithParam<const char*> { };
+class InvalidQueryTest : public testing::TestWithParam<std::string_view> { };
 
 TEST_P(InvalidQueryTest, InvalidQuery)
 {

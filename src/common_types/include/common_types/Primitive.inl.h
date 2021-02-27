@@ -8,6 +8,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <string_view>
 
 namespace sq {
 
@@ -23,28 +24,28 @@ template <>
 struct PrimitiveTraits<PrimitiveString>
 {
     static constexpr bool is_primitive = true;
-    static constexpr const char* name = "PrimitiveString";
+    static constexpr std::string_view name = "PrimitiveString";
 };
 
 template <>
 struct PrimitiveTraits<PrimitiveInt>
 {
     static constexpr bool is_primitive = true;
-    static constexpr const char* name = "PrimitiveInt";
+    static constexpr std::string_view name = "PrimitiveInt";
 };
 
 template <>
 struct PrimitiveTraits<PrimitiveFloat>
 {
     static constexpr bool is_primitive = true;
-    static constexpr const char* name = "PrimitiveFloat";
+    static constexpr std::string_view name = "PrimitiveFloat";
 };
 
 template <>
 struct PrimitiveTraits<PrimitiveBool>
 {
     static constexpr bool is_primitive = true;
-    static constexpr const char* name = "PrimitiveBool";
+    static constexpr std::string_view name = "PrimitiveBool";
 };
 
 struct PrimitiveToStrVisitor

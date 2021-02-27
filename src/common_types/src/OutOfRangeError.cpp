@@ -24,7 +24,7 @@ namespace {
     ss << "OutOfRangeError at " << token
        << ": " << message
        << "\n" << token.query()
-       << "\n" << std::string(util::to_size_t(token.pos()), ' ') << "^\n";
+       << "\n" << std::string(util::to_size(token.pos()), ' ') << "^\n";
     return ss.str();
 }
 

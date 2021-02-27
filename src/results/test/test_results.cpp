@@ -14,6 +14,7 @@
 #include "test/results_test_util.h"
 #include "util/strutil.h"
 
+#include <gsl/gsl>
 #include <gtest/gtest.h>
 #include <range/v3/view/cartesian_product.hpp>
 #include <range/v3/view/iota.hpp>
@@ -69,13 +70,13 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
 
 struct MockFieldGenerator
 {
-    MOCK_METHOD(FieldPtr, get, (std::ptrdiff_t index), (const));
+    MOCK_METHOD(FieldPtr, get, (gsl::index index), (const));
 };
 
 template <ranges::category Cat>
 void test_minimal_system_calls_with_element_access(
-    std::ptrdiff_t index,
-    std::ptrdiff_t size
+    gsl::index index,
+    gsl::index size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -96,7 +97,7 @@ void test_minimal_system_calls_with_element_access(
         .WillOnce(Return(ByMove(std::move(a0))));
 
     auto arange = FieldRange<Cat>{
-        ranges::views::iota(std::ptrdiff_t{0}, size) |
+        ranges::views::iota(gsl::index{0}, size) |
         ranges::views::transform(
             [&](auto i) { return mfg.get(i); }
         )
@@ -118,10 +119,10 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithElementAccess)
 
 template <ranges::category Cat>
 void test_minimal_system_calls_with_slice(
-    std::optional<std::ptrdiff_t> start,
-    std::optional<std::ptrdiff_t> stop,
-    std::optional<std::ptrdiff_t> step,
-    std::ptrdiff_t size
+    std::optional<gsl::index> start,
+    std::optional<gsl::index> stop,
+    std::optional<gsl::index> step,
+    gsl::index size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -162,7 +163,7 @@ void test_minimal_system_calls_with_slice(
             )));
     }
     auto arange = FieldRange<Cat>{
-        ranges::views::iota(std::ptrdiff_t{0}, size) |
+        ranges::views::iota(gsl::index{0}, size) |
         ranges::views::transform(
             [&](auto index) { return mfg.get(index); }
         )
@@ -230,7 +231,7 @@ TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
 // Param passing tests
 // -----------------------------------------------------------------------------
 
-using ParamPassingTestCase = std::tuple<const char*, FieldCallParams>;
+using ParamPassingTestCase = std::tuple<std::string_view, FieldCallParams>;
 class ResultTreeParamTest
     : public testing::TestWithParam<ParamPassingTestCase>
 { };
@@ -278,8 +279,8 @@ INSTANTIATE_TEST_SUITE_P(
 
 void test_element_access(
     ranges::category cat,
-    std::ptrdiff_t index,
-    std::ptrdiff_t size
+    gsl::index index,
+    gsl::index size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -316,7 +317,7 @@ void test_element_access(
 
 TEST(ResultTreeTest, TestElementAccess)
 {
-    static constexpr auto size = std::ptrdiff_t{10};
+    static constexpr auto size = gsl::index{10};
 
     for (const auto cat : all_categories)
     {
@@ -348,10 +349,10 @@ TEST(ResultTreeTest, TestElementAccessOutOfRange)
 
 void test_slice(
     ranges::category cat,
-    std::optional<std::ptrdiff_t> start,
-    std::optional<std::ptrdiff_t> stop,
-    std::optional<std::ptrdiff_t> step,
-    std::ptrdiff_t size
+    std::optional<gsl::index> start,
+    std::optional<gsl::index> stop,
+    std::optional<gsl::index> step,
+    gsl::index size
 )
 {
     SCOPED_TRACE(testing::Message()
@@ -369,8 +370,8 @@ void test_slice(
        << util::optional_to_str(step) << "]";
     const auto ast = generate_ast(ss.str());
     auto step_v = step.value_or(1);
-    auto start_v = std::ptrdiff_t{0};
-    auto stop_v = std::ptrdiff_t{0};
+    auto start_v = gsl::index{0};
+    auto stop_v = gsl::index{0};
     auto compare = [=](auto i, auto e) {
         return (step_v > 0)? (i < e && i < size) : (i > e && i > -1);
     };
@@ -419,7 +420,7 @@ void test_slice(
 
 TEST(ResultTreeTest, TestSlice)
 {
-    using OIL = std::initializer_list<std::optional<std::ptrdiff_t>>;
+    using OIL = std::initializer_list<std::optional<gsl::index>>;
     auto indeces = OIL{
         std::nullopt, 0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5, -6
     };

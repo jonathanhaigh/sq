@@ -17,7 +17,7 @@
 namespace {
 int run_sq(int argc, char** argv)
 {
-    const auto args = gsl::span{argv, sq::util::to_size_t(argc)};
+    const auto args = gsl::span{argv, sq::util::to_size(argc)};
     if (args.size() < 2) {
         std::cerr << "Not enough args\n";
         return 1;

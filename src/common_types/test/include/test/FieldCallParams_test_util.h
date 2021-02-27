@@ -8,6 +8,8 @@
 
 #include "common_types/FieldCallParams.h"
 
+#include <string_view>
+
 namespace sq::test {
 
 using PosParam = FieldCallParams::PosParams::value_type;
@@ -17,7 +19,7 @@ template <typename... Args>
 [[nodiscard]] FieldCallParams params(Args&&... args);
 
 template <typename T>
-[[nodiscard]] NamedParam named(const char* name, T&& np);
+[[nodiscard]] NamedParam named(std::string_view name, T&& np);
 
 } // namespace sq::test
 

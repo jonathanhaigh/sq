@@ -8,7 +8,7 @@
 
 #include "common_types/Token.h"
 
-#include <cstddef>
+#include <gsl/gsl>
 #include <optional>
 #include <range/v3/view/facade.hpp>
 #include <string_view>
@@ -21,7 +21,7 @@ class TokenView
 public:
     explicit TokenView(std::string_view str) noexcept;
 
-    TokenView sub_view(std::ptrdiff_t pos);
+    TokenView sub_view(gsl::index pos);
 
     TokenView() noexcept = default;
     TokenView(const TokenView&) noexcept = default;
@@ -37,10 +37,10 @@ public:
     void next();
 
 private:
-    std::ptrdiff_t whitespace_length() const;
+    gsl::index whitespace_length() const;
 
     std::string_view str_;
-    std::ptrdiff_t pos_ = 0;
+    gsl::index pos_ = 0;
     mutable std::optional<Token> cache_ = std::nullopt;
 };
 

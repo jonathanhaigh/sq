@@ -8,6 +8,7 @@
 #include "common_types/ParseError.h"
 #include "util/ASSERT.h"
 
+#include <gsl/gsl>
 #include <memory>
 #include <sstream>
 
@@ -84,7 +85,7 @@ Ast* Parser::parse_dot_expression(Ast& parent)
     {
         return nullptr;
     }
-    auto *current_parent = std::addressof(parent.children().back());
+    auto current_parent = gsl::not_null{std::addressof(parent.children().back())};
     while (accept_token(Token::Kind::Dot))
     {
         if (!parse_field_call(*current_parent))
@@ -229,7 +230,7 @@ bool Parser::parse_list_filter(Ast& parent)
     {
         return false;
     }
-    const auto opt_start = parse_integer<std::ptrdiff_t>();
+    const auto opt_start = parse_integer<gsl::index>();
     const auto opt_colon = accept_token(Token::Kind::Colon);
     if (opt_start && !opt_colon)
     {
@@ -237,10 +238,10 @@ bool Parser::parse_list_filter(Ast& parent)
     }
     else if (opt_colon)
     {
-        const auto opt_stop = parse_integer<std::ptrdiff_t>();
+        const auto opt_stop = parse_integer<gsl::index>();
         const auto opt_colon2 = accept_token(Token::Kind::Colon);
         const auto opt_step = opt_colon2?
-            parse_integer<std::ptrdiff_t>() :
+            parse_integer<gsl::index>() :
             std::nullopt;
 
         parent.data().filter_spec() = SliceSpec{opt_start, opt_stop, opt_step};
