@@ -9,6 +9,7 @@
 #include "system/standard/SqParamSchemaImpl.h"
 #include "system/standard/SqStringImpl.h"
 #include "system/standard/SqTypeSchemaImpl.h"
+#include "util/typeutil.h" // for ranges::enable_view<gsl::span<T, N>>
 
 #include <memory>
 #include <range/v3/view/transform.hpp>
@@ -21,7 +22,7 @@ SqFieldSchemaImpl::SqFieldSchemaImpl(const FieldSchema& field_schema)
 
 Result SqFieldSchemaImpl::get_name() const
 {
-    return std::make_unique<SqStringImpl>(field_schema_->name);
+    return std::make_unique<SqStringImpl>(field_schema_->name());
 }
 
 Result SqFieldSchemaImpl::get_params() const
@@ -29,7 +30,7 @@ Result SqFieldSchemaImpl::get_params() const
     return FieldRange<
         ranges::category::random_access | ranges::category::sized
     >{
-        field_schema_->params | ranges::views::transform(
+        field_schema_->params() | ranges::views::transform(
             [](const ParamSchema& ps) {
                 return std::make_unique<SqParamSchemaImpl>(ps);
             }
@@ -39,17 +40,17 @@ Result SqFieldSchemaImpl::get_params() const
 
 Result SqFieldSchemaImpl::get_return_type() const
 {
-    return std::make_unique<SqTypeSchemaImpl>(*(field_schema_->return_type));
+    return std::make_unique<SqTypeSchemaImpl>(field_schema_->return_type());
 }
 
 Result SqFieldSchemaImpl::get_return_list() const
 {
-    return std::make_unique<SqBoolImpl>(field_schema_->return_list);
+    return std::make_unique<SqBoolImpl>(field_schema_->return_list());
 }
 
 Primitive SqFieldSchemaImpl::to_primitive() const
 {
-    return PrimitiveString{field_schema_->name};
+    return PrimitiveString{field_schema_->name()};
 }
 
 } // namespace sq::system::standard

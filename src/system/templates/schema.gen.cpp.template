@@ -26,14 +26,14 @@
     for _, type_schema in ipairs(types) do
 
         type_schema.index = type_index
-        type_schema.first_field_index = field_index
+        type_schema.fields_begin_index = field_index
         type_index_by_name[type_schema.name] = type_index
         type_index = type_index + 1
 
         for _, field_schema in ipairs(type_schema.fields) do
 
             field_schema.index = field_index
-            field_schema.first_param_index = param_index
+            field_schema.params_begin_index = param_index
             field_index = field_index + 1
 
             for _, param_schema in ipairs(field_schema.params) do
@@ -42,10 +42,11 @@
                 param_index = param_index + 1
 
             end
-            field_schema.noof_params = param_index - field_schema.first_param_index
+            field_schema.params_end_index = param_index;
         end
-        type_schema.noof_fields = field_index - type_schema.first_field_index
+        type_schema.fields_end_index = field_index;
     end
+
     local noof_types = type_index
     local noof_fields = field_index
     local noof_params = param_index
@@ -58,69 +59,144 @@
         pt_index = pt_index + 1
     end
     local noof_pts = pt_index
+
+    local type_schema_values = {}
+    local field_schema_values = {}
+    local param_schema_values = {}
+    for _, type_schema in ipairs(types) do
+        table.insert(type_schema_values, string.format(
+            "TypeSchema{%q, %d, %d}",
+            type_schema.name,
+            type_schema.fields_begin_index,
+            type_schema.fields_end_index
+        ))
+        for _, field_schema in ipairs(type_schema.fields) do
+            table.insert(field_schema_values, string.format(
+                "FieldSchema{%q, %d, %d, %d, %s}",
+                field_schema.name,
+                field_schema.params_begin_index,
+                field_schema.params_end_index,
+                type_index_by_name[field_schema.return_type],
+                tostring(field_schema.return_list)
+            ))
+            for _, param_schema in ipairs(field_schema.params) do
+                table.insert(param_schema_values, string.format(
+                    "ParamSchema{%q, %d, %d }",
+                    param_schema.name,
+                    param_schema.index,
+                    pt_index_by_name[param_schema.type]
+                ))
+            end
+        end
+    end
+
+    pt_schema_values = {}
+    for _, pt_schema in ipairs(primitive_types) do
+        table.insert(pt_schema_values, string.format(
+            "PrimitiveTypeSchema{ %q }", pt_schema.name
+        ))
+    end
 }}
 #include "system/schema.h"
 
 namespace sq::system {
 namespace {
 
-struct SchemaImpl
-{
-    constexpr SchemaImpl() noexcept;
-
-    std::array<TypeSchema, {{= noof_types }}> types;
-    std::array<FieldSchema, {{= noof_fields }}> fields;
-    std::array<ParamSchema, {{= noof_params }}> params;
-    std::array<PrimitiveTypeSchema, {{= noof_pts }}> primitive_types;
+constexpr std::array<TypeSchema, {{= noof_types }}> g_types{
+    {{= table.concat(type_schema_values, ",\n    ") }}
 };
 
-constexpr SchemaImpl::SchemaImpl() noexcept
-{
-{{ for _, type_schema in ipairs(types) do }}
-    types[{{= type_schema.index }}].name = "{{= type_schema.name }}";
-    types[{{= type_schema.index }}].fields = std::span{fields}.subspan(
-        {{= type_schema.first_field_index }},
-        {{= type_schema.noof_fields}}
-    );
-{{ for _, field_schema in ipairs(type_schema.fields) do }}
-    fields[{{= field_schema.index }}].name = "{{= field_schema.name }}";
-    fields[{{= field_schema.index }}].return_type = std::addressof(
-        types[{{= type_index_by_name[field_schema.return_type] }}]
-    );
-    fields[{{= field_schema.index }}].return_list = {{= tostring(field_schema.return_list) }};
-    fields[{{= field_schema.index }}].params = std::span{params}.subspan(
-        {{= field_schema.first_param_index }},
-        {{= field_schema.noof_params }}
-    );
-{{ for _, param_schema in ipairs(field_schema.params) do }}
-    params[{{= param_schema.global_index }}].index = {{= param_schema.index }};
-    params[{{= param_schema.global_index }}].name = "{{= param_schema.name }}";
-    params[{{= param_schema.global_index }}].type = std::addressof(
-        primitive_types[{{= pt_index_by_name[param_schema.type] }}]
-    );
-{{ end }}
-{{ end }}
-{{ end }}
-
-{{ for _, pt_schema in ipairs(primitive_types) do }}
-    primitive_types[{{= pt_schema.index }}].name = "{{= pt_schema.name }}";
-{{ end }}
-}
-
-// NOLINTNEXTLINE(fuchsia-statically-constructed-objects)
-constexpr SchemaImpl g_schema_impl{};
-
-constexpr auto g_schema = Schema{
-    g_schema_impl.types,
-    g_schema_impl.primitive_types,
-    std::addressof(g_schema_impl.types[{{= type_index_by_name[root_type] }}])
+constexpr std::array<FieldSchema, {{= noof_fields }}> g_fields{
+    {{= table.concat(field_schema_values, ",\n    ") }}
 };
+
+constexpr std::array<ParamSchema, {{= noof_params }}> g_params{
+    {{= table.concat(param_schema_values, ",\n    ") }}
+};
+
+constexpr std::array<PrimitiveTypeSchema, {{= noof_pts }}> g_pts{
+    {{= table.concat(pt_schema_values, ",\n    ") }}
+};
+
+inline constexpr std::size_t g_root_type_index = {{= type_index_by_name.SqRoot }};
 
 } // namespace
 
+std::string_view PrimitiveTypeSchema::name() const
+{
+    return name_;
+}
+
+std::string_view ParamSchema::name() const
+{
+    return name_;
+}
+
+std::size_t ParamSchema::index() const
+{
+    return index_;
+}
+
+const PrimitiveTypeSchema& ParamSchema::type() const
+{
+    return g_pts.at(type_index_);
+}
+
+std::string_view FieldSchema::name() const
+{
+    return name_;
+}
+
+gsl::span<const ParamSchema> FieldSchema::params() const
+{
+    return gsl::span{g_params}.subspan(
+        params_begin_index_,
+        params_end_index_ - params_begin_index_
+    );
+}
+
+const TypeSchema& FieldSchema::return_type() const
+{
+    return g_types.at(return_type_index_);
+}
+
+bool FieldSchema::return_list() const
+{
+    return return_list_;
+}
+
+std::string_view TypeSchema::name() const
+{
+    return name_;
+}
+
+gsl::span<const FieldSchema> TypeSchema::fields() const
+{
+    return gsl::span{g_fields}.subspan(
+        fields_begin_index_,
+        fields_end_index_ - fields_begin_index_
+    );
+}
+
+gsl::span<const TypeSchema> Schema::types() const
+{
+    return gsl::span{g_types};
+}
+
+gsl::span<const PrimitiveTypeSchema> Schema::primitive_types() const
+{
+    return gsl::span{g_pts};
+}
+
+const TypeSchema& Schema::root_type() const
+{
+    return g_types.at(g_root_type_index);
+}
+
 const Schema& schema()
 {
-    return g_schema;
+    static constexpr Schema ret{};
+    return ret;
 }
 
 } // namespace sq::system
