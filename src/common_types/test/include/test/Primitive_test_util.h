@@ -8,11 +8,15 @@
 
 #include "common_types/Primitive.h"
 
+#include <gsl/gsl>
+#include <string_view>
+
 namespace sq::test {
 
 [[nodiscard]] Primitive to_primitive(PrimitiveString&& v);
 [[nodiscard]] Primitive to_primitive(const PrimitiveString& v);
-[[nodiscard]] Primitive to_primitive(const char* v);
+[[nodiscard]] Primitive to_primitive(std::string_view v);
+[[nodiscard]] Primitive to_primitive(gsl::czstring<> v);
 [[nodiscard]] Primitive to_primitive(PrimitiveInt v);
 [[nodiscard]] Primitive to_primitive(int v);
 [[nodiscard]] Primitive to_primitive(PrimitiveFloat v);

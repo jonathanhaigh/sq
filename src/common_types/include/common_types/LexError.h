@@ -8,7 +8,7 @@
 
 #include "common_types/ParseError.h"
 
-#include <cstddef>
+#include <gsl/gsl>
 #include <string_view>
 
 namespace sq {
@@ -17,7 +17,7 @@ class LexError
     : public ParseError
 {
 public:
-    LexError(std::ptrdiff_t pos, std::string_view query);
+    LexError(gsl::index pos, std::string_view query);
 };
 
 } // namespace sq

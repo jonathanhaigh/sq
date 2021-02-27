@@ -6,11 +6,10 @@
 #ifndef SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 #define SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 
-#include <cstddef>
+#include <gsl/gsl>
+#include <iosfwd>
 #include <optional>
 #include <variant>
-
-#include <iosfwd>
 
 namespace sq::parser {
 
@@ -21,7 +20,7 @@ std::ostream& operator<<(std::ostream& os, NoFilterSpec nlfs);
 
 struct ElementAccessSpec
 {
-    std::ptrdiff_t index_;
+    gsl::index index_;
 };
 std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas);
 [[nodiscard]] bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs);
@@ -29,9 +28,9 @@ std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas);
 
 struct SliceSpec
 {
-    std::optional<std::ptrdiff_t> start_;
-    std::optional<std::ptrdiff_t> stop_;
-    std::optional<std::ptrdiff_t> step_;
+    std::optional<gsl::index> start_;
+    std::optional<gsl::index> stop_;
+    std::optional<gsl::index> step_;
 };
 std::ostream& operator<<(std::ostream& os, SliceSpec lss);
 [[nodiscard]] bool operator==(const SliceSpec& lhs, const SliceSpec& rhs);

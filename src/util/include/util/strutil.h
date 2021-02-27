@@ -6,6 +6,7 @@
 #ifndef SQ_INCLUDE_GUARD_util_strutil_h_
 #define SQ_INCLUDE_GUARD_util_strutil_h_
 
+#include <gsl/gsl>
 #include <iostream>
 #include <memory>
 #include <range/v3/range/access.hpp>
@@ -45,7 +46,7 @@ struct join
     }
 
 private:
-    const R* rng_;
+    gsl::not_null<const R*> rng_;
     std::string_view delim_ = ", ";
 };
 
@@ -74,7 +75,7 @@ struct OptionalToStr
         if (var)
         {
             auto ss = std::ostringstream{};
-            ss << *std::forward<T>(var);
+            ss << std::forward<T>(var).value();
             return ss.str();
         }
         return std::string{};

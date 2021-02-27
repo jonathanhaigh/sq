@@ -36,9 +36,9 @@ template <typename T>
 inline constexpr bool is_sq_primitive_v = detail::PrimitiveTraits<T>::is_primitive;
 
 template <typename T>
-inline constexpr const char* primitive_type_name_v = detail::PrimitiveTraits<T>::name;
+inline constexpr std::string_view primitive_type_name_v = detail::PrimitiveTraits<T>::name;
 
-[[nodiscard]] const char* primitive_type_name(const Primitive& value);
+[[nodiscard]] std::string_view primitive_type_name(const Primitive& value);
 
 [[nodiscard]] std::string primitive_to_str(const Primitive& value);
 

@@ -6,7 +6,7 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Token_h_
 #define SQ_INCLUDE_GUARD_common_types_Token_h_
 
-#include <cstddef>
+#include <gsl/gsl>
 #include <iosfwd>
 #include <regex>
 #include <string_view>
@@ -42,21 +42,21 @@ public:
 
     Token(
         std::string_view query,
-        std::ptrdiff_t pos,
-        std::ptrdiff_t len,
+        gsl::index pos,
+        gsl::index len,
         Kind kind
     ) noexcept;
 
     [[nodiscard]] std::string_view query() const noexcept;
-    [[nodiscard]] std::ptrdiff_t pos() const noexcept;
-    [[nodiscard]] std::ptrdiff_t len() const noexcept;
+    [[nodiscard]] gsl::index pos() const noexcept;
+    [[nodiscard]] gsl::index len() const noexcept;
     [[nodiscard]] std::string_view view() const noexcept;
     [[nodiscard]] Kind kind() const noexcept;
 
 private:
     std::string_view query_;
-    std::ptrdiff_t pos_;
-    std::ptrdiff_t len_;
+    gsl::index pos_;
+    gsl::index len_;
     Kind kind_;
 };
 
