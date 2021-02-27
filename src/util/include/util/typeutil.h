@@ -9,6 +9,7 @@
 #include <concepts>
 #include <cstddef>
 #include <gsl/gsl>
+#include <range/v3/range/concepts.hpp>
 #include <type_traits>
 
 namespace sq::util {
@@ -29,5 +30,19 @@ inline constexpr std::size_t to_size_t(T v)
 }
 
 } // namespace sq::util
+
+namespace ranges {
+
+// Tell the ranges library that gsl::spans with dynamic extent are views. Note
+// that the view concept requires a default constructor so sized gsl::spans are
+// *not* views...
+template <typename T>
+inline constexpr bool enable_view<gsl::span<T, gsl::dynamic_extent>> = true;
+
+// ... unless the size is zero.
+template <typename T>
+inline constexpr bool enable_view<gsl::span<T, 0>> = true;
+
+} // namespace ranges
 
 #endif // SQ_INCLUDE_GUARD_util_typeutil_h_

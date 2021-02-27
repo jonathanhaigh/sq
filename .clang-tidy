@@ -1,16 +1,17 @@
 ---
 Checks: >-
     *,
+    -altera-struct-pack-align,
     -fuchsia-default-arguments-calls,
     -fuchsia-overloaded-operator,
     -fuchsia-trailing-return,
     -google-runtime-references,
     -llvmlibc-*,
     -llvm-header-guard,
-    -misc-non-private-member-variables-in-classes,
     -misc-no-recursion,
     -modernize-use-trailing-return-type,
     -modernize-pass-by-value,
+    -readability-convert-member-functions-to-static,
 
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*/sq/src/.*"
