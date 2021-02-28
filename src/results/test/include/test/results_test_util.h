@@ -19,17 +19,6 @@ using ObjData = ResultTree::ObjData;
 using ObjDataField = ObjData::value_type;
 using ArrayData = ResultTree::ArrayData;
 
-template <typename T>
-inline constexpr bool is_result_tree_data_v = std::disjunction_v<
-    std::is_same<T, Data>,
-    std::is_same<T, ObjData>,
-    std::is_same<T, ArrayData>,
-    std::is_same<T, Primitive>
->;
-
-template <typename T>
-using enable_if_result_tree_data_t = std::enable_if_t<is_result_tree_data_v<T>>;
-
 /**
  * Represents a Field upon whose accesses we have expectations.
  */
@@ -64,10 +53,10 @@ struct FakeField
         Result(std::string_view, const FieldCallParams&)
     >;
 
-    template <typename T, typename = enable_if_primitive_like_t<T>>
+    template <util::ConvertibleToAlternative<Primitive> T>
     FakeField(ResultGenerator result_generator, T&& primitive);
 
-    template <typename T, typename = enable_if_primitive_like_t<T>>
+    template <util::ConvertibleToAlternative<Primitive> T>
     FakeField(T&& primitive);
 
     FakeField(Result&& result);
@@ -95,7 +84,7 @@ private:
  * Place an expectation on a mock field that its to_primitive() method will be
  * called exactly once and will return the given value.
  */
-template <typename T, typename = enable_if_primitive_like_t<T>>
+template <util::ConvertibleToAlternative<Primitive> T>
 void expect_one_primitive_access(MockField& mf, T&& retval);
 
 /**
@@ -126,7 +115,7 @@ void expect_field_accesses(
  * Create a MockField whose only access is expected to be one call to
  * to_primitive().
  */
-template <typename T, typename = enable_if_primitive_like_t<T>>
+template <util::ConvertibleToAlternative<Primitive> T>
 [[nodiscard]] StrictMockFieldPtr field_with_one_primitive_access(T&& retval);
 
 /**
@@ -146,10 +135,10 @@ template <typename... Args>
 /**
  * Create a ResultTree representing an array with the given values.
  */
-template <typename... Args>
+template <util::ConvertibleToAlternative<ResultTree::Data>... Args>
 [[nodiscard]] ResultTree array_data_tree(Args&&... args);
 
-template <typename T, typename = enable_if_primitive_like_t<T>>
+template <util::ConvertibleToAlternative<Primitive> T>
 [[nodiscard]] ResultTree primitive_tree(T&& primitive);
 
 inline constexpr auto input = ranges::category::input;
@@ -166,7 +155,7 @@ inline constexpr auto all_categories = {
 };
 
 
-template <typename T>
+template <ranges::cpp20::view T>
 [[nodiscard]] Result to_field_range(ranges::category cat, T&& rng);
 
 } // namespace sq::test

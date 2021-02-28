@@ -8,6 +8,8 @@
 
 #include "common_types/Primitive.h"
 
+#include "util/typeutil.h"
+
 #include <map>
 #include <string>
 #include <string_view>
@@ -34,10 +36,10 @@ public:
     [[nodiscard]] NamedParams& named_params();
     [[nodiscard]] const NamedParams& named_params() const;
 
-    template <typename ParamType>
+    template <util::Alternative<Primitive> ParamType>
     [[nodiscard]] const ParamType& get(size_t index, std::string_view name) const;
 
-    template <typename ParamType>
+    template <util::Alternative<Primitive> ParamType>
     [[nodiscard]] const ParamType* get_optional(size_t index, std::string_view name) const;
 
 private:

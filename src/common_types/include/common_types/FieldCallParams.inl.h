@@ -8,12 +8,13 @@
 
 #include "common_types/ArgumentMissingError.h"
 #include "common_types/ArgumentTypeError.h"
+#include "util/typeutil.h"
 
 #include <stdexcept>
 
 namespace sq {
 
-template <typename ParamType>
+template <util::Alternative<Primitive> ParamType>
 const ParamType& FieldCallParams::get(size_t index, std::string_view name) const
 {
     if (index < pos_params_.size())
@@ -46,7 +47,7 @@ const ParamType& FieldCallParams::get(size_t index, std::string_view name) const
     }
 }
 
-template <typename ParamType>
+template <util::Alternative<Primitive> ParamType>
 const ParamType* FieldCallParams::get_optional(size_t index, std::string_view name) const
 {
     try
