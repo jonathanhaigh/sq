@@ -6,7 +6,6 @@
 #include "parser/Parser.h"
 
 #include "common_types/ParseError.h"
-#include "util/ASSERT.h"
 
 #include <gsl/gsl>
 #include <memory>
@@ -262,7 +261,7 @@ void Parser::shift_token()
 
 std::optional<Token> Parser::accept_token(Token::Kind kind)
 {
-    ASSERT(ranges::begin(tokens_) != ranges::end(tokens_));
+    Expects(ranges::begin(tokens_) != ranges::end(tokens_));
     if (tokens_.read().kind() == kind)
     {
         auto ret = tokens_.read();
@@ -275,7 +274,7 @@ std::optional<Token> Parser::accept_token(Token::Kind kind)
 
 Token Parser::expect_token(Token::Kind kind)
 {
-    ASSERT(ranges::begin(tokens_) != ranges::end(tokens_));
+    Expects(ranges::begin(tokens_) != ranges::end(tokens_));
     if (tokens_.read().kind() != kind)
     {
         throw ParseError(tokens_.read(), Token::KindSet{kind});
