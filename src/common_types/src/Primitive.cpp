@@ -5,13 +5,15 @@
 
 #include "common_types/Primitive.h"
 
+#include "util/typeutil.h"
+
 namespace sq {
 namespace {
 
 struct PrimitiveTypeNameVisitor
 {
-    template <typename T>
-    [[nodiscard]] const char* operator()([[maybe_unused]] const T& value) const
+    template <util::Alternative<Primitive> T>
+    [[nodiscard]] std::string_view operator()([[maybe_unused]] const T& value) const
     {
         return primitive_type_name_v<T>;
     }
@@ -19,7 +21,7 @@ struct PrimitiveTypeNameVisitor
 
 } // namespace
 
-const char* primitive_type_name(const Primitive& value)
+std::string_view primitive_type_name(const Primitive& value)
 {
     return std::visit(PrimitiveTypeNameVisitor{}, value);
 }

@@ -10,6 +10,7 @@
 #include "parser/FilterSpec.h"
 #include "results/ResultView.h"
 
+#include <gsl/gsl>
 #include <memory>
 
 namespace sq::results {

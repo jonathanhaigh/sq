@@ -7,6 +7,9 @@
 #define SQ_INCLUDE_GUARD_common_types_test_FieldCallParams_test_util_h_
 
 #include "common_types/FieldCallParams.h"
+#include "util/typeutil.h"
+
+#include <string_view>
 
 namespace sq::test {
 
@@ -16,8 +19,8 @@ using NamedParam = FieldCallParams::NamedParams::value_type;
 template <typename... Args>
 [[nodiscard]] FieldCallParams params(Args&&... args);
 
-template <typename T>
-[[nodiscard]] NamedParam named(const char* name, T&& np);
+template <util::ConvertibleToAlternative<Primitive> T>
+[[nodiscard]] NamedParam named(std::string_view name, T&& np);
 
 } // namespace sq::test
 

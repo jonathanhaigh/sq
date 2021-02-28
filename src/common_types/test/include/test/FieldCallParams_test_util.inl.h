@@ -7,14 +7,16 @@
 #define SQ_INCLUDE_GUARD_common_types_test_FieldCallParams_test_util_inl_h_
 
 #include "test/Primitive_test_util.h"
+#include "util/typeutil.h"
 
+#include <string_view>
 #include <utility>
 
 namespace sq::test {
 
 namespace detail {
 
-template <typename T>
+template <util::ConvertibleToAlternative<Primitive> T>
 void add_params(FieldCallParams& fcp, T&& p)
 {
     fcp.pos_params().emplace_back(to_primitive(std::forward<T>(p)));
@@ -42,8 +44,8 @@ FieldCallParams params(Args&&... args)
     return ret;
 }
 
-template <typename T>
-NamedParam named(const char* name, T&& np)
+template <util::ConvertibleToAlternative<Primitive> T>
+NamedParam named(std::string_view name, T&& np)
 {
     return NamedParam{name, to_primitive(std::forward<T>(np))};
 }

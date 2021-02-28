@@ -13,9 +13,6 @@ namespace sq::parser {
 
 namespace {
 
-using util::to_size_t;
-using util::to_ptrdiff_t;
-
 const auto& token_regex_map()
 {
     static const auto map = std::array{
@@ -54,7 +51,7 @@ const Token& TokenView::read() const
     }
 
     const auto pos = pos_ + whitespace_length();
-    const auto remaining = str_.substr(to_size_t(pos));
+    const auto remaining = str_.substr(util::to_size(pos));
 
     if (std::ssize(remaining) == 0)
     {
@@ -97,10 +94,10 @@ void TokenView::next()
     cache_ = std::nullopt;
 }
 
-std::ptrdiff_t TokenView::whitespace_length() const
+gsl::index TokenView::whitespace_length() const
 {
-    const auto remaining = str_.substr(to_size_t(pos_));
-    return to_ptrdiff_t(std::min(
+    const auto remaining = str_.substr(util::to_size(pos_));
+    return util::to_index(std::min(
         remaining.find_first_not_of(" \t\r\n"),
         remaining.size()
     ));

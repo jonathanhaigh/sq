@@ -13,7 +13,7 @@ namespace sq {
 
 namespace {
 
-constexpr const char* token_kind_to_str(Token::Kind kind)
+constexpr std::string_view token_kind_to_str(Token::Kind kind)
 {
     switch (kind)
     {
@@ -41,8 +41,8 @@ constexpr const char* token_kind_to_str(Token::Kind kind)
 
 Token::Token(
     std::string_view query,
-    std::ptrdiff_t pos,
-    std::ptrdiff_t len,
+    gsl::index pos,
+    gsl::index len,
     Kind kind
 ) noexcept
     : query_{query}
@@ -56,19 +56,19 @@ std::string_view Token::query() const noexcept
     return query_;
 }
 
-std::ptrdiff_t Token::pos() const noexcept
+gsl::index Token::pos() const noexcept
 {
     return pos_;
 }
 
-std::ptrdiff_t Token::len() const noexcept
+gsl::index Token::len() const noexcept
 {
     return len_;
 }
 
 std::string_view Token::view() const noexcept
 {
-    return query_.substr(util::to_size_t(pos_), util::to_size_t(len_));
+    return query_.substr(util::to_size(pos_), util::to_size(len_));
 }
 
 Token::Kind Token::kind() const noexcept

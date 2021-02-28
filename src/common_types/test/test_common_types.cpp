@@ -7,6 +7,7 @@
 #include "common_types/Primitive.h"
 #include "common_types/ArgumentTypeError.h"
 #include "common_types/ArgumentMissingError.h"
+#include "util/typeutil.h"
 
 #include <gtest/gtest.h>
 
@@ -14,7 +15,7 @@ namespace sq::test {
 
 namespace {
 
-template <typename T>
+template <util::Alternative<Primitive> T>
 void test_primitive_type()
 {
     SCOPED_TRACE(testing::Message()
@@ -22,9 +23,8 @@ void test_primitive_type()
         << primitive_type_name_v<T>
         << ">()"
     );
-    EXPECT_NE(primitive_type_name_v<T>, nullptr);
-    EXPECT_STREQ(primitive_type_name(T{}), primitive_type_name_v<T>);
-    EXPECT_STREQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
+    EXPECT_EQ(primitive_type_name(T{}), primitive_type_name_v<T>);
+    EXPECT_EQ(primitive_type_name(Primitive{T{}}), primitive_type_name_v<T>);
 }
 
 } // namespace
