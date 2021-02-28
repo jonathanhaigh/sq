@@ -9,11 +9,21 @@
 
 namespace sq::system {
 
+/**
+ * Dispatches field accesses for this system object to an implementation
+ * subclass using the CRTP.
+ */
 template <typename Impl>
 class {{= name }}
     : public Field
 {
 public:
+    /**
+     * Dispatch a field access to an implementation subclass.
+     *
+     * I.e. something like calling:
+     *       derived_implementation_object->get_[member](params)
+     */
     [[nodiscard]] Result get(std::string_view member, const FieldCallParams& params) const override;
 };
 

@@ -14,6 +14,11 @@
 
 namespace sq::util {
 
+/**
+ * A move-only tree structure.
+ *
+ * @param T type of data to store in each node of the tree.
+ */
 template <typename T>
     requires std::movable<T> && std::equality_comparable<T>
 class MoveOnlyTree
@@ -34,11 +39,21 @@ public:
         : data_{std::forward<Args>(args)...}
     { }
 
+    ///@{
+    /**
+     * Get the data associated with this node.
+     */
     [[nodiscard]] const T& data() const noexcept { return data_; }
     [[nodiscard]] T& data() noexcept { return data_; }
+    ///@}
 
+    ///@{
+    /**
+     * Get the child nodes of this node.
+     */
     [[nodiscard]] const Children& children() const noexcept { return children_; }
     [[nodiscard]] Children& children() noexcept { return children_; }
+    ///@}
 
     [[nodiscard]] friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
         return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;

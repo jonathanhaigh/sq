@@ -14,11 +14,22 @@
 
 namespace sq {
 
+/**
+ * Error indicating incorrect grammar in a query.
+ */
 class ParseError
     : public Exception
 {
 public:
     using Exception::Exception;
+
+    /**
+     * Create a ParseError for when an unexpected token is found.
+     *
+     * @param token the unexpected token.
+     * @param expecting the set of tokens that would have been valid in place
+     * of the unexpected token.
+     */
     ParseError(const Token& token, const Token::KindSet& expecting);
 };
 

@@ -17,6 +17,9 @@ namespace rj = rapidjson;
 
 namespace sq::serialization {
 
+/**
+ * Writes an SQ Primitive type to a RapidJSON output stream.
+ */
 template <typename Writer>
 class RjPrimitiveVisitor
 {
@@ -55,6 +58,9 @@ private:
     gsl::not_null<Writer*> writer_;
 };
 
+/**
+ * Writes an SQ ResultTree::Data object to a RapidJSON output stream.
+ */
 template <typename Writer>
 class RjResultVisitor
 {

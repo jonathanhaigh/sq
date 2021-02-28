@@ -16,10 +16,22 @@
 
 namespace sq::parser {
 
+/**
+ * Generates an abstract syntax tree (AST) representing the input query from
+ * from a stream of tokens.
+ */
 class Parser
 {
 public:
+    /**
+     * Create a Parser that uses the given TokenView as a stream of tokens for
+     * the input query.
+     */
     explicit Parser(const TokenView& tokens);
+
+    /**
+     * Generate an AST for the input query.
+     */
     [[nodiscard]] Ast parse();
 
 private:
