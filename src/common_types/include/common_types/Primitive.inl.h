@@ -10,43 +10,39 @@
 #include <sstream>
 #include <string_view>
 
+#include "util/typeutil.h"
+
 namespace sq {
 
+template <util::Alternative<Primitive> P>
+struct PrimitiveTypeName
+{ };
+
+template <>
+struct PrimitiveTypeName<PrimitiveString>
+{
+    static constexpr std::string_view value = "PrimitiveString";
+};
+
+template <>
+struct PrimitiveTypeName<PrimitiveInt>
+{
+    static constexpr std::string_view value = "PrimitiveInt";
+};
+
+template <>
+struct PrimitiveTypeName<PrimitiveFloat>
+{
+    static constexpr std::string_view value = "PrimitiveFloat";
+};
+
+template <>
+struct PrimitiveTypeName<PrimitiveBool>
+{
+    static constexpr std::string_view value = "PrimitiveBool";
+};
+
 namespace detail {
-
-template <typename T>
-struct PrimitiveTraits
-{
-    static constexpr bool is_primitive = false;
-};
-
-template <>
-struct PrimitiveTraits<PrimitiveString>
-{
-    static constexpr bool is_primitive = true;
-    static constexpr std::string_view name = "PrimitiveString";
-};
-
-template <>
-struct PrimitiveTraits<PrimitiveInt>
-{
-    static constexpr bool is_primitive = true;
-    static constexpr std::string_view name = "PrimitiveInt";
-};
-
-template <>
-struct PrimitiveTraits<PrimitiveFloat>
-{
-    static constexpr bool is_primitive = true;
-    static constexpr std::string_view name = "PrimitiveFloat";
-};
-
-template <>
-struct PrimitiveTraits<PrimitiveBool>
-{
-    static constexpr bool is_primitive = true;
-    static constexpr std::string_view name = "PrimitiveBool";
-};
 
 struct PrimitiveToStrVisitor
 {
@@ -62,7 +58,7 @@ struct PrimitiveToStrVisitor
         return os_.str();
     }
 
-    template <typename T>
+    template <util::Alternative<Primitive> T>
     [[nodiscard]] std::string operator()(const T& value)
     {
         os_ << value;
@@ -75,8 +71,8 @@ private:
 
 } // namespace detail
 
-template <typename T, typename>
-std::string primitive_to_str(const PrimitiveString& value)
+template <util::Alternative<Primitive> T>
+std::string primitive_to_str(const T& value)
 {
     return detail::PrimitiveToStrVisitor{}(value);
 }

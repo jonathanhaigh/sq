@@ -6,6 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_util_strutil_h_
 #define SQ_INCLUDE_GUARD_util_strutil_h_
 
+#include "util/typeutil.h"
+
 #include <gsl/gsl>
 #include <iostream>
 #include <memory>
@@ -17,7 +19,8 @@
 
 namespace sq::util {
 
-template<typename R>
+template<ranges::cpp20::range R>
+    requires Printable<ranges::range_value_t<R>>
 struct join
 {
     explicit join(const R& rng)
@@ -55,13 +58,13 @@ namespace detail {
 
 struct VariantToStr
 {
-    template <typename V>
-    [[nodiscard]] std::string operator()(V&& var) const
+    template <Printable... Types>
+    [[nodiscard]] std::string operator()(const std::variant<Types...>& var) const
     {
         auto ss = std::ostringstream{};
         std::visit(
             [&ss](auto&& v) { ss << v; },
-            std::forward<V>(var)
+            var
         );
         return ss.str();
     }
@@ -69,13 +72,13 @@ struct VariantToStr
 
 struct OptionalToStr
 {
-    template <typename T>
-    [[nodiscard]] std::string operator()(T&& var) const
+    template <Printable T>
+    [[nodiscard]] std::string operator()(const std::optional<T>& opt) const
     {
-        if (var)
+        if (opt)
         {
             auto ss = std::ostringstream{};
-            ss << std::forward<T>(var).value();
+            ss << opt.value();
             return ss.str();
         }
         return std::string{};

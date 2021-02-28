@@ -8,16 +8,17 @@
 
 #include "test/Primitive_test_util.h"
 #include "util/ASSERT.h"
+#include "util/typeutil.h"
 
 namespace sq::test {
 
-template <typename T, typename>
+template <util::ConvertibleToAlternative<Primitive> T>
 FakeField::FakeField(ResultGenerator result_generator, T&& primitive)
     : result_generator_{result_generator}
     , primitive_{test::to_primitive(std::forward<T>(primitive))}
 { }
 
-template <typename T, typename>
+template <util::ConvertibleToAlternative<Primitive> T>
 FakeField::FakeField(T&& primitive)
     : result_generator_{
         [&](auto, auto) { return std::make_unique<FakeField>(); }
@@ -25,7 +26,7 @@ FakeField::FakeField(T&& primitive)
     , primitive_{test::to_primitive(std::forward<T>(primitive))}
 { }
 
-template <typename T, typename>
+template <util::ConvertibleToAlternative<Primitive> T>
 void expect_one_primitive_access(MockField& mf, T&& retval)
 {
     EXPECT_CALL(mf, to_primitive())
@@ -46,7 +47,7 @@ void expect_field_accesses(
     expect_field_accesses(mf, std::forward<Args>(args)...);
 }
 
-template <typename T, typename>
+template <util::ConvertibleToAlternative<Primitive> T>
 StrictMockFieldPtr field_with_one_primitive_access(T&& retval)
 {
     auto mf = std::make_unique<testing::StrictMock<MockField>>();
@@ -70,7 +71,7 @@ void add_fields_to_obj_data(
     ResultTree&& field_data
 );
 
-template <typename T, typename = enable_if_primitive_like_t<T>>
+template <util::ConvertibleToAlternative<Primitive> T>
 void add_fields_to_obj_data(
     ObjData& obj,
     std::string_view field_name,
@@ -84,11 +85,7 @@ void add_fields_to_obj_data(
     );
 }
 
-template <
-    typename T,
-    typename = enable_if_result_tree_data_t<T>,
-    typename = void // to distinguish from primitive_like version
->
+template <util::Alternative<ResultTree::Data> T>
 void add_fields_to_obj_data(
     ObjData& obj,
     std::string_view field_name,
@@ -116,7 +113,7 @@ void add_fields_to_obj_data(
 
 void add_items_to_array_data(ArrayData& arr, ResultTree&& field_data);
 
-template <typename T, typename = enable_if_primitive_like_t<T>>
+template <util::ConvertibleToAlternative<Primitive> T>
 void add_items_to_array_data(ArrayData& arr, T&& field_data)
 {
     add_items_to_array_data(
@@ -125,17 +122,13 @@ void add_items_to_array_data(ArrayData& arr, T&& field_data)
     );
 }
 
-template <
-    typename T,
-    typename = enable_if_result_tree_data_t<T>,
-    typename = void // To distinguish from primitive_like version
->
+template <util::Alternative<ResultTree::Data> T>
 void add_items_to_array_data(ArrayData& arr, T&& field_data)
 {
     add_items_to_array_data(arr, ResultTree{std::forward<T>(field_data)});
 }
 
-template <typename T, typename... Args>
+template <util::ConvertibleToAlternative<ResultTree::Data> T, typename... Args>
 void add_items_to_array_data(
     ArrayData& arr,
     T&& field_data,
@@ -156,7 +149,7 @@ ResultTree obj_data_tree(Args&&... args)
     return ResultTree{std::move(obj_data)};
 }
 
-template <typename... Args>
+template <util::ConvertibleToAlternative<ResultTree::Data>... Args>
 ResultTree array_data_tree(Args&&... args)
 {
     auto arr = ArrayData{};
@@ -164,13 +157,13 @@ ResultTree array_data_tree(Args&&... args)
     return ResultTree{std::move(arr)};
 }
 
-template <typename T, typename>
+template <util::ConvertibleToAlternative<Primitive> T>
 ResultTree primitive_tree(T&& primitive)
 {
     return ResultTree{to_primitive(std::forward<T>(primitive))};
 }
 
-template <typename T>
+template <ranges::cpp20::view T>
 Result to_field_range(ranges::category cat, T&& rng)
 {
     if (cat == input)

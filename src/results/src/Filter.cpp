@@ -41,7 +41,7 @@ struct HasRangeCategory
         return false;
     }
 
-    template <typename R>
+    template <ranges::cpp20::range R>
     [[nodiscard]] bool operator()([[maybe_unused]] const R& rng) const
     {
         return (ranges::get_categories<R>() & cat_) == cat_;
@@ -76,7 +76,7 @@ struct SlurpRangeIntoVector
 };
 constexpr auto slurp_range_into_vector = SlurpRangeIntoVector{};
 
-template <typename R>
+template <ranges::cpp20::range R>
 [[nodiscard]] gsl::index get_range_size(R& rng)
 {
     if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
@@ -92,7 +92,7 @@ template <typename R>
     }
 }
 
-template <typename R, typename = util::disable_lvalues_t<R>>
+template <ranges::cpp20::view R>
 [[nodiscard]] auto get_reversed_range(R&& rng)
 {
     if constexpr (!ranges::bidirectional_range<R>)
@@ -108,7 +108,7 @@ template <typename R, typename = util::disable_lvalues_t<R>>
     }
 }
 
-template <typename Spec>
+template <util::Alternative<parser::FilterSpec> Spec>
 struct FilterImpl;
 
 template <>
@@ -299,14 +299,14 @@ struct FilterImpl<parser::SliceSpec>
 
 private:
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static ResultView to_result_view(R&& rng)
     {
         return FieldRange<ranges::get_categories<R>()>(std::forward<R>(rng));
     }
 
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         ASSERT(step > 0);
@@ -319,7 +319,7 @@ private:
                ranges::views::stride(step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_no_stop_pos_step(R&& rng, gsl::index start, gsl::index step)
     {
         ASSERT(start >= 0);
@@ -329,10 +329,9 @@ private:
                ranges::views::stride(step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto mixed_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(ranges::forward_range<R> || ranges::sized_range<R>);
         ASSERT(step > 0);
         ASSERT(start < 0 || stop < 0);
         auto size = get_range_size(rng);
@@ -344,10 +343,9 @@ private:
         return pos_index_pos_step(std::forward<R>(rng), start, stop, step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_no_stop_pos_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(ranges::forward_range<R> || ranges::sized_range<R>);
         ASSERT(step > 0);
         ASSERT(start < 0);
         start += get_range_size(rng);
@@ -355,10 +353,9 @@ private:
         return pos_index_no_stop_pos_step(std::forward<R>(rng), start, step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(ranges::bidirectional_range<R>);
         ASSERT(step < 0);
         ASSERT(start < 0);
         ASSERT(stop < 0);
@@ -368,10 +365,9 @@ private:
         return pos_index_pos_step(get_reversed_range(std::forward<R>(rng)), start, stop, step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(ranges::bidirectional_range<R>);
         ASSERT(step < 0);
         ASSERT(start < 0);
         start = -start -1;
@@ -379,7 +375,7 @@ private:
         return pos_index_no_stop_pos_step(get_reversed_range(std::forward<R>(rng)), start, step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto mixed_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         ASSERT(ranges::bidirectional_range<R>);
@@ -394,10 +390,9 @@ private:
         return neg_index_neg_step(std::forward<R>(rng), start, stop, step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(ranges::bidirectional_range<R>);
         ASSERT(step < 0);
         ASSERT(start >= 0);
         ASSERT(stop >= 0);
@@ -409,10 +404,9 @@ private:
         ) | ranges::views::stride(-step);
     }
 
-    template <typename R, typename = util::disable_lvalues_t<R>>
+    template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(ranges::bidirectional_range<R>);
         ASSERT(step < 0);
         ASSERT(start >= 0);
         return get_reversed_range(
@@ -427,7 +421,7 @@ private:
 
 struct FilterCreatorVisitor
 {
-    template <typename T>
+    template <util::Alternative<parser::FilterSpec> T>
     [[nodiscard]] FilterPtr operator()(const T& spec) const
     {
         return std::make_unique<FilterImpl<T>>(spec);

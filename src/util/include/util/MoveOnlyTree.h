@@ -6,12 +6,16 @@
 #ifndef SQ_INCLUDE_GUARD_util_MoveOnlyTree_h_
 #define SQ_INCLUDE_GUARD_util_MoveOnlyTree_h_
 
+#include "util/typeutil.h"
+
+#include <concepts>
 #include <iostream>
 #include <vector>
 
 namespace sq::util {
 
 template <typename T>
+    requires std::movable<T> && std::equality_comparable<T>
 class MoveOnlyTree
 {
 public:
@@ -48,7 +52,7 @@ private:
     T data_;
 };
 
-template <typename T>
+template <util::Printable T>
 std::ostream& operator<<(std::ostream& os, const MoveOnlyTree<T>& tree)
 {
     os << tree.data();
