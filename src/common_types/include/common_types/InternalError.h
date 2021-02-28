@@ -10,6 +10,13 @@
 
 namespace sq {
 
+/**
+ * Exception indicating a programming error in SQ.
+ *
+ * InternalError should never actually be thrown - they are used in places that
+ * the programmer believes are dead code, but where the C++ language still
+ * requires e.g. a return statement.
+ */
 class InternalError
     : public Exception
 {

@@ -14,11 +14,18 @@ namespace sq {
 
 class Token;
 
+/**
+ * Error indicating a request to access an element outside of an allowed range.
+ */
 class OutOfRangeError
     : public Exception
 {
 public:
     using Exception::Exception;
+    /**
+     * @param token the token in the query where the access was requested.
+     * @param message details about the requested access.
+     */
     OutOfRangeError(const Token& token, std::string_view message);
 };
 

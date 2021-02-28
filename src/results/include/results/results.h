@@ -18,6 +18,14 @@
 
 namespace sq::results {
 
+/**
+ * Tree representing the results of a query.
+ *
+ * Each node of the tree can represent either:
+ * - a primitive type (a leaf node);
+ * - a list of child results;
+ * - a mapping from child field names to results for those children.
+ */
 class ResultTree {
 public:
     using ObjData = std::vector<std::pair<std::string, ResultTree>>;
@@ -35,8 +43,13 @@ public:
     ResultTree(const parser::Ast& ast, ResultView&& result);
     explicit ResultTree(Data&& data);
 
+    ///@{
+    /**
+     * Get the data associated with this node.
+     */
     [[nodiscard]] const Data& data() const { return data_; }
     [[nodiscard]] Data& data() { return data_; }
+    ///@}
 
 private:
     Data data_;

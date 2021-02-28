@@ -14,6 +14,9 @@ namespace sq::system {
 
 class SchemaImpl;
 
+/**
+ * Represents the schema for a primitive type.
+ */
 class PrimitiveTypeSchema
 {
 public:
@@ -27,6 +30,9 @@ private:
     std::string_view name_;
 };
 
+/**
+ * Represents the schema for a parameter of field of a system object.
+ */
 class ParamSchema
 {
 public:
@@ -52,6 +58,9 @@ private:
 
 class TypeSchema;
 
+/**
+ * Represents the schema for a field of a system object.
+ */
 class FieldSchema
 {
 public:
@@ -82,6 +91,9 @@ private:
     bool return_list_;
 };
 
+/**
+ * Represents the schema for a system object.
+ */
 class TypeSchema
 {
 public:
@@ -104,6 +116,9 @@ private:
     std::size_t fields_end_index_;
 };
 
+/**
+ * Represents the whole SQ schema.
+ */
 struct Schema
 {
 public:
@@ -112,6 +127,9 @@ public:
     [[nodiscard]] const TypeSchema& root_type() const;
 };
 
+/**
+ * Get the whole SQ schema.
+ */
 const Schema& schema();
 
 } // namespace sq::system

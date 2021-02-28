@@ -10,6 +10,9 @@
 
 namespace sq {
 
+/**
+ * Base class for errors thrown by the SQ code.
+ */
 class Exception
     : public std::runtime_error
 {

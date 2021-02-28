@@ -19,6 +19,15 @@
 
 namespace sq::util {
 
+/**
+ * Dumps the elements of a range into a std::ostream with a delimiter between
+ * each element.
+ *
+ * E.g:
+ *     auto ints = { 1, 2, 3, 4 };
+ *     std::cout << join(ints, "*");
+ * Prints "1*2*3*4" 
+ */
 template<ranges::cpp20::range R>
     requires Printable<ranges::range_value_t<R>>
 struct join
@@ -87,7 +96,16 @@ struct OptionalToStr
 
 } // namespace detail
 
+/**
+ * Convert a std::variant into a std::string using operator<< for the type
+ * currently stored in the variant.
+ */
 inline constexpr auto variant_to_str = detail::VariantToStr{};
+
+/**
+ * Dumps a std::optional into a std::ostream using operator<< for the
+ * underlying type. Returns an empty string if no value is present.
+ */
 inline constexpr auto optional_to_str = detail::OptionalToStr{};
 
 } // namespace sq::util
