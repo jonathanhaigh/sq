@@ -8,7 +8,6 @@
 #include "common_types/InternalError.h"
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
-#include "util/ASSERT.h"
 #include "util/typeutil.h"
 
 #include <gsl/gsl>
@@ -176,7 +175,7 @@ private:
     template <ranges::category Cat>
     [[nodiscard]] ResultView nonnegative_index_access(FieldRange<Cat>&& rng, gsl::index index) const
     {
-        ASSERT(index >= 0);
+        Expects(index >= 0);
         auto it = ranges::begin(rng);
         auto end = ranges::end(rng);
         ranges::advance(it, index, end);
@@ -198,7 +197,7 @@ private:
     template <ranges::category Cat>
     [[nodiscard]] ResultView negative_index_access(FieldRange<Cat>&& rng, gsl::index index, gsl::index size) const
     {
-        ASSERT(index < 0);
+        Expects(index < 0);
         auto nonneg_index = size + index;
         if (nonneg_index < 0)
         {
@@ -309,9 +308,9 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(step > 0);
-        ASSERT(start >= 0);
-        ASSERT(stop >= 0);
+        Expects(step > 0);
+        Expects(start >= 0);
+        Expects(stop >= 0);
         if (stop < start) { stop = start; }
         return std::forward<R>(rng) |
                ranges::views::drop(start) |
@@ -322,8 +321,8 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_no_stop_pos_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(start >= 0);
-        ASSERT(step > 0);
+        Expects(start >= 0);
+        Expects(step > 0);
         return std::forward<R>(rng) |
                ranges::views::drop(start) |
                ranges::views::stride(step);
@@ -332,8 +331,8 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto mixed_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(step > 0);
-        ASSERT(start < 0 || stop < 0);
+        Expects(step > 0);
+        Expects(start < 0 || stop < 0);
         auto size = get_range_size(rng);
 
         if (start < 0) { start += size; };
@@ -346,8 +345,8 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_no_stop_pos_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(step > 0);
-        ASSERT(start < 0);
+        Expects(step > 0);
+        Expects(start < 0);
         start += get_range_size(rng);
         if (start < 0) { start = 0; }
         return pos_index_no_stop_pos_step(std::forward<R>(rng), start, step);
@@ -356,9 +355,9 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(step < 0);
-        ASSERT(start < 0);
-        ASSERT(stop < 0);
+        Expects(step < 0);
+        Expects(start < 0);
+        Expects(stop < 0);
         start = -start - 1;
         stop = -stop - 1;
         step *= -1;
@@ -368,8 +367,8 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto neg_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(step < 0);
-        ASSERT(start < 0);
+        Expects(step < 0);
+        Expects(start < 0);
         start = -start -1;
         step *= -1;
         return pos_index_no_stop_pos_step(get_reversed_range(std::forward<R>(rng)), start, step);
@@ -378,9 +377,9 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto mixed_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(ranges::bidirectional_range<R>);
-        ASSERT(step < 0);
-        ASSERT(start >= 0 || stop >= 0);
+        Expects(ranges::bidirectional_range<R>);
+        Expects(step < 0);
+        Expects(start >= 0 || stop >= 0);
         auto size = get_range_size(rng);
 
         if (start >= 0) { start -= size; };
@@ -393,9 +392,9 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        ASSERT(step < 0);
-        ASSERT(start >= 0);
-        ASSERT(stop >= 0);
+        Expects(step < 0);
+        Expects(start >= 0);
+        Expects(stop >= 0);
         if (stop > start) { stop = start; }
         return get_reversed_range(
             rng |
@@ -407,8 +406,8 @@ private:
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
-        ASSERT(step < 0);
-        ASSERT(start >= 0);
+        Expects(step < 0);
+        Expects(start >= 0);
         return get_reversed_range(
             rng | ranges::views::take(start + 1)
         ) | ranges::views::stride(-step);

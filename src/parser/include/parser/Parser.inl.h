@@ -25,6 +25,7 @@ std::optional<Int> Parser::parse_integer()
     }
     const auto& token = opt_token.value();
     const auto str_view = token.view();
+    ASSERT(!str_view.empty());
     const auto* begin = str_view.data();
     // We can't really avoid using pointer arithmetic when using
     // std::from_chars - it requires a const char* to indicate the end of the

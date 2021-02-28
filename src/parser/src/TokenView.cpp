@@ -9,6 +9,8 @@
 #include "util/ASSERT.h"
 #include "util/typeutil.h"
 
+#include <gsl/gsl>
+
 namespace sq::parser {
 
 namespace {
@@ -43,7 +45,7 @@ TokenView::TokenView(std::string_view str) noexcept
 
 const Token& TokenView::read() const
 {
-    ASSERT(pos_ != -1);
+    Expects(pos_ != -1);
 
     if (cache_)
     {
