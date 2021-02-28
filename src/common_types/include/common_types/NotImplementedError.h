@@ -10,6 +10,9 @@
 
 namespace sq {
 
+/**
+ * Error indicating that a requested feature has not been implemented.
+ */
 class NotImplementedError
     : public Exception
 {

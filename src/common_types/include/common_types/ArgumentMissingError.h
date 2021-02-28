@@ -12,10 +12,18 @@
 
 namespace sq {
 
+
+/**
+ * Error indicating that a required parameter of a field is missing.
+ */
 class ArgumentMissingError
     : public Exception
 {
 public:
+    /**
+     * @param arg_name the name of the missing argument.
+     * @param arg_type the type of the missing argument.
+     */
     ArgumentMissingError(std::string_view arg_name, std::string_view arg_type);
 };
 

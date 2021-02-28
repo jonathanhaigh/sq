@@ -13,11 +13,18 @@
 
 namespace sq::parser {
 
+/**
+ * Represents the lack of a filter specification for a field access.
+ */
 struct NoFilterSpec { };
 std::ostream& operator<<(std::ostream& os, NoFilterSpec nlfs);
 [[nodiscard]] bool operator==(NoFilterSpec lhs, NoFilterSpec rhs);
 [[nodiscard]] bool operator!=(NoFilterSpec lhs, NoFilterSpec rhs);
 
+/**
+ * Represents access of an indexed element in a list of results for a field
+ * access.
+ */
 struct ElementAccessSpec
 {
     gsl::index index_;
@@ -26,6 +33,9 @@ std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas);
 [[nodiscard]] bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs);
 [[nodiscard]] bool operator!=(ElementAccessSpec lhs, ElementAccessSpec rhs);
 
+/**
+ * Represents a Python-style slice of a list of results for a field access.
+ */
 struct SliceSpec
 {
     std::optional<gsl::index> start_;

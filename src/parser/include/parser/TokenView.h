@@ -15,13 +15,14 @@
 
 namespace sq::parser {
 
+/**
+ * A ranges::view of the input query split into tokens.
+ */
 class TokenView
     : public ranges::view_facade<TokenView>
 {
 public:
     explicit TokenView(std::string_view str) noexcept;
-
-    TokenView sub_view(gsl::index pos);
 
     TokenView() noexcept = default;
     TokenView(const TokenView&) noexcept = default;
@@ -30,6 +31,7 @@ public:
     TokenView& operator=(TokenView&&) noexcept = default;
     ~TokenView() noexcept = default;
 
+    // required for ranges::view_facade
     friend ranges::range_access;
 
     [[nodiscard]] const Token& read() const;

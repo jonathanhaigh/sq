@@ -17,6 +17,10 @@ using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
 using ArrayData = ResultTree::ArrayData;
 
+/**
+ * Convert the result of accessing a field into a ResultTree containing data
+ * ready for serialization and output.
+ */
 class ResultViewToDataVisitor
 {
 public:

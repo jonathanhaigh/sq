@@ -10,6 +10,10 @@
 
 namespace sq {
 
+/**
+ * Error indicating that an array operation has been requested on a non-array
+ * type.
+ */
 class NotAnArrayError
     : public Exception
 {

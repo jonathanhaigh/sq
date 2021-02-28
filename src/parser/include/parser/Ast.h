@@ -18,6 +18,22 @@ namespace sq::parser {
 
 inline constexpr std::string_view ast_root_node_name = "root";
 
+/**
+ * The data for a node in an abstract syntax tree (AST) for an input query.
+ *
+ * Each node in the AST represents an access of field of a system object.
+ *
+ * E.g. a query like 'a.b("param1") { c[3] d }' will have an AST something like:
+ *      NODE[name="a"; params=[]; filter=None; children=[
+ *          NODE[name="b"; params=["param1"]; Filter=None; children=[
+ *              NODE[name="c"; params=[]; filter=ElementAccess(3); children=[]],
+ *              NODE[name="d"; params=[]; filter=None; children=[]]
+ *          ]
+ *      ]
+ *
+ * Note that this class just defines the data for each node. The tree structure
+ * is provided by MoveOnlyTree.
+ */
 class AstData
 {
 public:
@@ -33,13 +49,26 @@ public:
         : name_(name)
     { }
 
+    /**
+     * Name of the field being accessed.
+     */
     [[nodiscard]] const std::string& name() const { return name_; }
 
+    ///@{
+    /**
+     * Params to pass to the system when accessing the field.
+     */
     [[nodiscard]] const FieldCallParams& params() const { return params_; }
     [[nodiscard]] FieldCallParams& params() { return params_; }
+    ///@}
 
+    ///@{
+    /**
+     * Details of the filter specified for the results of accessing the field.
+     */
     [[nodiscard]] const FilterSpec& filter_spec() const { return filter_spec_; }
     [[nodiscard]] FilterSpec& filter_spec() { return filter_spec_; }
+    ///@}
 
 private:
     std::string name_;

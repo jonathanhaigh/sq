@@ -16,7 +16,7 @@
 namespace sq::util {
 
 /**
- * Can T be dumped into a std::ostream?
+ * Concept for types that can be dumped to a std::ostream.
  */
 template <typename T>
 concept Printable = requires (T x, std::ostream& os)
@@ -24,8 +24,9 @@ concept Printable = requires (T x, std::ostream& os)
     os << x;
 };
 
+///@{
 /**
- * Is T a std::variant?
+ * Get whether the type T is a specialization of std::variant.
  */
 template <typename T>
 struct IsVariant
@@ -39,10 +40,12 @@ struct IsVariant<std::variant<Types...>>
 
 template <typename T>
 inline constexpr bool is_variant_v = IsVariant<T>::value;
+///@}
 
 
+///@{
 /**
- * Is T one of the variant V's alternatives?
+ * Get whether the type T is one of the alternative types of the variant V.
  */
 template <typename T, typename V>
     requires is_variant_v<V>
@@ -57,13 +60,18 @@ struct IsAlternative<T, std::variant<Types...>>
 
 template <typename T, typename V>
 inline constexpr bool is_alternative_v = IsAlternative<T, V>::value;
+///@}
 
+/**
+ * Concept for types that are alternatives of the variant V.
+ */
 template <typename T, typename V>
 concept Alternative = is_alternative_v<T, V>;
 
 
+///@{
 /**
- * Can T be converted to one of the variant V's alternatives?
+ * Get whether T can be converted to one of the variant V's alternatives.
  */
 template <typename T, typename V>
     requires is_variant_v<V>
@@ -79,7 +87,12 @@ struct IsConvertibleToAlternative<T, std::variant<Types...>>
 template <typename T, typename V>
 inline constexpr bool is_convertible_to_alternative_v =
     IsConvertibleToAlternative<T, V>::value;
+///@}
 
+/**
+ * Concept for types that are convertible to one of the variant V's
+ * alternatives.
+ */
 template <typename T, typename V>
 concept ConvertibleToAlternative = is_convertible_to_alternative_v<T, V>;
 
