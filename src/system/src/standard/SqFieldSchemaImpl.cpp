@@ -25,6 +25,11 @@ Result SqFieldSchemaImpl::get_name() const
     return std::make_unique<SqStringImpl>(field_schema_->name());
 }
 
+Result SqFieldSchemaImpl::get_doc() const
+{
+    return std::make_unique<SqStringImpl>(field_schema_->doc());
+}
+
 Result SqFieldSchemaImpl::get_params() const
 {
     return FieldRange<

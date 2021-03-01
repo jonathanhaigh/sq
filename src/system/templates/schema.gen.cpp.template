@@ -60,20 +60,27 @@
     end
     local noof_pts = pt_index
 
+    function doc_to_str(doc)
+        local str = (type(doc) == "table") and table.concat(doc, "\n") or doc
+        return string.format("R\"*DOC*STRING*(%s)*DOC*STRING*\"", str)
+    end
+
     local type_schema_values = {}
     local field_schema_values = {}
     local param_schema_values = {}
     for _, type_schema in ipairs(types) do
         table.insert(type_schema_values, string.format(
-            "TypeSchema{%q, %d, %d}",
+            "TypeSchema{%q, %s, %d, %d}",
             type_schema.name,
+            doc_to_str(type_schema.doc),
             type_schema.fields_begin_index,
             type_schema.fields_end_index
         ))
         for _, field_schema in ipairs(type_schema.fields) do
             table.insert(field_schema_values, string.format(
-                "FieldSchema{%q, %d, %d, %d, %s}",
+                "FieldSchema{%q, %s, %d, %d, %d, %s}",
                 field_schema.name,
+                doc_to_str(field_schema.doc),
                 field_schema.params_begin_index,
                 field_schema.params_end_index,
                 type_index_by_name[field_schema.return_type],
@@ -81,8 +88,9 @@
             ))
             for _, param_schema in ipairs(field_schema.params) do
                 table.insert(param_schema_values, string.format(
-                    "ParamSchema{%q, %d, %d }",
+                    "ParamSchema{%q, %s, %d, %d }",
                     param_schema.name,
+                    doc_to_str(param_schema.doc),
                     param_schema.index,
                     pt_index_by_name[param_schema.type]
                 ))
@@ -93,7 +101,9 @@
     pt_schema_values = {}
     for _, pt_schema in ipairs(primitive_types) do
         table.insert(pt_schema_values, string.format(
-            "PrimitiveTypeSchema{ %q }", pt_schema.name
+            "PrimitiveTypeSchema{ %q, %s }",
+            pt_schema.name,
+            doc_to_str(pt_schema.doc)
         ))
     end
 }}
@@ -127,9 +137,19 @@ std::string_view PrimitiveTypeSchema::name() const
     return name_;
 }
 
+std::string_view PrimitiveTypeSchema::doc() const
+{
+    return doc_;
+}
+
 std::string_view ParamSchema::name() const
 {
     return name_;
+}
+
+std::string_view ParamSchema::doc() const
+{
+    return doc_;
 }
 
 std::size_t ParamSchema::index() const
@@ -145,6 +165,11 @@ const PrimitiveTypeSchema& ParamSchema::type() const
 std::string_view FieldSchema::name() const
 {
     return name_;
+}
+
+std::string_view FieldSchema::doc() const
+{
+    return doc_;
 }
 
 gsl::span<const ParamSchema> FieldSchema::params() const
@@ -168,6 +193,11 @@ bool FieldSchema::return_list() const
 std::string_view TypeSchema::name() const
 {
     return name_;
+}
+
+std::string_view TypeSchema::doc() const
+{
+    return doc_;
 }
 
 gsl::span<const FieldSchema> TypeSchema::fields() const

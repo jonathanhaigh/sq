@@ -73,6 +73,22 @@ public:
     template <util::Alternative<Primitive> ParamType>
     [[nodiscard]] const ParamType* get_optional(size_t index, std::string_view name) const;
 
+    /**
+     * Get an optional parameter if it is present, else return a default value.
+     *
+     * Note that default_value is returned by reference when the parameter is
+     * not present so be careful about the lifetime of default_value.
+     *
+     * Throws ArgumentTypeError if the parameter is present but is not of the
+     * requested type.
+     */
+    template <util::Alternative<Primitive> ParamType>
+    [[nodiscard]] const ParamType& get_or(
+        size_t index,
+        std::string_view name,
+        const ParamType& default_value
+    ) const;
+
 private:
 
     PosParams pos_params_;

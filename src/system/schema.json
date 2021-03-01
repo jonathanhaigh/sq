@@ -1,93 +1,120 @@
 {
     "primitive_types": [
-        { "name": "PrimitiveString" },
-        { "name": "PrimitiveInt" },
-        { "name": "PrimitiveFloat" },
-        { "name": "PrimitiveBool" }
+        {
+            "name": "PrimitiveString",
+            "doc": "A UTF-8 string"
+        },
+        {
+            "name": "PrimitiveInt",
+            "doc": "A 64-bit signed integer type"
+        },
+        {
+            "name": "PrimitiveFloat",
+            "doc": "A double precision floating point number type"
+        },
+        {
+            "name": "PrimitiveBool",
+            "doc": "A boolean type"
+        }
     ],
     "root_type": "SqRoot",
     "types": [
         {
             "name": "SqBool",
+            "doc": "A boolean type",
             "fields": []
         },
         {
             "name": "SqDataSize",
+            "doc": "A data size",
             "fields": [
                 {
                     "name": "B",
+                    "doc": "Size of the data in bytes",
                     "return_type": "SqInt",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "KiB",
+                    "doc": "Size of the data in kibibytes (1KiB = 1024 bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "kB",
+                    "doc": "Size of the data in kilobytes (1kB = 1000 bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "MiB",
+                    "doc": "Size of the data in mebibytes (1MiB = 1024\\ :sup:`2` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "MB",
+                    "doc": "Size of the data in megabytes (1MB = 1000 \\ :sup:`2` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "GiB",
+                    "doc": "Size of the data in gibibytes (1GiB = 1024\\ :sup:`3` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "GB",
+                    "doc": "Size of the data in gigabytes (1GB = 1000\\ :sup:`3` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "TiB",
+                    "doc": "Size of the data in tebibytes (1TiB = 1024\\ :sup:`4` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "TB",
+                    "doc": "Size of the data in terabytes (1TB = 1000\\ :sup:`4` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "PiB",
+                    "doc": "Size of the data in pebibytes (1PiB = 1024\\ :sup:`5` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "PB",
+                    "doc": "Size of the data in petabytes (1PB = 1000\\ :sup:`5` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "EiB",
+                    "doc": "Size of the data in exbibytes (1EiB = 1024\\ :sup:`6` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "EB",
+                    "doc": "Size of the data in exabytes (1EB = 1000\\ :sup:`6` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
                     "params": []
@@ -96,27 +123,39 @@
         },
         {
             "name": "SqFieldSchema",
+            "doc": "The schema of a field",
             "fields": [
                 {
                     "name": "name",
+                    "doc": "The name of the field",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "doc",
+                    "doc": "The documentation for the field",
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "params",
+                    "doc": "The field's parameters",
                     "return_type": "SqParamSchema",
                     "return_list": true,
                     "params": []
                 },
                 {
                     "name": "return_type",
+                    "doc": "The fields return type",
                     "return_type": "SqTypeSchema",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "return_list",
+                    "doc": "Whether the field returns multiple values or not",
                     "return_type": "SqBool",
                     "return_list": false,
                     "params": []
@@ -125,30 +164,49 @@
         },
         {
             "name": "SqFloat",
+            "doc": "A double precision floating point type",
             "fields": []
         },
 
         {
             "name": "SqInt",
+            "doc": "A 64-bit signed integer type",
             "fields": []
         },
         {
             "name": "SqParamSchema",
+            "doc": "The schema of a parameter",
             "fields": [
                 {
                     "name": "name",
+                    "doc": "The name of the parameter",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "doc",
+                    "doc": "The documentation for the parameter",
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "index",
+                    "doc": [
+                        "The index of the parameter",
+                        "Parameter indeces start with zero for the first parameter."
+                    ],
                     "return_type": "SqInt",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "type",
+                    "doc": [
+                        "The type of the parameter",
+                        "The type of a parameter is always a primitive type."
+                    ],
                     "return_type": "SqPrimitiveTypeSchema",
                     "return_list": false,
                     "params": []
@@ -157,69 +215,157 @@
         },
         {
             "name": "SqPath",
+            "doc": "A filesystem path",
             "fields": [
                 {
                     "name": "string",
+                    "doc": "Get the path as an SqString",
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "parent",
+                    "doc": [
+                        "Get the parent directory of the path",
+                        "Notes:",
+                        "* This is a purely lexical operation and does not access the filesystem.",
+                        "Examples:",
+                        "* The parent of \"/home/user1/file.tar.gz\" is \"/home/user1\".",
+                        "* The parent of \"/home/user1/.file\" is \"/home/user1\".",
+                        "* The parent of \"/usr/bin/sq\" is \"/usr/bin\".",
+                        "* The parent of \"/usr/bin/\" is \"/usr/bin\".",
+                        "* The parent of \"/\" is \"/\".",
+                        "* The parent of \"C:\\\" is \"C:\\\"."
+                    ],
                     "return_type": "SqPath",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "filename",
+                    "doc": [
+                        "Get the filename component of the path",
+                        "Notes:",
+                        "* This is a purely lexical operation and does not access the filesystem.",
+                        "Examples:",
+                        "* The filename of \"/home/user1/file.tar.gz\" is \"file.tar.gz\".",
+                        "* The filename of \"/home/user1/.file\" is \".file\".",
+                        "* The filename of \"/usr/bin/sq\" is \"sq\".",
+                        "* The filename of \"/usr/bin/\" is \"\".",
+                        "* The filename of \"/\" is \"\".",
+                        "* The filename of \"C:\\\" is \"\"."
+                    ],
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "stem",
+                    "doc": [
+                        "Get the stem component of the path",
+                        "Notes:",
+                        "* This is a purely lexical operation and does not access the filesystem.",
+                        "* The stem component of a path is the filename of the path with any extension removed.",
+                        "Examples:",
+                        "* The stem of \"/home/user1/file.tar.gz\" is \"file.tar\".",
+                        "* The stem of \"/home/user1/.file\" is \".file\".",
+                        "* The stem of \"/usr/bin/sq\" is \"sq\".",
+                        "* The stem of \"/usr/bin/\" is \"\".",
+                        "* The stem of \"/\" is \"\".",
+                        "* The stem of \"C:\\\" is \"\"."
+                    ],
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "extension",
+                    "doc": [
+                        "Get the extension component of the path",
+                        "Notes:",
+                        "* This is a purely lexical operation and does not access the filesystem.",
+                        "* The extension component of a path is the substring starting from that last \".\"",
+                        "  in the filename of the path, if it exists, else \"\".",
+                        "  An exception is made for filenames whose only \".\" is at the start of the name:",
+                       "   the extension of \"/home/user1/.bashrc\" is \"\", not \".bashrc\".",
+                        "Examples:",
+                        "* The extension of \"/home/user1/file.tar.gz\" is \".gz\".",
+                        "* The extension of \"/home/user1/.file\" is \"\".",
+                        "* The extension of \"/usr/bin/sq\" is \"\".",
+                        "* The extension of \"/usr/bin/\" is \"\".",
+                        "* The extension of \"/\" is \"\".",
+                        "* The extension of \"C:\\\" is \"\"."
+                    ],
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "children",
+                    "doc": [
+                        "Get the children of the path",
+                        "Notes:",
+                        "* The special file names \".\" and \"..\" are not included."
+                    ],
                     "return_type": "SqPath",
                     "return_list": true,
                     "params": []
                 },
                 {
                     "name": "parts",
+                    "doc": [
+                        "Get the elements of the path in a list",
+                        "Examples:",
+                        "* The parts of \"/home/user1/Downloads/\" are:",
+                        "  [ \"/\", \"home\", \"user1\", \"Downloads\", \"\" ].",
+                        "* The parts of \"C:\\users\\user1\\file.tar.gz\" are:",
+                        "  [ \"C:\", \"/\", \"users\", \"user1\", \"file.tar.gz\" ]."
+                    ],
                     "return_type": "SqString",
                     "return_list": true,
                     "params": []
                 },
                 {
                     "name": "absolute",
+                    "doc": [
+                        "Get an absolute path that refers to the same file as this path",
+                        "Notes:",
+                        "* The returned path may still contain symlinks or the",
+                        "  special filenames \".\" and \"..\".",
+                        "Examples, where the current working directory is \"/home/user1\":",
+                        "*  \"Downloads/file.tar.gz\" -> \"/home/user1/Downloads/file.tar.gz\".",
+                        "* \".././user1/.bashrc\" -> \"/home/user1/.././user1/.bashrc\"."
+                    ],
                     "return_type": "SqPath",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "canonical",
+                    "doc": [
+                        "Get a canonical path that refers to the same file as this path",
+                        "Notes:",
+                        " * A canonical path is absolute and does not contain any symlinks",
+                        "   or the special filenames \".\" and \"..\".",
+                        "Examples, where the current working directory is \"/home/user1\":",
+                        "*  \"Downloads/file.tar.gz\" -> \"/home/user1/Downloads/file.tar.gz\".",
+                        "* \".././user1/.bashrc\" -> \"/home/user1/.bashrc\"."
+                    ],
                     "return_type": "SqPath",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "is_absolute",
+                    "doc": "Get whether the path is absolute",
                     "return_type": "SqBool",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "size",
+                    "doc": "Get the size of the file referred to by the path",
                     "return_type": "SqDataSize",
                     "return_list": false,
                     "params": []
@@ -228,9 +374,18 @@
         },
         {
             "name": "SqPrimitiveTypeSchema",
+            "doc": "The schema for a primitive type",
             "fields": [
                 {
                     "name": "name",
+                    "doc": "The name of the primitive type",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "doc",
+                    "doc": "The documentation for the primitive type",
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
@@ -239,68 +394,99 @@
         },
         {
             "name": "SqRoot",
+            "doc": [
+                "The SQ root type",
+                "The SQ root type is the entry point into the system:",
+                "all SQ Queries begin by selecting fields from the SQ root type."
+            ],
             "fields": [
                 {
                     "name": "schema",
+                    "doc": "Get the system schema",
                     "return_type": "SqSchema",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "path",
+                    "doc": "Get an SqPath system object",
                     "return_type":  "SqPath",
                     "return_list": false,
                     "params": [
                         {
                             "index": 0,
                             "name": "path",
+                            "doc": "the path to get",
                             "type": "PrimitiveString",
-                            "required": false
+                            "required": false,
+                            "default_value_doc": "the current working directory",
+                            "default_value": null
                         }
                     ]
                 },
                 {
                     "name": "int",
+                    "doc": "Get an SqInt system object",
                     "return_type": "SqInt",
                     "return_list": false,
                     "params": [
                         {
                             "index": 0,
                             "name": "value",
+                            "doc": "the value of the integer to get",
                             "type": "PrimitiveInt",
-                            "required": false
+                            "required": false,
+                            "default_value": 0
                         }
                     ]
                 },
                 {
                     "name": "ints",
+                    "doc": [
+                        "Get a sequence of SqInt system objects",
+                        "The sequence returned is the half-open range [start, stop),",
+                        "including start but excluding stop.",
+                        "Examples:",
+                        "* ints(0, 10) -> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].",
+                        "* ints(-10, 0) -> [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1].",
+                        "* ints(10) -> [10, 11, 12, 13, ...]",
+                        "* ints(stop=5) -> [0, 1, 2, 3, 4]"
+                    ],
                     "return_type": "SqInt",
                     "return_list": true,
                     "params": [
                         {
                             "index": 0,
                             "name": "start",
+                            "doc": "the first integer in the squence",
                             "type": "PrimitiveInt",
-                            "required": false
+                            "required": false,
+                            "default_value": 0
                         },
                         {
                             "index": 1,
                             "name": "stop",
+                            "doc": "the upper bound for the sequence",
                             "type": "PrimitiveInt",
-                            "required": false
+                            "required": false,
+                            "default_value": null,
+                            "default_value_doc": "∞"
                         }
                     ]
                 },
                 {
                     "name": "bool",
+                    "doc": "Get an SqBool system object",
                     "return_type": "SqBool",
                     "return_list": false,
                     "params": [
                         {
                             "index": 0,
                             "name": "value",
+                            "doc": "the value of the boolean to get",
                             "type": "PrimitiveBool",
-                            "required": false
+                            "required": false,
+                            "default_value": false
                         }
                     ]
                 }
@@ -308,21 +494,25 @@
         },
         {
             "name": "SqSchema",
+            "doc": "Get the SQ system schema",
             "fields": [
                 {
                     "name": "root_type",
+                    "doc": "The SQ root type",
                     "return_type": "SqTypeSchema",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "primitive_types",
+                    "doc": "a list of the SQ primitive types",
                     "return_type": "SqPrimitiveTypeSchema",
                     "return_list": true,
                     "params": []
                 },
                 {
                     "name": "types",
+                    "doc": "a list of the SQ system object types",
                     "return_type": "SqTypeSchema",
                     "return_list": true,
                     "params": []
@@ -331,19 +521,30 @@
         },
         {
             "name": "SqString",
+            "doc": "A string of characters",
             "fields": [ ]
         },
         {
             "name": "SqTypeSchema",
+            "doc": "The schema for an SQ system object type",
             "fields": [
                 {
                     "name": "name",
+                    "doc": "The name of the type",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "doc",
+                    "doc": "The documentation for the SQ system object type",
                     "return_type": "SqString",
                     "return_list": false,
                     "params": []
                 },
                 {
                     "name": "fields",
+                    "doc": "a list of the type's fields",
                     "return_type": "SqFieldSchema",
                     "return_list": true,
                     "params": []
