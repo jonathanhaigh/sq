@@ -23,6 +23,11 @@ Result SqTypeSchemaImpl::get_name() const
     return std::make_unique<SqStringImpl>(type_schema_->name());
 }
 
+Result SqTypeSchemaImpl::get_doc() const
+{
+    return std::make_unique<SqStringImpl>(type_schema_->doc());
+}
+
 Result SqTypeSchemaImpl::get_fields() const
 {
     return FieldRange<

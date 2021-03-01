@@ -60,6 +60,23 @@ const ParamType* FieldCallParams::get_optional(size_t index, std::string_view na
     }
 }
 
+template <util::Alternative<Primitive> ParamType>
+const ParamType& FieldCallParams::get_or(
+    size_t index,
+    std::string_view name,
+    const ParamType& default_value
+) const
+{
+    try
+    {
+        return get<ParamType>(index, name);
+    }
+    catch (const ArgumentMissingError&)
+    {
+        return default_value;
+    }
+}
+
 } // namespace sq
 
 #endif // SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_

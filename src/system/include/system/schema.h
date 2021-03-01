@@ -20,14 +20,20 @@ class SchemaImpl;
 class PrimitiveTypeSchema
 {
 public:
-    constexpr explicit PrimitiveTypeSchema(std::string_view name)
+    constexpr explicit PrimitiveTypeSchema(
+        std::string_view name,
+        std::string_view doc
+    )
         : name_{name}
+        , doc_{doc}
     { }
 
     [[nodiscard]] std::string_view name() const;
+    [[nodiscard]] std::string_view doc() const;
 
 private:
     std::string_view name_;
+    std::string_view doc_;
 };
 
 /**
@@ -38,20 +44,24 @@ class ParamSchema
 public:
     constexpr ParamSchema(
         std::string_view name,
+        std::string_view doc,
         std::size_t index,
         std::size_t type_index
     )
         : name_{name}
+        , doc_{doc}
         , index_{index}
         , type_index_{type_index}
     { }
 
     [[nodiscard]] std::string_view name() const;
+    [[nodiscard]] std::string_view doc() const;
     [[nodiscard]] std::size_t index() const;
     [[nodiscard]] const PrimitiveTypeSchema& type() const;
 
 private:
     std::string_view name_;
+    std::string_view doc_;
     std::size_t index_;
     std::size_t type_index_;
 };
@@ -66,12 +76,14 @@ class FieldSchema
 public:
     constexpr FieldSchema(
         std::string_view name,
+        std::string_view doc,
         std::size_t params_begin_index,
         std::size_t params_end_index,
         std::size_t return_type_index,
         bool return_list
     )
         : name_{name}
+        , doc_{doc}
         , params_begin_index_{params_begin_index}
         , params_end_index_{params_end_index}
         , return_type_index_{return_type_index}
@@ -79,12 +91,14 @@ public:
     { }
 
     [[nodiscard]] std::string_view name() const;
+    [[nodiscard]] std::string_view doc() const;
     [[nodiscard]] gsl::span<const ParamSchema> params() const;
     [[nodiscard]] const TypeSchema& return_type() const;
     [[nodiscard]] bool return_list() const;
 
 private:
     std::string_view name_;
+    std::string_view doc_;
     std::size_t params_begin_index_;
     std::size_t params_end_index_;
     std::size_t return_type_index_;
@@ -99,19 +113,23 @@ class TypeSchema
 public:
     constexpr TypeSchema(
         std::string_view name,
+        std::string_view doc,
         std::size_t fields_begin_index,
         std::size_t fields_end_index
     )
         : name_{name}
+        , doc_{doc}
         , fields_begin_index_{fields_begin_index}
         , fields_end_index_{fields_end_index}
     { }
 
     [[nodiscard]] std::string_view name() const;
+    [[nodiscard]] std::string_view doc() const;
     [[nodiscard]] gsl::span<const FieldSchema> fields() const;
 
 private:
     std::string_view name_;
+    std::string_view doc_;
     std::size_t fields_begin_index_;
     std::size_t fields_end_index_;
 };

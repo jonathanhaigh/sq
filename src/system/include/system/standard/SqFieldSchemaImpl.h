@@ -21,6 +21,7 @@ public:
     explicit SqFieldSchemaImpl(const FieldSchema& field_schema);
 
     [[nodiscard]] Result get_name() const;
+    [[nodiscard]] Result get_doc() const;
     [[nodiscard]] Result get_params() const;
     [[nodiscard]] Result get_return_type() const;
     [[nodiscard]] Result get_return_list() const;

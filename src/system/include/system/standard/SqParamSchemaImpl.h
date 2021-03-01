@@ -20,8 +20,9 @@ class SqParamSchemaImpl
 public:
     explicit SqParamSchemaImpl(const ParamSchema& param_schema);
 
-    [[nodiscard]] Result get_index() const;
     [[nodiscard]] Result get_name() const;
+    [[nodiscard]] Result get_doc() const;
+    [[nodiscard]] Result get_index() const;
     [[nodiscard]] Result get_type() const;
 
     [[nodiscard]] Primitive to_primitive() const override;
