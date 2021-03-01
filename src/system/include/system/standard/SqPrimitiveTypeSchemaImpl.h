@@ -21,6 +21,7 @@ public:
     explicit SqPrimitiveTypeSchemaImpl(const PrimitiveTypeSchema& primitive_type_schema);
 
     [[nodiscard]] Result get_name() const;
+    [[nodiscard]] Result get_doc() const;
 
     [[nodiscard]] Primitive to_primitive() const override;
 

@@ -21,6 +21,7 @@ public:
     explicit SqTypeSchemaImpl(const TypeSchema& type_schema);
 
     [[nodiscard]] Result get_name() const;
+    [[nodiscard]] Result get_doc() const;
     [[nodiscard]] Result get_fields() const;
 
     [[nodiscard]] Primitive to_primitive() const override;

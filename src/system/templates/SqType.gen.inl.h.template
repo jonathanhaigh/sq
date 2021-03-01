@@ -13,16 +13,36 @@ namespace sq::system {
 template <typename Impl>
 Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const FieldCallParams& params) const
 {
-{{ for _, field in ipairs(fields) do
+{{
+    -- Convert a value into a string that can be used in C++ code as a literal
+    -- value.
+    function value_to_cpp_literal(value)
+        if type(value) == "string" then
+            return string.format("%q", value)
+        end
+        return tostring(value)
+    end
+
+    for _, field in ipairs(fields) do
     param_strs = {}
     for _, param in ipairs(field.params) do
-        table.insert(param_strs, string.format(
-            "params.%s<%s>(%d, \"%s\")",
-            param.required and "get" or "get_optional",
-            param.type,
-            param.index,
-            param.name
-        ))
+        if param.required or param.default_value == nil then
+            table.insert(param_strs, string.format(
+                "params.%s<%s>(%d, \"%s\")",
+                param.required and "get" or "get_optional",
+                param.type,
+                param.index,
+                param.name
+            ))
+        else
+            table.insert(param_strs, string.format(
+                "params.get_or<%s>(%d, \"%s\", %s)",
+                param.type,
+                param.index,
+                param.name,
+                value_to_cpp_literal(param.default_value)
+            ))
+        end
     end
 }}
     if (member.compare("{{= field.name }}") == 0)

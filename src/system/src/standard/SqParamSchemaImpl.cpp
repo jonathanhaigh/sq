@@ -17,14 +17,19 @@ SqParamSchemaImpl::SqParamSchemaImpl(const ParamSchema& param_schema)
     : param_schema_{std::addressof(param_schema)}
 { }
 
-Result SqParamSchemaImpl::get_index() const
-{
-    return std::make_unique<SqIntImpl>(param_schema_->index());
-}
-
 Result SqParamSchemaImpl::get_name() const
 {
     return std::make_unique<SqStringImpl>(param_schema_->name());
+}
+
+Result SqParamSchemaImpl::get_doc() const
+{
+    return std::make_unique<SqStringImpl>(param_schema_->doc());
+}
+
+Result SqParamSchemaImpl::get_index() const
+{
+    return std::make_unique<SqIntImpl>(param_schema_->index());
 }
 
 Result SqParamSchemaImpl::get_type() const

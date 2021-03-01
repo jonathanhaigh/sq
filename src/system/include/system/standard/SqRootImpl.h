@@ -16,9 +16,9 @@ class SqRootImpl
 public:
     [[nodiscard]] static Result get_schema();
     [[nodiscard]] static Result get_path(const PrimitiveString* path);
-    [[nodiscard]] static Result get_int(const PrimitiveInt* value);
-    [[nodiscard]] static Result get_ints(const PrimitiveInt* start, const PrimitiveInt* stop);
-    [[nodiscard]] static Result get_bool(const PrimitiveBool* value);
+    [[nodiscard]] static Result get_int(PrimitiveInt value);
+    [[nodiscard]] static Result get_ints(PrimitiveInt start, const PrimitiveInt* stop);
+    [[nodiscard]] static Result get_bool(PrimitiveBool value);
     [[nodiscard]] Primitive to_primitive() const override;
 };
 

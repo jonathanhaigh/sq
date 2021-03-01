@@ -19,6 +19,11 @@ Result SqPrimitiveTypeSchemaImpl::get_name() const
     return std::make_unique<SqStringImpl>(primitive_type_schema_->name());
 }
 
+Result SqPrimitiveTypeSchemaImpl::get_doc() const
+{
+    return std::make_unique<SqStringImpl>(primitive_type_schema_->doc());
+}
+
 Primitive SqPrimitiveTypeSchemaImpl::to_primitive() const
 {
     return PrimitiveString{primitive_type_schema_->name()};

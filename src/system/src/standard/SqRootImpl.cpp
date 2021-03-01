@@ -31,42 +31,33 @@ Result SqRootImpl::get_path(const PrimitiveString* path)
     return std::make_unique<SqPathImpl>(std::filesystem::current_path());
 }
 
-Result SqRootImpl::get_int(const PrimitiveInt* value)
+Result SqRootImpl::get_int(PrimitiveInt value)
 {
-    if (value != nullptr)
-    {
-        return std::make_unique<SqIntImpl>(*value);
-    }
-    return std::make_unique<SqIntImpl>(0);
+    return std::make_unique<SqIntImpl>(value);
 }
 
 Result SqRootImpl::get_ints(
-    const PrimitiveInt* start,
+    PrimitiveInt start,
     const PrimitiveInt* stop
 )
 {
-    auto start_v = (start != nullptr)? *start : 0;
     auto int_to_sq_int = [](const auto i){ return std::make_unique<SqIntImpl>(i); };
     if (stop != nullptr)
     {
         return FieldRange<ranges::category::bidirectional | ranges::category::sized>{
-            ranges::views::iota(start_v, *stop) |
+            ranges::views::iota(start, *stop) |
             ranges::views::transform(int_to_sq_int)
         };
     }
     return FieldRange<ranges::category::bidirectional>{
-        ranges::views::iota(start_v, ranges::unreachable) |
+        ranges::views::iota(start, ranges::unreachable) |
         ranges::views::transform(int_to_sq_int)
     };
 }
 
-Result SqRootImpl::get_bool(const PrimitiveBool* value)
+Result SqRootImpl::get_bool(PrimitiveBool value)
 {
-    if (value != nullptr)
-    {
-        return std::make_unique<SqBoolImpl>(*value);
-    }
-    return std::make_unique<SqBoolImpl>(false);
+    return std::make_unique<SqBoolImpl>(value);
 }
 
 Primitive SqRootImpl::to_primitive() const

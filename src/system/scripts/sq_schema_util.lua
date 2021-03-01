@@ -9,7 +9,7 @@ local sq_schema_util = { }
 local function load_schema(path)
     local lunajson = require("lunajson")
     local f = assert(io.open(path, "rb"))
-    local schema = lunajson.decode(f:read("*all"))
+    local schema = lunajson.decode(f:read("*all"), 0, nil)
     f:close()
     return schema
 end
