@@ -52,6 +52,7 @@ private:
     [[nodiscard]] bool parse_list_filter(Ast& parent);
     [[nodiscard]] bool parse_slice_or_element_access(Ast& parent);
     [[nodiscard]] bool parse_condition(Ast& parent);
+    [[nodiscard]] std::optional<ComparisonOperator> parse_comparison_operator();
 
     template <std::integral Int>
     [[nodiscard]] std::optional<Int> parse_integer();
