@@ -6,7 +6,7 @@ executors:
       - image: jonathanhaigh/builder:20210224
 
 jobs:
-  sq-debug-build-using-clang-and-make:
+  sq-release-build-using-clang-and-make:
     executor: ubuntu-docker-executor
     parameters:
       compiler:
@@ -15,7 +15,7 @@ jobs:
         enum: ["clang++", "g++"]
       build-type:
         type: enum
-        default: "Debug"
+        default: "Release"
         enum: ["Debug", "Release"]
     steps:
       - checkout
@@ -28,6 +28,6 @@ jobs:
             make -j8
             make test
 workflows:
-  SQ Debug build using clang++ and make:
+  SQ Release build using clang++ and make:
     jobs:
-      - sq-debug-build-using-clang-and-make
+      - sq-release-build-using-clang-and-make
