@@ -431,8 +431,34 @@ struct FilterImpl<parser::ComparisonSpec>
     {
         switch (spec.op_)
         {
+            case parser::ComparisonOperator::GreaterThanOrEqualTo:
+                return [value=spec.value_](const FieldPtr& field) {
+                    // https://bugs.llvm.org/show_bug.cgi?id=46235
+                    // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+                    return field->to_primitive() >= value;
+                };
+            case parser::ComparisonOperator::GreaterThan:
+                return [value=spec.value_](const FieldPtr& field) {
+                    // https://bugs.llvm.org/show_bug.cgi?id=46235
+                    // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+                    return field->to_primitive() > value;
+                };
+            case parser::ComparisonOperator::LessThanOrEqualTo:
+                return [value=spec.value_](const FieldPtr& field) {
+                    // https://bugs.llvm.org/show_bug.cgi?id=46235
+                    // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+                    return field->to_primitive() <= value;
+                };
+            case parser::ComparisonOperator::LessThan:
+                return [value=spec.value_](const FieldPtr& field) {
+                    // https://bugs.llvm.org/show_bug.cgi?id=46235
+                    // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+                    return field->to_primitive() < value;
+                };
             case parser::ComparisonOperator::Equals:
                 return [value=spec.value_](const FieldPtr& field) {
+                    // https://bugs.llvm.org/show_bug.cgi?id=46235
+                    // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
                     return field->to_primitive() == value;
                 };
         }

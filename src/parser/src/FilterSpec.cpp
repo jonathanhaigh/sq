@@ -19,6 +19,10 @@ const char* comparison_operator_to_str(ComparisonOperator op)
 {
     switch (op)
     {
+        case ComparisonOperator::GreaterThanOrEqualTo: return ">=";
+        case ComparisonOperator::GreaterThan: return ">";
+        case ComparisonOperator::LessThanOrEqualTo: return "<=";
+        case ComparisonOperator::LessThan: return "<";
         case ComparisonOperator::Equals: return "=";
     }
     ASSERT(false);

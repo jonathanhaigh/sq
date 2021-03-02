@@ -13,6 +13,7 @@
 #include "test/FieldCallParams_test_util.h"
 #include "test/results_test_util.h"
 #include "util/strutil.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <gtest/gtest.h>
@@ -26,6 +27,15 @@ namespace sq::test {
 namespace {
 
 using namespace sq::results;
+
+inline constexpr auto all_comparison_ops = {
+    parser::ComparisonOperator::GreaterThanOrEqualTo,
+    parser::ComparisonOperator::GreaterThan,
+    parser::ComparisonOperator::LessThanOrEqualTo,
+    parser::ComparisonOperator::LessThan,
+    parser::ComparisonOperator::Equals
+};
+
 
 parser::Ast generate_ast(std::string_view query)
 {
@@ -109,12 +119,12 @@ void test_minimal_system_calls_with_element_access(
 
 TEST(ResultTreeTest, TestMinimalSystemCallsWithElementAccess)
 {
-    test_minimal_system_calls_with_element_access<input>(10, 20);
+    test_minimal_system_calls_with_element_access<input>(3, 5);
 
     // Only sized input ranges or forward ranges can handle negative indeces
     // efficiently
-    test_minimal_system_calls_with_element_access<input | sized>(-10, 20);
-    test_minimal_system_calls_with_element_access<forward>(-10, 20);
+    test_minimal_system_calls_with_element_access<input | sized>(-3, 5);
+    test_minimal_system_calls_with_element_access<forward>(-3, 5);
 }
 
 template <ranges::category Cat>
@@ -175,25 +185,26 @@ void test_minimal_system_calls_with_slice(
 
 TEST(ResultTreeTest, TestMinimalSystemCallsWithSlice)
 {
-    test_minimal_system_calls_with_slice<input>(5, 15, 2, 20);
+    test_minimal_system_calls_with_slice<input>(2, 5, 2, 6);
 
     // Non-sized input ranges can't handle negative indeces efficiently
-    test_minimal_system_calls_with_slice<input | sized>(5, -5, 2, 20);
-    test_minimal_system_calls_with_slice<input | sized>(-15, 15, 2, 20);
-    test_minimal_system_calls_with_slice<input | sized>(-15, -5, 2, 20);
-    test_minimal_system_calls_with_slice<forward>(5, -5, 2, 20);
-    test_minimal_system_calls_with_slice<forward>(-15, 15, 2, 20);
-    test_minimal_system_calls_with_slice<forward>(-15, -5, 2, 20);
+    test_minimal_system_calls_with_slice<input | sized>(2, -1, 2, 6);
+    test_minimal_system_calls_with_slice<input | sized>(-4, 5, 2, 6);
+    test_minimal_system_calls_with_slice<input | sized>(-4, -1, 2, 6);
+    test_minimal_system_calls_with_slice<forward>(2, -1, 2, 6);
+    test_minimal_system_calls_with_slice<forward>(-4, 5, 2, 6);
+    test_minimal_system_calls_with_slice<forward>(-4, -1, 2, 6);
 
     // Only bidirectional ranges can handle negative steps efficiently
-    test_minimal_system_calls_with_slice<bidirectional>(15, 5, -2, 20);
-    test_minimal_system_calls_with_slice<bidirectional>(15, -15, -2, 20);
-    test_minimal_system_calls_with_slice<bidirectional>(-5, 5, -2, 20);
-    test_minimal_system_calls_with_slice<bidirectional>(-5, -15, -2, 20);
+    test_minimal_system_calls_with_slice<bidirectional>(5, 2, -2, 6);
+    test_minimal_system_calls_with_slice<bidirectional>(5, -4, -2, 6);
+    test_minimal_system_calls_with_slice<bidirectional>(-1, 2, -2, 6);
+    test_minimal_system_calls_with_slice<bidirectional>(-1, -4, -2, 6);
 }
 
 template <ranges::category Cat>
 void test_minimal_system_calls_with_comparison_filter(
+    parser::ComparisonOperator op,
     gsl::index index,
     gsl::index size
 )
@@ -201,12 +212,13 @@ void test_minimal_system_calls_with_comparison_filter(
     SCOPED_TRACE(testing::Message()
         << "test_minimal_system_calls_with_comparison_filter<"
         << Cat << ">("
+        << op << ", "
         << index << ", "
         << size << ")"
     );
 
     auto ss = std::stringstream{};
-    ss << "a[=" << index << "]";
+    ss << "a[" << op << index << "]";
     const auto ast = generate_ast(ss.str());
 
     auto mfg = testing::StrictMock<MockFieldGenerator>{};
@@ -230,16 +242,20 @@ void test_minimal_system_calls_with_comparison_filter(
 
 TEST(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter)
 {
-    for (const auto i :  { 0, 5, 10 })
+    static constexpr auto size = gsl::index{5};
+    for (const auto op : all_comparison_ops)
     {
-        test_minimal_system_calls_with_comparison_filter<input>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<forward>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<bidirectional>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<random_access>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<input | sized>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<forward | sized>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<bidirectional | sized>(i, 10);
-        test_minimal_system_calls_with_comparison_filter<random_access | sized>(i, 10);
+        for (const auto i :  { 0, 3, 5 })
+        {
+            test_minimal_system_calls_with_comparison_filter<input>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<forward>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<bidirectional>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<random_access>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<input | sized>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<forward | sized>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<bidirectional | sized>(op, i, size);
+            test_minimal_system_calls_with_comparison_filter<random_access | sized>(op, i, size);
+        }
     }
 }
 
@@ -368,7 +384,7 @@ void test_element_access(
 
 TEST(ResultTreeTest, TestElementAccess)
 {
-    static constexpr auto size = gsl::index{10};
+    static constexpr auto size = gsl::index{4};
 
     for (const auto cat : all_categories)
     {
@@ -494,6 +510,7 @@ TEST(ResultTreeTest, TestSlice)
 }
 
 void test_comparison_filter(
+    parser::ComparisonOperator op,
     ranges::category cat,
     gsl::index index,
     gsl::index size
@@ -501,12 +518,13 @@ void test_comparison_filter(
 {
     SCOPED_TRACE(testing::Message()
         << "test_comparison_filter("
+        << "op=" << op << ", "
         << "cat=" << cat << ", "
         << "index=" << index << ", "
         << "size=" << size << ")"
     );
     auto ss = std::stringstream{};
-    ss << "a[=" << index << "]";
+    ss << "a[" << op << index << "]";
     const auto ast = generate_ast(ss.str());
 
     auto arange = to_field_range(cat,
@@ -525,24 +543,53 @@ void test_comparison_filter(
     EXPECT_EQ(res_root[0].first, "a");
     ASSERT_TRUE(std::holds_alternative<ArrayData>(res_root[0].second.data()));
     const auto& res_a_arr = std::get<ArrayData>(res_root[0].second.data());
-    ASSERT_EQ(ranges::size(res_a_arr), 1);
-    const auto& res_a_arr0 = res_a_arr[0].data();
-    ASSERT_TRUE(std::holds_alternative<Primitive>(res_a_arr0));
-    const auto& prim = std::get<Primitive>(res_a_arr0);
-    ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));
-    const auto& primint = std::get<PrimitiveInt>(prim);
-    EXPECT_EQ(primint, index);
+
+    // Get the half-open range of indeces for which we expect the comparison to
+    // be true
+    const auto [ begin_matching, end_matching ] = [&]() -> std::pair<gsl::index, gsl::index> {
+        switch (op)
+        {
+            case parser::ComparisonOperator::GreaterThanOrEqualTo:
+                return std::pair{index, size};
+            case parser::ComparisonOperator::GreaterThan:
+                return std::pair{index + 1, size};
+            case parser::ComparisonOperator::LessThanOrEqualTo:
+                return std::pair{0, index + 1};
+            case parser::ComparisonOperator::LessThan:
+                return std::pair{0, index};
+            case parser::ComparisonOperator::Equals:
+                return std::pair{index, index + 1};
+        }
+        ASSERT(false);
+        return std::pair{0, 0};
+    }();
+
+    const auto noof_matches = end_matching - begin_matching;
+    ASSERT_EQ(ranges::size(res_a_arr), noof_matches);
+
+    for (auto i = 0; i < noof_matches; ++i)
+    {
+        const auto& res_a_element = res_a_arr.at(util::to_size(i)).data();
+        ASSERT_TRUE(std::holds_alternative<Primitive>(res_a_element));
+        const auto& prim = std::get<Primitive>(res_a_element);
+        ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));
+        const auto& primint = std::get<PrimitiveInt>(prim);
+        EXPECT_EQ(primint, begin_matching + i);
+    }
 }
 
 TEST(ResultTreeTest, TestComparisonFilter)
 {
-    static constexpr auto size = gsl::index{10};
+    static constexpr auto size = gsl::index{4};
 
     for (const auto cat : all_categories)
     {
-        for (const auto index : ranges::views::iota(0, size))
+        for (const auto op : all_comparison_ops)
         {
-            test_comparison_filter(cat, index, size);
+            for (const auto index : ranges::views::iota(0, size))
+            {
+                test_comparison_filter(op, cat, index, size);
+            }
         }
     }
 }
