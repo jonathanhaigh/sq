@@ -308,10 +308,12 @@ bool Parser::parse_slice_or_element_access(Ast& parent)
     return true;
 }
 
-// condition: Equals primitive_value
+// condition: comparison_operator primitive_value
 bool Parser::parse_condition(Ast& parent)
 {
-    if (!accept_token(Token::Kind::Equals))
+    const auto opt_op = parse_comparison_operator();
+
+    if (!opt_op)
     {
         return false;
     }
@@ -322,10 +324,42 @@ bool Parser::parse_condition(Ast& parent)
         throw ParseError(tokens_.read(), expecting_);
     }
     parent.data().filter_spec() = ComparisonSpec{
-        ComparisonOperator::Equals,
+        opt_op.value(),
         std::move(prim.value())
     };
     return true;
+}
+
+// comparison_operator: (
+//      GreaterThanOrEqualTo |
+//      GreaterThan |
+//      LessThanOrEqualTo |
+//      LessThan |
+//      Equals
+// )
+std::optional<ComparisonOperator> Parser::parse_comparison_operator()
+{
+    if (accept_token(Token::Kind::GreaterThanOrEqualTo))
+    {
+        return ComparisonOperator::GreaterThanOrEqualTo;
+    }
+    if (accept_token(Token::Kind::GreaterThan))
+    {
+        return ComparisonOperator::GreaterThan;
+    }
+    if (accept_token(Token::Kind::LessThanOrEqualTo))
+    {
+        return ComparisonOperator::LessThanOrEqualTo;
+    }
+    if (accept_token(Token::Kind::LessThan))
+    {
+        return ComparisonOperator::LessThan;
+    }
+    if (accept_token(Token::Kind::Equals))
+    {
+        return ComparisonOperator::Equals;
+    }
+    return std::nullopt;
 }
 
 void Parser::shift_token()

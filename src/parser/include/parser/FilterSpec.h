@@ -50,6 +50,10 @@ std::ostream& operator<<(std::ostream& os, SliceSpec lss);
 
 enum class ComparisonOperator
 {
+    GreaterThanOrEqualTo,
+    GreaterThan,
+    LessThanOrEqualTo,
+    LessThan,
     Equals
 };
 
