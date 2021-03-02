@@ -26,10 +26,14 @@ constexpr std::string_view token_kind_to_str(Token::Kind kind)
         case Token::Kind::Eof: return "Eof";
         case Token::Kind::Equals: return "Equals";
         case Token::Kind::Float: return "Float";
+        case Token::Kind::GreaterThan: return "GreaterThan";
+        case Token::Kind::GreaterThanOrEqualTo: return "GreaterThanOrEqualTo";
         case Token::Kind::Identifier: return "Identifier";
         case Token::Kind::Integer: return "Integer";
         case Token::Kind::LBrace: return "LBrace";
         case Token::Kind::LBracket: return "LBracket";
+        case Token::Kind::LessThan: return "LessThan";
+        case Token::Kind::LessThanOrEqualTo: return "LessThanOrEqualTo";
         case Token::Kind::LParen: return "LParen";
         case Token::Kind::RBrace: return "RBrace";
         case Token::Kind::RBracket: return "RBracket";

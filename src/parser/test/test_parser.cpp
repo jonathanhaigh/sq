@@ -268,6 +268,146 @@ INSTANTIATE_TEST_SUITE_P(
             ComparisonSpec{ComparisonOperator::Equals, to_primitive(99.2)}
         },
         SimpleTestCase{
+            "a[>=true]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, true}
+        },
+        SimpleTestCase{
+            "a[>=false]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, false}
+        },
+        SimpleTestCase{
+            "a[>=\"str\"]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, to_primitive("str")}
+        },
+        SimpleTestCase{
+            "a[>=-10]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, to_primitive(-10)}
+        },
+        SimpleTestCase{
+            "a[>=99]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, to_primitive(99)}
+        },
+        SimpleTestCase{
+            "a[>=-10.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, to_primitive(-10.2)}
+        },
+        SimpleTestCase{
+            "a[>=99.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThanOrEqualTo, to_primitive(99.2)}
+        },
+        SimpleTestCase{
+            "a[>true]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, true}
+        },
+        SimpleTestCase{
+            "a[>false]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, false}
+        },
+        SimpleTestCase{
+            "a[>\"str\"]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, to_primitive("str")}
+        },
+        SimpleTestCase{
+            "a[>-10]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, to_primitive(-10)}
+        },
+        SimpleTestCase{
+            "a[>99]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, to_primitive(99)}
+        },
+        SimpleTestCase{
+            "a[>-10.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, to_primitive(-10.2)}
+        },
+        SimpleTestCase{
+            "a[>99.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::GreaterThan, to_primitive(99.2)}
+        },
+        SimpleTestCase{
+            "a[<=true]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, true}
+        },
+        SimpleTestCase{
+            "a[<=false]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, false}
+        },
+        SimpleTestCase{
+            "a[<=\"str\"]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, to_primitive("str")}
+        },
+        SimpleTestCase{
+            "a[<=-10]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, to_primitive(-10)}
+        },
+        SimpleTestCase{
+            "a[<=99]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, to_primitive(99)}
+        },
+        SimpleTestCase{
+            "a[<=-10.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, to_primitive(-10.2)}
+        },
+        SimpleTestCase{
+            "a[<=99.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThanOrEqualTo, to_primitive(99.2)}
+        },
+        SimpleTestCase{
+            "a[<true]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, true}
+        },
+        SimpleTestCase{
+            "a[<false]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, false}
+        },
+        SimpleTestCase{
+            "a[<\"str\"]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, to_primitive("str")}
+        },
+        SimpleTestCase{
+            "a[<-10]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, to_primitive(-10)}
+        },
+        SimpleTestCase{
+            "a[<99]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, to_primitive(99)}
+        },
+        SimpleTestCase{
+            "a[<-10.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, to_primitive(-10.2)}
+        },
+        SimpleTestCase{
+            "a[<99.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::LessThan, to_primitive(99.2)}
+        },
+        SimpleTestCase{
             "a(1)",
             params(1),
             no_filter_spec
