@@ -21,7 +21,7 @@ namespace {
 {
     auto ss = std::stringstream{};
     ss << "lex error: Failed to identify token at position " << pos
-       << "\n" << query
+       << "\n" << query << "\n"
        << std::string(util::to_size(pos), ' ') << "^\n";
 
     return ss.str();

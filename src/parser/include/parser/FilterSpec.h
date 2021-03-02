@@ -6,6 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 #define SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 
+#include "common_types/Primitive.h"
+
 #include <gsl/gsl>
 #include <iosfwd>
 #include <optional>
@@ -46,10 +48,30 @@ std::ostream& operator<<(std::ostream& os, SliceSpec lss);
 [[nodiscard]] bool operator==(const SliceSpec& lhs, const SliceSpec& rhs);
 [[nodiscard]] bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs);
 
+enum class ComparisonOperator
+{
+    Equals
+};
+
+/**
+ * Represents a comparison to determine whether to keep a field or not.
+ */
+struct ComparisonSpec
+{
+    ComparisonOperator op_;
+    Primitive value_;
+};
+
+std::ostream& operator<<(std::ostream& os, const ComparisonOperator& op);
+std::ostream& operator<<(std::ostream& os, const ComparisonSpec& cs);
+[[nodiscard]] bool operator==(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
+[[nodiscard]] bool operator!=(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
+
 using FilterSpec = std::variant<
     NoFilterSpec,
     ElementAccessSpec,
-    SliceSpec
+    SliceSpec,
+    ComparisonSpec
 >;
 
 } // namespace sq::parser

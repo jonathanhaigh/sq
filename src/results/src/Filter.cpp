@@ -8,12 +8,16 @@
 #include "common_types/InternalError.h"
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
+#include "util/ASSERT.h"
 #include "util/typeutil.h"
 
+#include <functional>
 #include <gsl/gsl>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_access.hpp>
+#include <range/v3/view/cache1.hpp>
 #include <range/v3/view/drop.hpp>
+#include <range/v3/view/filter.hpp>
 #include <range/v3/view/move.hpp>
 #include <range/v3/view/reverse.hpp>
 #include <range/v3/view/stride.hpp>
@@ -105,6 +109,12 @@ template <ranges::cpp20::view R>
     {
         return std::forward<R>(rng) | ranges::views::reverse;
     }
+}
+
+template <ranges::cpp20::view R>
+[[nodiscard]] ResultView to_result_view(R&& rng)
+{
+    return FieldRange<ranges::get_categories<R>()>(std::forward<R>(rng));
 }
 
 template <util::Alternative<parser::FilterSpec> Spec>
@@ -299,13 +309,6 @@ struct FilterImpl<parser::SliceSpec>
 private:
 
     template <ranges::cpp20::view R>
-    [[nodiscard]] static ResultView to_result_view(R&& rng)
-    {
-        return FieldRange<ranges::get_categories<R>()>(std::forward<R>(rng));
-    }
-
-
-    template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         Expects(step > 0);
@@ -416,6 +419,61 @@ private:
     std::optional<gsl::index> start_;
     std::optional<gsl::index> stop_;
     std::optional<gsl::index> step_;
+};
+
+template <>
+struct FilterImpl<parser::ComparisonSpec>
+    : Filter
+{
+    using CompareFn = std::function<bool(const FieldPtr&)>;
+
+    static CompareFn create_compare_fn(const parser::ComparisonSpec& spec)
+    {
+        switch (spec.op_)
+        {
+            case parser::ComparisonOperator::Equals:
+                return [value=spec.value_](const FieldPtr& field) {
+                    return field->to_primitive() == value;
+                };
+        }
+        ASSERT(false);
+        throw InternalError{"Invalid comparison operator"};
+    }
+
+    explicit FilterImpl([[maybe_unused]] const parser::ComparisonSpec& spec)
+        : compare_{create_compare_fn(spec)}
+    { }
+
+    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
+    {
+        return std::move(result);
+    }
+
+    [[nodiscard]] ResultView view(ResultView&& result) const override
+    {
+        return std::visit(*this, std::move(result));
+    }
+
+    [[nodiscard]] ResultView operator()([[maybe_unused]] FieldPtr&& field) const
+    {
+        throw NotAnArrayError("Cannot apply array filter to non-array field");
+    }
+
+    template <ranges::category Cat>
+    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
+    {
+        return to_result_view(
+            std::move(rng) |
+            // If rng is allocating and constructing a new Field on every
+            // dereference, make sure we only do that once by caching the
+            // FieldPtr.
+            ranges::views::cache1 |
+            ranges::views::filter(compare_)
+        );
+    }
+
+private:
+    CompareFn compare_;
 };
 
 struct FilterCreatorVisitor

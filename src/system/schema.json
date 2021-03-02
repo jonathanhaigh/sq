@@ -489,6 +489,22 @@
                             "default_value": false
                         }
                     ]
+                },
+                {
+                    "name": "float",
+                    "doc": "Get an SqFloat system object",
+                    "return_type": "SqFloat",
+                    "return_list": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "value",
+                            "doc": "the value of the float to get",
+                            "type": "PrimitiveFloat",
+                            "required": false,
+                            "default_value": 0.0
+                        }
+                    ]
                 }
             ]
         },

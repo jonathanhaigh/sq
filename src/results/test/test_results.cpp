@@ -192,6 +192,57 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithSlice)
     test_minimal_system_calls_with_slice<bidirectional>(-5, -15, -2, 20);
 }
 
+template <ranges::category Cat>
+void test_minimal_system_calls_with_comparison_filter(
+    gsl::index index,
+    gsl::index size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_minimal_system_calls_with_comparison_filter<"
+        << Cat << ">("
+        << index << ", "
+        << size << ")"
+    );
+
+    auto ss = std::stringstream{};
+    ss << "a[=" << index << "]";
+    const auto ast = generate_ast(ss.str());
+
+    auto mfg = testing::StrictMock<MockFieldGenerator>{};
+
+    for (int i = 0; i < size; ++i)
+    {
+        EXPECT_CALL(mfg, get(i))
+            .WillOnce(Return(ByMove(std::make_unique<FakeField>(i))));
+    }
+
+    auto arange = FieldRange<Cat>{
+        ranges::views::iota(gsl::index{0}, size) |
+        ranges::views::transform(
+            [&](auto i) { return mfg.get(i); }
+        )
+    };
+    const auto fcp = FieldCallParams{};
+    auto root = field_with_accesses("a", fcp, std::move(arange));
+    const auto results = ResultTree(ast, std::move(root));
+}
+
+TEST(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter)
+{
+    for (const auto i :  { 0, 5, 10 })
+    {
+        test_minimal_system_calls_with_comparison_filter<input>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<forward>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<bidirectional>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<random_access>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<input | sized>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<forward | sized>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<bidirectional | sized>(i, 10);
+        test_minimal_system_calls_with_comparison_filter<random_access | sized>(i, 10);
+    }
+}
+
 // -----------------------------------------------------------------------------
 // Tree generation tests - to check result trees contain the right structure
 // and data.
@@ -439,6 +490,60 @@ TEST(ResultTreeTest, TestSlice)
             std::get<3>(arg_pack),
             5
         );
+    }
+}
+
+void test_comparison_filter(
+    ranges::category cat,
+    gsl::index index,
+    gsl::index size
+)
+{
+    SCOPED_TRACE(testing::Message()
+        << "test_comparison_filter("
+        << "cat=" << cat << ", "
+        << "index=" << index << ", "
+        << "size=" << size << ")"
+    );
+    auto ss = std::stringstream{};
+    ss << "a[=" << index << "]";
+    const auto ast = generate_ast(ss.str());
+
+    auto arange = to_field_range(cat,
+        ranges::views::iota(PrimitiveInt{0}, size) |
+        ranges::views::transform(
+            [](auto i) {
+                return std::make_unique<FakeField>(i);
+            }
+        )
+    );
+    auto root = std::make_unique<FakeField>(std::move(arange));
+    const auto results = ResultTree(ast, std::move(root));
+    ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
+    const auto& res_root = std::get<ObjData>(results.data());
+    EXPECT_EQ(res_root.size(), 1);
+    EXPECT_EQ(res_root[0].first, "a");
+    ASSERT_TRUE(std::holds_alternative<ArrayData>(res_root[0].second.data()));
+    const auto& res_a_arr = std::get<ArrayData>(res_root[0].second.data());
+    ASSERT_EQ(ranges::size(res_a_arr), 1);
+    const auto& res_a_arr0 = res_a_arr[0].data();
+    ASSERT_TRUE(std::holds_alternative<Primitive>(res_a_arr0));
+    const auto& prim = std::get<Primitive>(res_a_arr0);
+    ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));
+    const auto& primint = std::get<PrimitiveInt>(prim);
+    EXPECT_EQ(primint, index);
+}
+
+TEST(ResultTreeTest, TestComparisonFilter)
+{
+    static constexpr auto size = gsl::index{10};
+
+    for (const auto cat : all_categories)
+    {
+        for (const auto index : ranges::views::iota(0, size))
+        {
+            test_comparison_filter(cat, index, size);
+        }
     }
 }
 

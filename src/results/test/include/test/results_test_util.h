@@ -10,8 +10,9 @@
 
 namespace sq::test {
 
-using testing::Return;
-using testing::ByMove;
+using ::testing::Return;
+using ::testing::ByMove;
+using ::testing::_;
 
 using sq::results::ResultTree;
 using Data = ResultTree::Data;

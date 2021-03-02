@@ -6,6 +6,7 @@
 #include "system/standard/SqRootImpl.h"
 
 #include "system/standard/SqBoolImpl.h"
+#include "system/standard/SqFloatImpl.h"
 #include "system/standard/SqIntImpl.h"
 #include "system/standard/SqPathImpl.h"
 #include "system/standard/SqSchemaImpl.h"
@@ -58,6 +59,11 @@ Result SqRootImpl::get_ints(
 Result SqRootImpl::get_bool(PrimitiveBool value)
 {
     return std::make_unique<SqBoolImpl>(value);
+}
+
+Result SqRootImpl::get_float(PrimitiveFloat value)
+{
+    return std::make_unique<SqFloatImpl>(value);
 }
 
 Primitive SqRootImpl::to_primitive() const
