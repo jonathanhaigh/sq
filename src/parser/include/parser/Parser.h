@@ -47,8 +47,11 @@ private:
     [[nodiscard]] std::optional<Primitive> parse_primitive_value();
     [[nodiscard]] std::optional<PrimitiveString> parse_dqstring();
     [[nodiscard]] std::optional<PrimitiveBool> parse_bool();
+    [[nodiscard]] std::optional<PrimitiveFloat> parse_float();
     [[nodiscard]] bool parse_named_parameter(Ast& parent);
     [[nodiscard]] bool parse_list_filter(Ast& parent);
+    [[nodiscard]] bool parse_slice_or_element_access(Ast& parent);
+    [[nodiscard]] bool parse_condition(Ast& parent);
 
     template <std::integral Int>
     [[nodiscard]] std::optional<Int> parse_integer();

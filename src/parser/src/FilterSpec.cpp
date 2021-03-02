@@ -5,11 +5,28 @@
 
 #include "parser/FilterSpec.h"
 
+#include "common_types/Primitive.h"
+#include "util/ASSERT.h"
 #include "util/strutil.h"
 
 #include <iostream>
 
 namespace sq::parser {
+
+namespace {
+
+const char* comparison_operator_to_str(ComparisonOperator op)
+{
+    switch (op)
+    {
+        case ComparisonOperator::Equals: return "=";
+    }
+    ASSERT(false);
+    return "Unknown ComparisonOperator";
+}
+
+} // namespace
+
 
 std::ostream& operator<<(std::ostream& os, [[maybe_unused]] NoFilterSpec nlfs)
 {
@@ -61,6 +78,30 @@ bool operator==(const SliceSpec& lhs, const SliceSpec& rhs)
 }
 
 bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs)
+{
+    return !(lhs == rhs);
+}
+
+std::ostream& operator<<(std::ostream& os, const ComparisonOperator& op)
+{
+    os << comparison_operator_to_str(op);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ComparisonSpec& cs)
+{
+    os << cs.op_
+       << primitive_to_str(cs.value_);
+    return os;
+}
+
+bool operator==(const ComparisonSpec& lhs, const ComparisonSpec& rhs)
+{
+    return lhs.op_ == rhs.op_ &&
+           lhs.value_ == rhs.value_;
+}
+
+bool operator!=(const ComparisonSpec& lhs, const ComparisonSpec& rhs)
 {
     return !(lhs == rhs);
 }
