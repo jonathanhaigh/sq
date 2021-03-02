@@ -24,10 +24,18 @@ const auto& token_regex_map()
         std::pair{Token::Kind::RBrace, std::regex{"[}]"}},
         std::pair{Token::Kind::LBracket, std::regex{"\\["}},
         std::pair{Token::Kind::RBracket, std::regex{"\\]"}},
-        std::pair{Token::Kind::Equals, std::regex{"="}},
         std::pair{Token::Kind::Comma, std::regex{","}},
         std::pair{Token::Kind::Colon, std::regex{":"}},
         std::pair{Token::Kind::DQString, std::regex{R"%("(?:[^"]|\\")*")%"}},
+
+        // Order matters here:
+        // * Prefer to match "<=" than "<" then "=".
+        // * Prefer to match ">=" than ">" then "=".
+        std::pair{Token::Kind::LessThanOrEqualTo, std::regex{"<="}},
+        std::pair{Token::Kind::LessThan, std::regex{"<"}},
+        std::pair{Token::Kind::GreaterThanOrEqualTo, std::regex{">="}},
+        std::pair{Token::Kind::GreaterThan, std::regex{">"}},
+        std::pair{Token::Kind::Equals, std::regex{"="}},
 
         // Order matters here:
         // * Prefer to match "true" and "false" before identifiers but only if
