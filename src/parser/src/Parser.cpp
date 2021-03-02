@@ -7,6 +7,8 @@
 
 #include "common_types/ParseError.h"
 
+#include <cerrno>
+#include <cstdlib>
 #include <gsl/gsl>
 #include <memory>
 #include <sstream>
@@ -155,6 +157,10 @@ bool Parser::parse_parameter(Ast& parent)
 // primitive_value: (Integer | DQString | bool)
 std::optional<Primitive> Parser::parse_primitive_value()
 {
+    if (const auto opt_float = parse_float())
+    {
+        return Primitive{opt_float.value()};
+    }
     if (const auto opt_int = parse_integer<PrimitiveInt>())
     {
         return Primitive{opt_int.value()};
@@ -198,6 +204,42 @@ std::optional<PrimitiveBool> Parser::parse_bool()
     return std::nullopt;
 }
 
+// Float
+std::optional<PrimitiveFloat> Parser::parse_float()
+{
+    // NOTE: ideally we'd turn parse_integer() into a generic parse_number()
+    // function that uses std::from_chars for both integers and floats, but gcc
+    // doesn't seem to have implemented std::from_chars for floating point
+    // types yet.
+
+    const auto opt_token = accept_token(Token::Kind::Float);
+    if (!opt_token)
+    {
+        return std::nullopt;
+    }
+
+    // strtod requires a NUL terminated string so make a std::string copy to
+    // make sure we can get that.
+    const std::string float_str{opt_token.value().view()};
+    const gsl::czstring<> float_cstr{float_str.c_str()};
+    gsl::zstring<> str_end{nullptr};
+    errno = 0;
+    auto ret = std::strtod(float_cstr, &str_end);
+    if (errno == ERANGE)
+    {
+        auto ss = std::ostringstream{};
+        ss << "float " << float_str << " does not fit in required type; "
+           << "must be in the closed interval ["
+           << std::numeric_limits<PrimitiveFloat>::min() << ", "
+           << std::numeric_limits<PrimitiveFloat>::max() << "]";
+        throw OutOfRangeError(opt_token.value(), ss.str());
+    }
+    // We shouldn't get errors other than range errors because the tokenizer
+    // has already told us that the token matches the pattern for a float.
+    ASSERT(str_end == float_cstr + float_str.size());
+    return ret;
+}
+
 // named_parameter: Identifier Equals primitive_value
 bool Parser::parse_named_parameter(Ast& parent)
 {
@@ -219,37 +261,70 @@ bool Parser::parse_named_parameter(Ast& parent)
     return true;
 }
 
-// list_filter: (
-//                  LBracket Integer RBracket |
-//                  LBracket Integer? Colon Integer? (Colon Integer?)? RBracket
-//              )
+// list_filter: LBracket (slice_or_element_access | condition) RBracket
 bool Parser::parse_list_filter(Ast& parent)
 {
     if (!accept_token(Token::Kind::LBracket))
     {
         return false;
     }
-    const auto opt_start = parse_integer<gsl::index>();
-    const auto opt_colon = accept_token(Token::Kind::Colon);
-    if (opt_start && !opt_colon)
-    {
-        parent.data().filter_spec() = ElementAccessSpec{opt_start.value()};
-    }
-    else if (opt_colon)
-    {
-        const auto opt_stop = parse_integer<gsl::index>();
-        const auto opt_colon2 = accept_token(Token::Kind::Colon);
-        const auto opt_step = opt_colon2?
-            parse_integer<gsl::index>() :
-            std::nullopt;
-
-        parent.data().filter_spec() = SliceSpec{opt_start, opt_stop, opt_step};
-    }
-    else
+    if (!parse_slice_or_element_access(parent) &&
+        !parse_condition(parent))
     {
         throw ParseError(tokens_.read(), expecting_);
     }
     (void)expect_token(Token::Kind::RBracket);
+    return true;
+}
+
+// slice_or_element_access: (
+//      Integer |
+//      Integer? Colon Integer? (Colon Integer?)?
+// )
+bool Parser::parse_slice_or_element_access(Ast& parent)
+{
+    // NOTE: parse both slices and element accesses in the same function to
+    // avoid backtracking: they cannot be distinguished based on their first
+    // tokens - they can both start with an Integer.
+    //
+    const auto opt_start = parse_integer<gsl::index>();
+    const auto opt_colon = accept_token(Token::Kind::Colon);
+    if (!opt_start && !opt_colon)
+    {
+        return false;
+    }
+    if (!opt_colon)
+    {
+        parent.data().filter_spec() = ElementAccessSpec{opt_start.value()};
+        return true;
+    }
+    const auto opt_stop = parse_integer<gsl::index>();
+    const auto opt_colon2 = accept_token(Token::Kind::Colon);
+    const auto opt_step = opt_colon2?
+        parse_integer<gsl::index>() :
+        std::nullopt;
+
+    parent.data().filter_spec() = SliceSpec{opt_start, opt_stop, opt_step};
+    return true;
+}
+
+// condition: Equals primitive_value
+bool Parser::parse_condition(Ast& parent)
+{
+    if (!accept_token(Token::Kind::Equals))
+    {
+        return false;
+    }
+
+    auto prim = parse_primitive_value();
+    if (!prim)
+    {
+        throw ParseError(tokens_.read(), expecting_);
+    }
+    parent.data().filter_spec() = ComparisonSpec{
+        ComparisonOperator::Equals,
+        std::move(prim.value())
+    };
     return true;
 }
 
@@ -274,14 +349,12 @@ std::optional<Token> Parser::accept_token(Token::Kind kind)
 
 Token Parser::expect_token(Token::Kind kind)
 {
-    Expects(ranges::begin(tokens_) != ranges::end(tokens_));
-    if (tokens_.read().kind() != kind)
+    auto opt_token = accept_token(kind);
+    if (!opt_token)
     {
-        throw ParseError(tokens_.read(), Token::KindSet{kind});
+        throw ParseError(tokens_.read(), expecting_);
     }
-    auto ret = tokens_.read();
-    shift_token();
-    return ret;
+    return opt_token.value();
 }
 
 } // namespace sq::parser

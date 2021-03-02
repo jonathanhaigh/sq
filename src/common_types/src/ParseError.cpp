@@ -22,7 +22,7 @@ namespace {
     auto ss = std::ostringstream{};
     ss << "parse error: unexpected " << token
        << "; Expecting one of: " << util::join(expecting)
-       << token.query()
+       << "\n" << token.query()
        << "\n" << std::string(util::to_size(token.pos()), ' ') << "^\n";
     return ss.str();
 }

@@ -31,22 +31,23 @@ public:
      */
     enum class Kind
     {
-        BoolTrue,
         BoolFalse,
-        LParen,
-        RParen,
-        LBrace,
-        RBrace,
-        LBracket,
-        RBracket,
-        Dot,
-        Equals,
-        Comma,
+        BoolTrue,
         Colon,
-        Identifier,
+        Comma,
+        Dot,
         DQString,
+        Eof,
+        Equals,
+        Float,
+        Identifier,
         Integer,
-        Eof
+        LBrace,
+        LBracket,
+        LParen,
+        RBrace,
+        RBracket,
+        RParen
     };
 
     /**

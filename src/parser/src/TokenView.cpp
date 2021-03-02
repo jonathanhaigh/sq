@@ -18,21 +18,32 @@ namespace {
 const auto& token_regex_map()
 {
     static const auto map = std::array{
-        std::pair{Token::Kind::BoolTrue, std::regex{"true"}},
-        std::pair{Token::Kind::BoolFalse, std::regex{"false"}},
-        std::pair{Token::Kind::LParen, std::regex{"\\("}},
-        std::pair{Token::Kind::RParen, std::regex{"\\)"}},
-        std::pair{Token::Kind::LBrace, std::regex{"\\{"}},
-        std::pair{Token::Kind::RBrace, std::regex{"\\}"}},
+        std::pair{Token::Kind::LParen, std::regex{"[(]"}},
+        std::pair{Token::Kind::RParen, std::regex{"[)]"}},
+        std::pair{Token::Kind::LBrace, std::regex{"[{]"}},
+        std::pair{Token::Kind::RBrace, std::regex{"[}]"}},
         std::pair{Token::Kind::LBracket, std::regex{"\\["}},
         std::pair{Token::Kind::RBracket, std::regex{"\\]"}},
-        std::pair{Token::Kind::Dot, std::regex{"\\."}},
         std::pair{Token::Kind::Equals, std::regex{"="}},
         std::pair{Token::Kind::Comma, std::regex{","}},
         std::pair{Token::Kind::Colon, std::regex{":"}},
+        std::pair{Token::Kind::DQString, std::regex{R"%("(?:[^"]|\\")*")%"}},
+
+        // Order matters here:
+        // * Prefer to match "true" and "false" before identifiers but only if
+        //   it doesn't look like "true" or "false" is just the start of a
+        //   longer identifier (e.g. "true1", "false_id")
+        std::pair{Token::Kind::BoolTrue, std::regex{"true(?![A-Za-z_0-9])"}},
+        std::pair{Token::Kind::BoolFalse, std::regex{"false(?![A-Za-z_0-9])"}},
         std::pair{Token::Kind::Identifier, std::regex{"[A-Za-z_][A-Za-z_0-9]*"}},
-        std::pair{Token::Kind::DQString, std::regex{R"%("([^"]|\\")*")%"}},
-        std::pair{Token::Kind::Integer, std::regex{"-?[0-9]+"}}
+
+        // Note that order matters here:
+        // * Prefer to match an Integer to a Float, but only if there's no
+        //   "." after the integer.
+        // * Prefer to match a Float to a Dot.
+        std::pair{Token::Kind::Integer, std::regex{"-?[0-9]+(?![0-9.])"}},
+        std::pair{Token::Kind::Float, std::regex{"[+-]?(?=[.]?[0-9])[0-9]*(?:[.][0-9]*)?(?:[Ee][+-]?[0-9]+)?"}},
+        std::pair{Token::Kind::Dot, std::regex{"[.]"}}
     };
     return map;
 }
@@ -63,7 +74,6 @@ const Token& TokenView::read() const
 
     for (const auto& [token_kind, regex] : token_regex_map())
     {
-        
         if (auto match = std::match_results<std::string_view::const_iterator>{};
             std::regex_search(
                 remaining.begin(), remaining.end(),

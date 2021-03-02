@@ -17,22 +17,23 @@ constexpr std::string_view token_kind_to_str(Token::Kind kind)
 {
     switch (kind)
     {
-        case Token::Kind::BoolTrue: return "BoolTrue";
         case Token::Kind::BoolFalse: return "BoolFalse";
-        case Token::Kind::LParen: return "LParen";
-        case Token::Kind::RParen: return "RParen";
-        case Token::Kind::LBrace: return "LBrace";
-        case Token::Kind::RBrace: return "RBrace";
-        case Token::Kind::LBracket: return "LBracket";
-        case Token::Kind::RBracket: return "RBracket";
-        case Token::Kind::Dot: return "Dot";
-        case Token::Kind::Equals: return "Equals";
-        case Token::Kind::Comma: return "Comma";
+        case Token::Kind::BoolTrue: return "BoolTrue";
         case Token::Kind::Colon: return "Colon";
-        case Token::Kind::Identifier: return "Identifier";
+        case Token::Kind::Comma: return "Comma";
+        case Token::Kind::Dot: return "Dot";
         case Token::Kind::DQString: return "DQString";
-        case Token::Kind::Integer: return "Integer";
         case Token::Kind::Eof: return "Eof";
+        case Token::Kind::Equals: return "Equals";
+        case Token::Kind::Float: return "Float";
+        case Token::Kind::Identifier: return "Identifier";
+        case Token::Kind::Integer: return "Integer";
+        case Token::Kind::LBrace: return "LBrace";
+        case Token::Kind::LBracket: return "LBracket";
+        case Token::Kind::LParen: return "LParen";
+        case Token::Kind::RBrace: return "RBrace";
+        case Token::Kind::RBracket: return "RBracket";
+        case Token::Kind::RParen: return "RParen";
     }
     return "UnknownTokenKind";
 }

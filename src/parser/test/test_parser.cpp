@@ -12,6 +12,7 @@
 #include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <limits>
 #include <string_view>
 #include <utility>
 
@@ -21,7 +22,7 @@ namespace {
 using namespace sq::parser;
 using Size = Ast::Children::size_type;
 
-inline constexpr auto no_filter_spec = FilterSpec{NoFilterSpec{}};
+inline constexpr auto no_filter_spec = NoFilterSpec{};
 
 parser::Ast generate_ast(std::string_view query)
 {
@@ -232,6 +233,41 @@ INSTANTIATE_TEST_SUITE_P(
             SliceSpec{1, 1, 1}
         },
         SimpleTestCase{
+            "a[=true]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, true}
+        },
+        SimpleTestCase{
+            "a[=false]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, false}
+        },
+        SimpleTestCase{
+            "a[=\"str\"]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, to_primitive("str")}
+        },
+        SimpleTestCase{
+            "a[=-10]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, to_primitive(-10)}
+        },
+        SimpleTestCase{
+            "a[=99]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, to_primitive(99)}
+        },
+        SimpleTestCase{
+            "a[=-10.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, to_primitive(-10.2)}
+        },
+        SimpleTestCase{
+            "a[=99.2]",
+            FieldCallParams{},
+            ComparisonSpec{ComparisonOperator::Equals, to_primitive(99.2)}
+        },
+        SimpleTestCase{
             "a(1)",
             params(1),
             no_filter_spec
@@ -239,6 +275,66 @@ INSTANTIATE_TEST_SUITE_P(
         SimpleTestCase{
             "a(-1)",
             params(-1),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(9223372036854775807)",
+            params(std::numeric_limits<PrimitiveInt>::max()),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-9223372036854775808)",
+            params(std::numeric_limits<PrimitiveInt>::min()),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(1.)",
+            params(1.),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-1.)",
+            params(-1.),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(1.0)",
+            params(1.0),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-1.0)",
+            params(-1.0),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(0.0)",
+            params(0.0),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-0.0)",
+            params(-0.0),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(0.)",
+            params(0.),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-0.)",
+            params(-0.),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(.0)",
+            params(.0),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(-.0)",
+            params(-.0),
             no_filter_spec
         },
         SimpleTestCase{
@@ -295,6 +391,16 @@ INSTANTIATE_TEST_SUITE_P(
             "a(1, true, \"str\", n=9)",
             params(1, true, "str", named("n", 9)),
             no_filter_spec
+        },
+        SimpleTestCase{
+            "a(true_n=1)",
+            params(named("true_n", 1)),
+            no_filter_spec
+        },
+        SimpleTestCase{
+            "a(false_n=1)",
+            params(named("false_n", 1)),
+            no_filter_spec
         }
     )
 );
@@ -336,7 +442,13 @@ INSTANTIATE_TEST_SUITE_P(
         "a(p-x)",
         "a[",
         "a]",
-        "a[]"
+        "a[]",
+        "a[=]",
+        "a[10=]",
+        "a[1.0]",
+        "a[1.0:]",
+        "a[:1.0:]",
+        "a[::1.0]"
     )
 );
 
