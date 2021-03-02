@@ -1,5 +1,5 @@
 version: v1.0
-name: SQ Release build using g++ and Ninja
+name: SQ Debug build using g++ and Ninja
 agent:
   machine:
     type: e1-standard-2
