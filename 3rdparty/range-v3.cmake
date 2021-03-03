@@ -6,7 +6,7 @@
 include(FetchContent)
 
 FetchContent_Declare(get_range_v3
-    URL https://github.com/ericniebler/range-v3/archive/0.11.0.tar.gz
+    URL https://github.com/jonathanhaigh/range-v3/archive/jh-cache1-ubsan.tar.gz
     DOWNLOAD_NO_PROGRESS TRUE
 )
 FetchContent_Populate(get_range_v3)
