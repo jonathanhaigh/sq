@@ -28,27 +28,27 @@ SqPathImpl::SqPathImpl(std::filesystem::path&& value)
 
 Result SqPathImpl::get_string() const
 {
-    return std::make_unique<SqStringImpl>(value_.string());
+    return std::make_shared<SqStringImpl>(value_.string());
 }
 
 Result SqPathImpl::get_parent() const
 {
-    return std::make_unique<SqPathImpl>(value_.parent_path());
+    return std::make_shared<SqPathImpl>(value_.parent_path());
 }
 
 Result SqPathImpl::get_filename() const
 {
-    return std::make_unique<SqStringImpl>(value_.filename().string());
+    return std::make_shared<SqStringImpl>(value_.filename().string());
 }
 
 Result SqPathImpl::get_extension() const
 {
-    return std::make_unique<SqStringImpl>(value_.extension().string());
+    return std::make_shared<SqStringImpl>(value_.extension().string());
 }
 
 Result SqPathImpl::get_stem() const
 {
-    return std::make_unique<SqStringImpl>(value_.stem().string());
+    return std::make_shared<SqStringImpl>(value_.stem().string());
 }
 
 Result SqPathImpl::get_children() const
@@ -59,7 +59,7 @@ Result SqPathImpl::get_children() const
             std::filesystem::directory_iterator{}
         ) |
         ranges::views::transform(
-            [](const auto& dirent){ return std::make_unique<SqPathImpl>(dirent.path()); }
+            [](const auto& dirent){ return std::make_shared<SqPathImpl>(dirent.path()); }
         )
     };
 }
@@ -69,29 +69,29 @@ Result SqPathImpl::get_parts() const
     return FieldRange<ranges::category::bidirectional>{
         value_ |
         ranges::views::transform(
-            [](const auto& part){ return std::make_unique<SqStringImpl>(part.string()); }
+            [](const auto& part){ return std::make_shared<SqStringImpl>(part.string()); }
         )
     };
 }
 
 Result SqPathImpl::get_absolute() const
 {
-    return std::make_unique<SqPathImpl>(std::filesystem::absolute(value_));
+    return std::make_shared<SqPathImpl>(std::filesystem::absolute(value_));
 }
 
 Result SqPathImpl::get_canonical() const
 {
-    return std::make_unique<SqPathImpl>(std::filesystem::canonical(value_));
+    return std::make_shared<SqPathImpl>(std::filesystem::canonical(value_));
 }
 
 Result SqPathImpl::get_is_absolute() const
 {
-    return std::make_unique<SqBoolImpl>(value_.is_absolute());
+    return std::make_shared<SqBoolImpl>(value_.is_absolute());
 }
 
 Result SqPathImpl::get_size() const
 {
-    return std::make_unique<SqDataSizeImpl>(gsl::narrow<std::size_t>(std::filesystem::file_size(value_)));
+    return std::make_shared<SqDataSizeImpl>(gsl::narrow<std::size_t>(std::filesystem::file_size(value_)));
 }
 
 Primitive SqPathImpl::to_primitive() const

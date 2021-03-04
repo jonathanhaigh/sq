@@ -20,21 +20,21 @@ namespace sq::system::standard {
 
 Result SqRootImpl::get_schema()
 {
-    return std::make_unique<SqSchemaImpl>();
+    return std::make_shared<SqSchemaImpl>();
 }
 
 Result SqRootImpl::get_path(const PrimitiveString* path)
 {
     if (path != nullptr)
     {
-        return std::make_unique<SqPathImpl>(*path);
+        return std::make_shared<SqPathImpl>(*path);
     }
-    return std::make_unique<SqPathImpl>(std::filesystem::current_path());
+    return std::make_shared<SqPathImpl>(std::filesystem::current_path());
 }
 
 Result SqRootImpl::get_int(PrimitiveInt value)
 {
-    return std::make_unique<SqIntImpl>(value);
+    return std::make_shared<SqIntImpl>(value);
 }
 
 Result SqRootImpl::get_ints(
@@ -42,7 +42,7 @@ Result SqRootImpl::get_ints(
     const PrimitiveInt* stop
 )
 {
-    auto int_to_sq_int = [](const auto i){ return std::make_unique<SqIntImpl>(i); };
+    auto int_to_sq_int = [](const auto i){ return std::make_shared<SqIntImpl>(i); };
     if (stop != nullptr)
     {
         return FieldRange<ranges::category::bidirectional | ranges::category::sized>{
@@ -58,12 +58,12 @@ Result SqRootImpl::get_ints(
 
 Result SqRootImpl::get_bool(PrimitiveBool value)
 {
-    return std::make_unique<SqBoolImpl>(value);
+    return std::make_shared<SqBoolImpl>(value);
 }
 
 Result SqRootImpl::get_float(PrimitiveFloat value)
 {
-    return std::make_unique<SqFloatImpl>(value);
+    return std::make_shared<SqFloatImpl>(value);
 }
 
 Primitive SqRootImpl::to_primitive() const

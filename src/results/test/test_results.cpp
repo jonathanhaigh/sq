@@ -36,13 +36,16 @@ inline constexpr auto all_comparison_ops = {
     parser::ComparisonOperator::Equals
 };
 
-
 parser::Ast generate_ast(std::string_view query)
 {
     auto tokens = parser::TokenView{query};
     auto parser = parser::Parser{tokens};
     return parser.parse();
 }
+
+struct ResultTreeTest
+    : public MockFieldTest
+{ };
 
 // -----------------------------------------------------------------------------
 // Minimal system call tests:
@@ -51,7 +54,7 @@ parser::Ast generate_ast(std::string_view query)
 // into the system are expensive and should cache results if repeated access is
 // required.
 // -----------------------------------------------------------------------------
-TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
+TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
 {
     const auto ast = generate_ast("a.b.c");
     const auto fcp = FieldCallParams{};
@@ -62,7 +65,7 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject)
     const auto results = ResultTree(ast, std::move(root));
 }
 
-TEST(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
+TEST_F(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject)
 {
     const auto ast = generate_ast("a { b c d }");
     const auto fcp = FieldCallParams{};
@@ -117,7 +120,7 @@ void test_minimal_system_calls_with_element_access(
     const auto results = ResultTree(ast, std::move(root));
 }
 
-TEST(ResultTreeTest, TestMinimalSystemCallsWithElementAccess)
+TEST_F(ResultTreeTest, TestMinimalSystemCallsWithElementAccess)
 {
     test_minimal_system_calls_with_element_access<input>(3, 5);
 
@@ -183,7 +186,7 @@ void test_minimal_system_calls_with_slice(
     const auto results = ResultTree(ast, std::move(root));
 }
 
-TEST(ResultTreeTest, TestMinimalSystemCallsWithSlice)
+TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSlice)
 {
     test_minimal_system_calls_with_slice<input>(2, 5, 2, 6);
 
@@ -226,7 +229,7 @@ void test_minimal_system_calls_with_comparison_filter(
     for (int i = 0; i < size; ++i)
     {
         EXPECT_CALL(mfg, get(i))
-            .WillOnce(Return(ByMove(std::make_unique<FakeField>(i))));
+            .WillOnce(Return(ByMove(std::make_shared<FakeField>(i))));
     }
 
     auto arange = FieldRange<Cat>{
@@ -240,7 +243,7 @@ void test_minimal_system_calls_with_comparison_filter(
     const auto results = ResultTree(ast, std::move(root));
 }
 
-TEST(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter)
+TEST_F(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter)
 {
     static constexpr auto size = gsl::index{5};
     for (const auto op : all_comparison_ops)
@@ -263,10 +266,10 @@ TEST(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter)
 // Tree generation tests - to check result trees contain the right structure
 // and data.
 // -----------------------------------------------------------------------------
-TEST(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
+TEST_F(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
 {
     const auto ast = generate_ast("a.b.c");
-    auto root = ResultView{std::make_unique<FakeField>()};
+    auto root = std::make_shared<FakeField>();
     const auto results = ResultTree{ast, std::move(root)};
 
     auto c = primitive_tree(0);
@@ -276,10 +279,10 @@ TEST(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject)
     EXPECT_EQ(results, expected);
 }
 
-TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
+TEST_F(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
 {
     const auto ast = generate_ast("a {b c d}");
-    auto root = ResultView{std::make_unique<FakeField>()};
+    auto root = std::make_shared<FakeField>();
     const auto results = ResultTree{ast, std::move(root)};
 
     auto b = primitive_tree(0);
@@ -299,8 +302,9 @@ TEST(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject)
 // -----------------------------------------------------------------------------
 
 using ParamPassingTestCase = std::tuple<std::string_view, FieldCallParams>;
-class ResultTreeParamTest
-    : public testing::TestWithParam<ParamPassingTestCase>
+struct ResultTreeParamTest
+    : MockFieldTest
+    , ::testing::WithParamInterface<ParamPassingTestCase>
 { };
 
 TEST_P(ResultTreeParamTest, TestParamPassing)
@@ -365,11 +369,11 @@ void test_element_access(
         ranges::views::iota(PrimitiveInt{0}, size) |
         ranges::views::transform(
             [](auto i) {
-                return std::make_unique<FakeField>(i);
+                return std::make_shared<FakeField>(i);
             }
         )
     );
-    auto root = std::make_unique<FakeField>(std::move(arange));
+    auto root = std::make_shared<FakeField>(std::move(arange));
     const auto results = ResultTree(ast, std::move(root));
     ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
     const auto& res_root = std::get<ObjData>(results.data());
@@ -382,7 +386,7 @@ void test_element_access(
     EXPECT_EQ(res_a, normalized_index);
 }
 
-TEST(ResultTreeTest, TestElementAccess)
+TEST_F(ResultTreeTest, TestElementAccess)
 {
     static constexpr auto size = gsl::index{4};
 
@@ -395,7 +399,7 @@ TEST(ResultTreeTest, TestElementAccess)
     }
 }
 
-TEST(ResultTreeTest, TestElementAccessOutOfRange)
+TEST_F(ResultTreeTest, TestElementAccessOutOfRange)
 {
     for (const auto cat : all_categories)
     {
@@ -475,17 +479,17 @@ void test_slice(
         ranges::views::iota(PrimitiveInt{0}, size) |
         ranges::views::transform(
             [](auto i) {
-                return std::make_unique<FakeField>(i);
+                return std::make_shared<FakeField>(i);
             }
         )
     );
 
-    auto system_root = std::make_unique<FakeField>(std::move(system_a));
+    auto system_root = std::make_shared<FakeField>(std::move(system_a));
     const auto root = ResultTree(ast, std::move(system_root));
     ASSERT_EQ(root, expected_root);
 }
 
-TEST(ResultTreeTest, TestSlice)
+TEST_F(ResultTreeTest, TestSlice)
 {
     using OIL = std::initializer_list<std::optional<gsl::index>>;
     auto indeces = OIL{
@@ -531,11 +535,11 @@ void test_comparison_filter(
         ranges::views::iota(PrimitiveInt{0}, size) |
         ranges::views::transform(
             [](auto i) {
-                return std::make_unique<FakeField>(i);
+                return std::make_shared<FakeField>(i);
             }
         )
     );
-    auto root = std::make_unique<FakeField>(std::move(arange));
+    auto root = std::make_shared<FakeField>(std::move(arange));
     const auto results = ResultTree(ast, std::move(root));
     ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
     const auto& res_root = std::get<ObjData>(results.data());
@@ -578,7 +582,7 @@ void test_comparison_filter(
     }
 }
 
-TEST(ResultTreeTest, TestComparisonFilter)
+TEST_F(ResultTreeTest, TestComparisonFilter)
 {
     static constexpr auto size = gsl::index{4};
 
@@ -594,14 +598,14 @@ TEST(ResultTreeTest, TestComparisonFilter)
     }
 }
 
-TEST(ResultTreeTest, TestNotAnArrayError)
+TEST_F(ResultTreeTest, TestNotAnArrayError)
 {
     for (const auto& query : { "a[0]", "a[::]" })
     {
         SCOPED_TRACE(testing::Message() << "query=" << query);
 
         const auto ast = generate_ast(query);
-        auto root = std::make_unique<FakeField>();
+        auto root = std::make_shared<FakeField>();
 
         EXPECT_THROW({
             auto results = ResultTree(ast, std::move(root));

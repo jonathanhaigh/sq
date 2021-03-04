@@ -9,6 +9,7 @@
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
 #include "util/ASSERT.h"
+#include "util/SharedRange.h"
 #include "util/typeutil.h"
 
 #include <functional>
@@ -28,94 +29,26 @@ namespace sq::results {
 
 namespace {
 
-struct HasRangeCategory
+template <ranges::cpp20::range R>
+[[nodiscard]] auto slurp_range_into_vector(R&& rng)
 {
-    explicit HasRangeCategory(ranges::category cat)
-        : cat_{cat}
-    { }
-
-    [[nodiscard]] bool operator()(const Result& result) const
-    {
-        return std::visit(*this, result);
-    }
-
-    [[nodiscard]] bool operator()([[maybe_unused]] const FieldPtr& fp) const
-    {
-        return false;
-    }
-
-    template <ranges::cpp20::range R>
-    [[nodiscard]] bool operator()([[maybe_unused]] const R& rng) const
-    {
-        return (ranges::get_categories<R>() & cat_) == cat_;
-    }
-
-private:
-    ranges::category cat_;
-};
-
-struct SlurpRangeIntoVector
-{
-    [[nodiscard]] FieldVector operator()(Result&& result) const
-    {
-        return std::visit(*this, std::move(result));
-    }
-
-    [[nodiscard]] FieldVector operator()([[maybe_unused]] const FieldPtr& fp) const
-    {
-        throw NotAnArrayError("Cannot apply array filter to non-array field");
-    }
-
-    template <ranges::category Cat>
-    [[nodiscard]] FieldVector operator()(FieldRange<Cat>&& rng) const
-    {
-        return std::move(rng) | ranges::views::move | ranges::to<std::vector>;
-    }
-
-    [[nodiscard]] FieldVector operator()(FieldVector&& vec) const
-    {
-        return std::move(vec);
-    }
-};
-constexpr auto slurp_range_into_vector = SlurpRangeIntoVector{};
+    return FieldRange<
+        ranges::category::random_access | ranges::category::sized
+    >{
+        util::SharedRange{
+            std::make_shared<std::vector<FieldPtr>>(
+                std::forward<R>(rng) | ranges::views::move | ranges::to<std::vector>()
+            )
+        }
+    };
+}
 
 template <ranges::cpp20::range R>
-[[nodiscard]] gsl::index get_range_size(R& rng)
+[[nodiscard]] Result to_result(R&& rng)
 {
-    if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
-    {
-        throw InternalError{
-            "get_range_size: internal error: bad range category"
-        };
-        return 0;
-    }
-    else
-    {
-        return util::to_index(ranges::distance(rng));
-    }
+    return FieldRange<ranges::get_categories<R>()>{std::forward<R>(rng)};
 }
 
-template <ranges::cpp20::view R>
-[[nodiscard]] auto get_reversed_range(R&& rng)
-{
-    if constexpr (!ranges::bidirectional_range<R>)
-    {
-        throw InternalError{
-            "get_reversed_range: internal error: bad range category"
-        };
-        return std::forward<R>(rng);
-    }
-    else
-    {
-        return std::forward<R>(rng) | ranges::views::reverse;
-    }
-}
-
-template <ranges::cpp20::view R>
-[[nodiscard]] ResultView to_result_view(R&& rng)
-{
-    return FieldRange<ranges::get_categories<R>()>(std::forward<R>(rng));
-}
 
 template <util::Alternative<parser::FilterSpec> Spec>
 struct FilterImpl;
@@ -127,12 +60,7 @@ struct FilterImpl<parser::NoFilterSpec>
     explicit FilterImpl([[maybe_unused]] const parser::NoFilterSpec& spec)
     { }
 
-    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
-    {
-        return std::move(result);
-    }
-
-    [[nodiscard]] ResultView view(ResultView&& result) const override
+    [[nodiscard]] Result operator()(Result&& result) const override
     {
         return std::move(result);
     }
@@ -146,44 +74,38 @@ struct FilterImpl<parser::ElementAccessSpec>
         : index_{spec.index_}
     { }
 
-    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
-    {
-        if (
-            index_ >= 0 ||
-            HasRangeCategory{ranges::category::sized}(result) ||
-            HasRangeCategory{ranges::category::forward}(result)
-        )
-        {
-            return std::move(result);
-        }
-        return slurp_range_into_vector(std::move(result));
-    }
-
-    [[nodiscard]] ResultView view(ResultView&& result) const override
+    [[nodiscard]] Result operator()(Result&& result) const override
     {
         return std::visit(*this, std::move(result));
     }
 
-    [[nodiscard]] ResultView operator()([[maybe_unused]] FieldPtr&& fp) const
+    [[nodiscard]] Result operator()([[maybe_unused]] const FieldPtr& fp) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
-    template <ranges::category Cat>
-    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result operator()(R&& rng) const
     {
         if (index_ >= 0)
         {
-            return nonnegative_index_access(std::move(rng), index_);
+            return nonnegative_index_access(std::forward<R>(rng), index_);
         }
-        const auto size = get_range_size(rng);
-        return negative_index_access(std::move(rng), index_, size);
+        if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
+        {
+            return (*this)(slurp_range_into_vector(rng));
+        }
+        else
+        {
+            const auto size = util::to_index(ranges::distance(rng));
+            return negative_index_access(std::forward<R>(rng), index_, size);
+        }
     }
 
 private:
 
-    template <ranges::category Cat>
-    [[nodiscard]] ResultView nonnegative_index_access(FieldRange<Cat>&& rng, gsl::index index) const
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result nonnegative_index_access(R&& rng, gsl::index index) const
     {
         Expects(index >= 0);
         auto it = ranges::begin(rng);
@@ -193,9 +115,9 @@ private:
         {
             std::ostringstream ss;
             ss << "array element access (\"[" << index_ << "]\"): out of range";
-            if constexpr (Cat != ranges::category::input)
+            if constexpr (ranges::forward_range<R> || ranges::sized_range<R>)
             {
-                ss << "(size=" << get_range_size(rng) << ")";
+                ss << "(size=" << ranges::distance(rng) << ")";
             }
             // clang-tidy bug: https://reviews.llvm.org/D72333
             // NOLINTNEXTLINE(readability-misleading-indentation)
@@ -204,8 +126,8 @@ private:
         return std::move(*it);
     }
 
-    template <ranges::category Cat>
-    [[nodiscard]] ResultView negative_index_access(FieldRange<Cat>&& rng, gsl::index index, gsl::index size) const
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result negative_index_access(R&& rng, gsl::index index, gsl::index size) const
     {
         Expects(index < 0);
         auto nonneg_index = size + index;
@@ -215,7 +137,7 @@ private:
             ss << "array element access (\"[" << index_ << "]\"): out of range (size=" << size << ")";
             throw OutOfRangeError(ss.str());
         }
-        return nonnegative_index_access(std::move(rng), nonneg_index);
+        return nonnegative_index_access(std::forward<R>(rng), nonneg_index);
     }
 
     gsl::index index_;
@@ -231,82 +153,79 @@ struct FilterImpl<parser::SliceSpec>
         , step_{spec.step_}
     { }
 
-    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
-    {
-        auto step = step_.value_or(1);
-        if (step < 0)
-        {
-            if (HasRangeCategory{ranges::category::bidirectional}(result))
-            {
-                return std::move(result);
-            }
-            return slurp_range_into_vector(std::move(result));
-        }
-        if (start_.value_or(0) < 0 || stop_.value_or(0) < 0)
-        {
-            if (HasRangeCategory{ranges::category::forward}(result) ||
-                HasRangeCategory{ranges::category::sized}(result))
-            {
-                return std::move(result);
-            }
-            return slurp_range_into_vector(std::move(result));
-        }
-        return std::move(result);
-    }
-
-    [[nodiscard]] ResultView view(ResultView&& result) const override
+    [[nodiscard]] Result operator()(Result&& result) const override
     {
         return std::visit(*this, std::move(result));
     }
 
-    [[nodiscard]] ResultView operator()([[maybe_unused]] const FieldPtr& fp) const
+    [[nodiscard]] Result operator()([[maybe_unused]] const FieldPtr& fp) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
-    template <ranges::category Cat>
-    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result operator()(R&& rng) const
     {
         auto step = step_.value_or(1);
-        if (step > 0)
-        {
-            auto start = start_.value_or(0);
-            auto stop = stop_.value_or(0);
-            if (stop_) {
-                if (start < 0 || stop < 0)
-                {
-                    return to_result_view(mixed_index_pos_step(std::move(rng), start, stop, step));
-                }
-                return to_result_view(pos_index_pos_step(std::move(rng), start, stop, step));
-            }
-            if (start < 0)
-            {
-                return to_result_view(neg_index_no_stop_pos_step(std::move(rng), start, step));
-            }
-            return to_result_view(pos_index_no_stop_pos_step(std::move(rng), start, step));
-        }
-
-        auto start = start_.value_or(-1);
-        auto stop = stop_.value_or(-1);
-        if (stop_) {
-            if (start >= 0 && stop >= 0)
-            {
-                return to_result_view(pos_index_neg_step(std::move(rng), start, stop, step));
-            }
-            if (start >= 0 || stop >= 0)
-            {
-                return to_result_view(mixed_index_neg_step(std::move(rng), start, stop, step));
-            }
-            return to_result_view(neg_index_neg_step(std::move(rng), start, stop, step));
-        }
-        if (start >= 0)
-        {
-            return to_result_view(pos_index_no_stop_neg_step(std::move(rng), start, step));
-        }
-        return to_result_view(neg_index_no_stop_neg_step(std::move(rng), start, step));
+        return step > 0?
+            pos_step(std::forward<R>(rng), step) :
+            neg_step(std::forward<R>(rng), step);
     }
 
 private:
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result pos_step(R&& rng, gsl::index step) const
+    {
+        auto start = start_.value_or(0);
+        auto stop = stop_.value_or(0);
+        if (start < 0 || (stop_ && stop < 0))
+        {
+            if constexpr (!ranges::forward_range<R> && !ranges::sized_range<R>)
+            {
+                return (*this)(slurp_range_into_vector(rng));
+            }
+            else
+            {
+                return stop_?
+                    to_result(mixed_index_pos_step(std::forward<R>(rng), start, stop, step)) :
+                    to_result(neg_index_no_stop_pos_step(std::forward<R>(rng), start, step));
+            }
+        }
+        return stop_?
+            to_result(pos_index_pos_step(std::forward<R>(rng), start, stop, step)) :
+            to_result(pos_index_no_stop_pos_step(std::forward<R>(rng), start, step));
+    }
+
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result neg_step(R&& rng, gsl::index step) const
+    {
+        if constexpr (!ranges::bidirectional_range<R>)
+        {
+            return (*this)(slurp_range_into_vector(rng));
+        }
+        else
+        {
+            auto start = start_.value_or(-1);
+            auto stop = stop_.value_or(-1);
+            if (start >=0 && stop >=0)
+            {
+                return to_result(pos_index_neg_step(std::forward<R>(rng), start, stop, step));
+            }
+            if (start >= 0)
+            {
+                return stop_?
+                    to_result(mixed_index_neg_step(std::forward<R>(rng), start, stop, step)) :
+                    to_result(pos_index_no_stop_neg_step(std::forward<R>(rng), start, step));
+            }
+            if (stop >= 0)
+            {
+                return to_result(mixed_index_neg_step(std::forward<R>(rng), start, stop, step));
+            }
+            return stop_?
+                to_result(neg_index_neg_step(std::forward<R>(rng), start, stop, step)) :
+                to_result(neg_index_no_stop_neg_step(std::forward<R>(rng), start, step));
+        }
+    }
 
     template <ranges::cpp20::view R>
     [[nodiscard]] static auto pos_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
@@ -332,11 +251,12 @@ private:
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::forward_range<R> || ranges::sized_range<R>
     [[nodiscard]] static auto mixed_index_pos_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         Expects(step > 0);
         Expects(start < 0 || stop < 0);
-        auto size = get_range_size(rng);
+        auto size = util::to_index(ranges::distance(rng));
 
         if (start < 0) { start += size; };
         if (start < 0){ start = 0; }
@@ -346,16 +266,18 @@ private:
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::forward_range<R> || ranges::sized_range<R>
     [[nodiscard]] static auto neg_index_no_stop_pos_step(R&& rng, gsl::index start, gsl::index step)
     {
         Expects(step > 0);
         Expects(start < 0);
-        start += get_range_size(rng);
+        start += util::to_index(ranges::distance(rng));
         if (start < 0) { start = 0; }
         return pos_index_no_stop_pos_step(std::forward<R>(rng), start, step);
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::bidirectional_range<R>
     [[nodiscard]] static auto neg_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         Expects(step < 0);
@@ -364,26 +286,33 @@ private:
         start = -start - 1;
         stop = -stop - 1;
         step *= -1;
-        return pos_index_pos_step(get_reversed_range(std::forward<R>(rng)), start, stop, step);
+        return pos_index_pos_step(
+            std::forward<R>(rng) | ranges::views::reverse,
+            start, stop, step
+        );
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::bidirectional_range<R>
     [[nodiscard]] static auto neg_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
         Expects(step < 0);
         Expects(start < 0);
         start = -start -1;
         step *= -1;
-        return pos_index_no_stop_pos_step(get_reversed_range(std::forward<R>(rng)), start, step);
+        return pos_index_no_stop_pos_step(
+           std::forward<R>(rng) | ranges::views::reverse,
+           start, step
+       );
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::bidirectional_range<R>
     [[nodiscard]] static auto mixed_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
-        Expects(ranges::bidirectional_range<R>);
         Expects(step < 0);
         Expects(start >= 0 || stop >= 0);
-        auto size = get_range_size(rng);
+        auto size = util::to_index(ranges::distance(rng));
 
         if (start >= 0) { start -= size; };
         if (start >= 0){ start = -1; }
@@ -393,27 +322,32 @@ private:
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::bidirectional_range<R>
     [[nodiscard]] static auto pos_index_neg_step(R&& rng, gsl::index start, gsl::index stop, gsl::index step)
     {
         Expects(step < 0);
         Expects(start >= 0);
         Expects(stop >= 0);
         if (stop > start) { stop = start; }
-        return get_reversed_range(
-            rng |
+
+        return std::forward<R>(rng) |
             ranges::views::drop(stop + 1) |
-            ranges::views::take(start - stop)
-        ) | ranges::views::stride(-step);
+            ranges::views::take(start - stop) |
+            ranges::views::reverse |
+            ranges::views::stride(-step);
     }
 
     template <ranges::cpp20::view R>
+        requires ranges::bidirectional_range<R>
     [[nodiscard]] static auto pos_index_no_stop_neg_step(R&& rng, gsl::index start, gsl::index step)
     {
         Expects(step < 0);
         Expects(start >= 0);
-        return get_reversed_range(
-            rng | ranges::views::take(start + 1)
-        ) | ranges::views::stride(-step);
+
+        return std::forward<R>(rng) |
+            ranges::views::take(start + 1) |
+            ranges::views::reverse |
+            ranges::views::stride(-step);
     }
 
     std::optional<gsl::index> start_;
@@ -470,26 +404,21 @@ struct FilterImpl<parser::ComparisonSpec>
         : compare_{create_compare_fn(spec)}
     { }
 
-    [[nodiscard]] Result transform_result_for_requirements(Result&& result) const override
-    {
-        return std::move(result);
-    }
-
-    [[nodiscard]] ResultView view(ResultView&& result) const override
+    [[nodiscard]] Result operator()(Result&& result) const override
     {
         return std::visit(*this, std::move(result));
     }
 
-    [[nodiscard]] ResultView operator()([[maybe_unused]] FieldPtr&& field) const
+    [[nodiscard]] Result operator()([[maybe_unused]] const FieldPtr& field) const
     {
         throw NotAnArrayError("Cannot apply array filter to non-array field");
     }
 
-    template <ranges::category Cat>
-    [[nodiscard]] ResultView operator()(FieldRange<Cat>&& rng) const
+    template <ranges::cpp20::view R>
+    [[nodiscard]] Result operator()(R&& rng) const
     {
-        return to_result_view(
-            std::move(rng) |
+        return to_result(
+            std::forward<R>(rng) |
             // If rng is allocating and constructing a new Field on every
             // dereference, make sure we only do that once by caching the
             // FieldPtr.
