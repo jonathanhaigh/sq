@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 
 #include "common_types/Primitive.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <iosfwd>
@@ -20,8 +21,8 @@ namespace sq::parser {
  */
 struct NoFilterSpec { };
 std::ostream& operator<<(std::ostream& os, NoFilterSpec nlfs);
-[[nodiscard]] bool operator==(NoFilterSpec lhs, NoFilterSpec rhs);
-[[nodiscard]] bool operator!=(NoFilterSpec lhs, NoFilterSpec rhs);
+SQ_ND bool operator==(NoFilterSpec lhs, NoFilterSpec rhs);
+SQ_ND bool operator!=(NoFilterSpec lhs, NoFilterSpec rhs);
 
 /**
  * Represents access of an indexed element in a list of results for a field
@@ -32,8 +33,8 @@ struct ElementAccessSpec
     gsl::index index_;
 };
 std::ostream& operator<<(std::ostream& os, ElementAccessSpec leas);
-[[nodiscard]] bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs);
-[[nodiscard]] bool operator!=(ElementAccessSpec lhs, ElementAccessSpec rhs);
+SQ_ND bool operator==(ElementAccessSpec lhs, ElementAccessSpec rhs);
+SQ_ND bool operator!=(ElementAccessSpec lhs, ElementAccessSpec rhs);
 
 /**
  * Represents a Python-style slice of a list of results for a field access.
@@ -45,8 +46,8 @@ struct SliceSpec
     std::optional<gsl::index> step_;
 };
 std::ostream& operator<<(std::ostream& os, SliceSpec lss);
-[[nodiscard]] bool operator==(const SliceSpec& lhs, const SliceSpec& rhs);
-[[nodiscard]] bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs);
+SQ_ND bool operator==(const SliceSpec& lhs, const SliceSpec& rhs);
+SQ_ND bool operator!=(const SliceSpec& lhs, const SliceSpec& rhs);
 
 enum class ComparisonOperator
 {
@@ -68,8 +69,8 @@ struct ComparisonSpec
 
 std::ostream& operator<<(std::ostream& os, const ComparisonOperator& op);
 std::ostream& operator<<(std::ostream& os, const ComparisonSpec& cs);
-[[nodiscard]] bool operator==(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
-[[nodiscard]] bool operator!=(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
+SQ_ND bool operator==(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
+SQ_ND bool operator!=(const ComparisonSpec& lhs, const ComparisonSpec& rhs);
 
 using FilterSpec = std::variant<
     NoFilterSpec,

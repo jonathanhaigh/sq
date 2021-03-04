@@ -1,6 +1,7 @@
 #include "system/CacheingField.h"
 
 #include "util/ASSERT.h"
+#include "util/typeutil.h"
 
 #include <range/v3/range/concepts.hpp>
 
@@ -12,21 +13,20 @@ namespace {
  */
 struct ShouldCache
 {
-    [[nodiscard]] bool operator()(const Result& value) const
+    SQ_ND bool operator()(const Result& value) const
     {
         return std::visit(*this, value);
     }
 
-    [[nodiscard]] bool operator()([[maybe_unused]] const FieldPtr& value) const
+    SQ_ND bool operator()(SQ_MU const FieldPtr& value) const
     {
         return true;
     }
 
-    template <ranges::cpp20::range R>
-    [[nodiscard]] bool operator()([[maybe_unused]] const R& rng) const
+    SQ_ND bool operator()(SQ_MU const ranges::cpp20::range auto& rng) const
     {
         // Don't cache input_ranges - they can only be iterated over once.
-        return ranges::forward_range<R>;
+        return ranges::forward_range<decltype(rng)>;
     }
 };
 

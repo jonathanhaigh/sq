@@ -6,6 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_schema_h_
 #define SQ_INCLUDE_GUARD_system_schema_h_
 
+#include "util/typeutil.h"
+
 #include <cstddef>
 #include <gsl/gsl>
 #include <string_view>
@@ -28,8 +30,8 @@ public:
         , doc_{doc}
     { }
 
-    [[nodiscard]] std::string_view name() const;
-    [[nodiscard]] std::string_view doc() const;
+    SQ_ND std::string_view name() const;
+    SQ_ND std::string_view doc() const;
 
 private:
     std::string_view name_;
@@ -54,10 +56,10 @@ public:
         , type_index_{type_index}
     { }
 
-    [[nodiscard]] std::string_view name() const;
-    [[nodiscard]] std::string_view doc() const;
-    [[nodiscard]] std::size_t index() const;
-    [[nodiscard]] const PrimitiveTypeSchema& type() const;
+    SQ_ND std::string_view name() const;
+    SQ_ND std::string_view doc() const;
+    SQ_ND std::size_t index() const;
+    SQ_ND const PrimitiveTypeSchema& type() const;
 
 private:
     std::string_view name_;
@@ -90,11 +92,11 @@ public:
         , return_list_{return_list}
     { }
 
-    [[nodiscard]] std::string_view name() const;
-    [[nodiscard]] std::string_view doc() const;
-    [[nodiscard]] gsl::span<const ParamSchema> params() const;
-    [[nodiscard]] const TypeSchema& return_type() const;
-    [[nodiscard]] bool return_list() const;
+    SQ_ND std::string_view name() const;
+    SQ_ND std::string_view doc() const;
+    SQ_ND gsl::span<const ParamSchema> params() const;
+    SQ_ND const TypeSchema& return_type() const;
+    SQ_ND bool return_list() const;
 
 private:
     std::string_view name_;
@@ -123,9 +125,9 @@ public:
         , fields_end_index_{fields_end_index}
     { }
 
-    [[nodiscard]] std::string_view name() const;
-    [[nodiscard]] std::string_view doc() const;
-    [[nodiscard]] gsl::span<const FieldSchema> fields() const;
+    SQ_ND std::string_view name() const;
+    SQ_ND std::string_view doc() const;
+    SQ_ND gsl::span<const FieldSchema> fields() const;
 
 private:
     std::string_view name_;
@@ -140,9 +142,9 @@ private:
 struct Schema
 {
 public:
-    [[nodiscard]] gsl::span<const TypeSchema> types() const;
-    [[nodiscard]] gsl::span<const PrimitiveTypeSchema> primitive_types() const;
-    [[nodiscard]] const TypeSchema& root_type() const;
+    SQ_ND gsl::span<const TypeSchema> types() const;
+    SQ_ND gsl::span<const PrimitiveTypeSchema> primitive_types() const;
+    SQ_ND const TypeSchema& root_type() const;
 };
 
 /**

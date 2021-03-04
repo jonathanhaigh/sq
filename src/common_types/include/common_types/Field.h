@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_common_types_Field_h_
 
 #include "common_types/Primitive.h"
+#include "util/typeutil.h"
 
 #include <memory>
 #include <range/v3/view/any_view.hpp>
@@ -54,12 +55,12 @@ public:
      * @param member the name of the field to access.
      * @param params parameters to pass to system when accessing the field.
      */
-    [[nodiscard]] virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
+    SQ_ND virtual Result get(std::string_view member, const FieldCallParams& params) const = 0;
 
     /**
      * Get a representation of the system object as a Primitive type.
      */
-    [[nodiscard]] virtual Primitive to_primitive() const = 0;
+    SQ_ND virtual Primitive to_primitive() const = 0;
 
     Field(const Field&) = delete;
     Field(Field&&) = delete;

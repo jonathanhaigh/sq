@@ -14,7 +14,7 @@
 
 namespace sq {
 
-template <util::Alternative<Primitive> ParamType>
+template <PrimitiveAlternative ParamType>
 const ParamType& FieldCallParams::get(size_t index, std::string_view name) const
 {
     if (index < pos_params_.size())
@@ -47,7 +47,7 @@ const ParamType& FieldCallParams::get(size_t index, std::string_view name) const
     }
 }
 
-template <util::Alternative<Primitive> ParamType>
+template <PrimitiveAlternative ParamType>
 const ParamType* FieldCallParams::get_optional(size_t index, std::string_view name) const
 {
     try
@@ -60,7 +60,7 @@ const ParamType* FieldCallParams::get_optional(size_t index, std::string_view na
     }
 }
 
-template <util::Alternative<Primitive> ParamType>
+template <PrimitiveAlternative ParamType>
 const ParamType& FieldCallParams::get_or(
     size_t index,
     std::string_view name,

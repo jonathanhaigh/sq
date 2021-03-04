@@ -8,6 +8,7 @@
 
 #include "common_types/Field.h"
 #include "parser/FilterSpec.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <memory>
@@ -22,12 +23,12 @@ struct Filter
     /**
      * Create a Filter for the given spec.
      */
-    [[nodiscard]] static FilterPtr create(const parser::FilterSpec& spec);
+    SQ_ND static FilterPtr create(const parser::FilterSpec& spec);
 
     /**
      * Apply this filter to a Result.
      */
-    [[nodiscard]] virtual Result operator()(Result&& result) const = 0;
+    SQ_ND virtual Result operator()(Result&& result) const = 0;
 
     virtual ~Filter() = default;
     Filter() = default;

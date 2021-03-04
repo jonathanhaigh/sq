@@ -6,15 +6,15 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Primitive_inl_h_
 #define SQ_INCLUDE_GUARD_common_types_Primitive_inl_h_
 
+#include "util/typeutil.h"
+
 #include <iomanip>
 #include <sstream>
 #include <string_view>
 
-#include "util/typeutil.h"
-
 namespace sq {
 
-template <util::Alternative<Primitive> P>
+template <PrimitiveAlternative P>
 struct PrimitiveTypeName
 { };
 
@@ -46,20 +46,19 @@ namespace detail {
 
 struct PrimitiveToStrVisitor
 {
-    [[nodiscard]] std::string operator()(const PrimitiveString& value)
+    SQ_ND std::string operator()(const PrimitiveString& value)
     {
         os_ << std::quoted(value);
         return os_.str();
     }
 
-    [[nodiscard]] std::string operator()(PrimitiveBool value)
+    SQ_ND std::string operator()(PrimitiveBool value)
     {
         os_ << std::boolalpha << value;
         return os_.str();
     }
 
-    template <util::Alternative<Primitive> T>
-    [[nodiscard]] std::string operator()(const T& value)
+    SQ_ND std::string operator()(const PrimitiveAlternative auto& value)
     {
         os_ << value;
         return os_.str();
@@ -71,8 +70,7 @@ private:
 
 } // namespace detail
 
-template <util::Alternative<Primitive> T>
-std::string primitive_to_str(const T& value)
+std::string primitive_to_str(const PrimitiveAlternative auto& value)
 {
     return detail::PrimitiveToStrVisitor{}(value);
 }

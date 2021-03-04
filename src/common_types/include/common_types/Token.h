@@ -6,6 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Token_h_
 #define SQ_INCLUDE_GUARD_common_types_Token_h_
 
+#include "util/typeutil.h"
+
 #include <gsl/gsl>
 #include <iosfwd>
 #include <regex>
@@ -78,28 +80,28 @@ public:
     /**
      * Get the full query string in which the token was found.
      */
-    [[nodiscard]] std::string_view query() const noexcept;
+    SQ_ND std::string_view query() const noexcept;
 
     /**
      * Get the character position within the query at which the token was
      * found.
      */
-    [[nodiscard]] gsl::index pos() const noexcept;
+    SQ_ND gsl::index pos() const noexcept;
 
     /**
      * Get the length, in characters, of the token.
      */
-    [[nodiscard]] gsl::index len() const noexcept;
+    SQ_ND gsl::index len() const noexcept;
 
     /**
      * Get a std::string_view pointing to the characters of the token.
      */
-    [[nodiscard]] std::string_view view() const noexcept;
+    SQ_ND std::string_view view() const noexcept;
 
     /**
      * Get the kind of the token.
      */
-    [[nodiscard]] Kind kind() const noexcept;
+    SQ_ND Kind kind() const noexcept;
 
 private:
     std::string_view query_;

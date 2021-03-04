@@ -9,6 +9,7 @@
 #include "common_types/FieldCallParams.h"
 #include "parser/FilterSpec.h"
 #include "util/MoveOnlyTree.h"
+#include "util/typeutil.h"
 
 #include <iosfwd>
 #include <string>
@@ -52,22 +53,22 @@ public:
     /**
      * Name of the field being accessed.
      */
-    [[nodiscard]] const std::string& name() const { return name_; }
+    SQ_ND const std::string& name() const { return name_; }
 
     ///@{
     /**
      * Params to pass to the system when accessing the field.
      */
-    [[nodiscard]] const FieldCallParams& params() const { return params_; }
-    [[nodiscard]] FieldCallParams& params() { return params_; }
+    SQ_ND const FieldCallParams& params() const { return params_; }
+    SQ_ND FieldCallParams& params() { return params_; }
     ///@}
 
     ///@{
     /**
      * Details of the filter specified for the results of accessing the field.
      */
-    [[nodiscard]] const FilterSpec& filter_spec() const { return filter_spec_; }
-    [[nodiscard]] FilterSpec& filter_spec() { return filter_spec_; }
+    SQ_ND const FilterSpec& filter_spec() const { return filter_spec_; }
+    SQ_ND FilterSpec& filter_spec() { return filter_spec_; }
     ///@}
 
 private:
@@ -76,8 +77,8 @@ private:
     FilterSpec filter_spec_;
 };
 std::ostream& operator<<(std::ostream& os, const AstData& ast_data);
-[[nodiscard]] bool operator==(const AstData& lhs, const AstData& rhs);
-[[nodiscard]] bool operator!=(const AstData& lhs, const AstData& rhs);
+SQ_ND bool operator==(const AstData& lhs, const AstData& rhs);
+SQ_ND bool operator!=(const AstData& lhs, const AstData& rhs);
 
 using Ast = util::MoveOnlyTree<AstData>;
 

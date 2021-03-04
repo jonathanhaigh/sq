@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
 
 #include "system/SqRoot.gen.h"
+#include "util/typeutil.h"
 
 namespace sq::system::standard {
 
@@ -14,13 +15,13 @@ class SqRootImpl
     : public SqRoot<SqRootImpl>
 {
 public:
-    [[nodiscard]] static Result get_schema();
-    [[nodiscard]] static Result get_path(const PrimitiveString* path);
-    [[nodiscard]] static Result get_int(PrimitiveInt value);
-    [[nodiscard]] static Result get_ints(PrimitiveInt start, const PrimitiveInt* stop);
-    [[nodiscard]] static Result get_bool(PrimitiveBool value);
-    [[nodiscard]] static Result get_float(PrimitiveFloat value);
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND static Result get_schema();
+    SQ_ND static Result get_path(const PrimitiveString* path);
+    SQ_ND static Result get_int(PrimitiveInt value);
+    SQ_ND static Result get_ints(PrimitiveInt start, const PrimitiveInt* stop);
+    SQ_ND static Result get_bool(PrimitiveBool value);
+    SQ_ND static Result get_float(PrimitiveFloat value);
+    SQ_ND Primitive to_primitive() const override;
 };
 
 } // namespace sq::system::standard

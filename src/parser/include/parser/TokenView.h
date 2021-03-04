@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_parser_TokenView_h_
 
 #include "common_types/Token.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <optional>
@@ -34,8 +35,8 @@ public:
     // required for ranges::view_facade
     friend ranges::range_access;
 
-    [[nodiscard]] const Token& read() const;
-    [[nodiscard]] bool equal(ranges::default_sentinel_t other) const noexcept;
+    SQ_ND const Token& read() const;
+    SQ_ND bool equal(ranges::default_sentinel_t other) const noexcept;
     void next();
 
 private:
