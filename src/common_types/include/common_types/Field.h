@@ -11,35 +11,22 @@
 #include <memory>
 #include <range/v3/view/any_view.hpp>
 #include <string_view>
-#include <vector>
 
 namespace sq {
 
 class FieldCallParams;
 class Field;
 
-using FieldPtr = std::unique_ptr<Field>;
-using FieldVector = std::vector<FieldPtr>;
+using FieldPtr = std::shared_ptr<Field>;
 
 template <ranges::category Cat>
 using FieldRange = ranges::any_view<FieldPtr, Cat>;
 
 /**
  * The result of accessing a field of a system object.
- *
- * * FieldPtr is used when a single result is returned.
- *
- * * FieldVector is used when multiple results are returned and it is not
- *   possible or desirable to generate results on demand using a generator.
- *   E.g. a list of elements that is small in size.
- *
- * * FieldRange<*> is used when multiple results are returned and it is
- *   possible to generate those results on-demand rather than having to keep
- *   all of the results in memory at once.
  */
 using Result = std::variant<
     FieldPtr,
-    FieldVector,
     FieldRange<ranges::category::input>,
     FieldRange<ranges::category::input | ranges::category::sized>,
     FieldRange<ranges::category::forward>,

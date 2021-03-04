@@ -9,7 +9,6 @@
 #include "common_types/Field.h"
 #include "common_types/Primitive.h"
 #include "parser/Ast.h"
-#include "results/ResultView.h"
 
 #include <string>
 #include <utility>
@@ -40,7 +39,7 @@ public:
     ResultTree& operator=(ResultTree&& other) = default;
     ~ResultTree() noexcept = default;
 
-    ResultTree(const parser::Ast& ast, ResultView&& result);
+    ResultTree(const parser::Ast& ast, Result&& result);
     explicit ResultTree(Data&& data);
 
     ///@{
