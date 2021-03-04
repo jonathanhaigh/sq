@@ -32,7 +32,7 @@ inline constexpr Multiplier multiplier_Ei = multiplier_Pi * multiplier_Ki;
 
 Result size_in_units(std::size_t size, Multiplier multiplier)
 {
-    return std::make_unique<SqFloatImpl>(
+    return std::make_shared<SqFloatImpl>(
         gsl::narrow<PrimitiveFloat>(size) / gsl::narrow<PrimitiveFloat>(multiplier)
     );
 }
@@ -46,7 +46,7 @@ SqDataSizeImpl::SqDataSizeImpl(std::size_t value)
 
 Result SqDataSizeImpl::get_B() const
 {
-    return std::make_unique<SqIntImpl>(gsl::narrow<PrimitiveInt>(value_));
+    return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(value_));
 }
 
 Result SqDataSizeImpl::get_KiB() const

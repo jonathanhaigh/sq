@@ -5,7 +5,7 @@
 #ifndef SQ_INCLUDE_GUARD_system_{{= name }}_gen_h_
 #define SQ_INCLUDE_GUARD_system_{{= name }}_gen_h_
 
-#include "common_types/Field.h"
+#include "system/CacheingField.h"
 
 namespace sq::system {
 
@@ -15,16 +15,19 @@ namespace sq::system {
  */
 template <typename Impl>
 class {{= name }}
-    : public Field
+    : public CacheingField
 {
-public:
+private:
     /**
      * Dispatch a field access to an implementation subclass.
      *
      * I.e. something like calling:
      *       derived_implementation_object->get_[member](params)
      */
-    [[nodiscard]] Result get(std::string_view member, const FieldCallParams& params) const override;
+    [[nodiscard]] Result dispatch(
+        std::string_view member,
+        const FieldCallParams& params
+    ) const override;
 };
 
 } // namespace sq::system

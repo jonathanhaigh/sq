@@ -21,7 +21,7 @@ FakeField::FakeField(ResultGenerator result_generator, T&& primitive)
 template <util::ConvertibleToAlternative<Primitive> T>
 FakeField::FakeField(T&& primitive)
     : result_generator_{
-        [&](auto, auto) { return std::make_unique<FakeField>(); }
+        [&](auto, auto) { return std::make_shared<FakeField>(); }
     }
     , primitive_{test::to_primitive(std::forward<T>(primitive))}
 { }
@@ -50,7 +50,7 @@ void expect_field_accesses(
 template <util::ConvertibleToAlternative<Primitive> T>
 StrictMockFieldPtr field_with_one_primitive_access(T&& retval)
 {
-    auto mf = std::make_unique<testing::StrictMock<MockField>>();
+    auto mf = std::make_shared<testing::StrictMock<MockField>>();
     expect_one_primitive_access(*mf, std::forward<T>(retval));
     return mf;
 }
@@ -58,7 +58,7 @@ StrictMockFieldPtr field_with_one_primitive_access(T&& retval)
 template <typename... Args>
 StrictMockFieldPtr field_with_accesses(Args&&... args)
 {
-    auto mf = std::make_unique<StrictMockField>();
+    auto mf = std::make_shared<StrictMockField>();
     expect_field_accesses(*mf, std::forward<Args>(args)...);
     return mf;
 }
