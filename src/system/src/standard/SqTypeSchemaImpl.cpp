@@ -20,12 +20,12 @@ SqTypeSchemaImpl::SqTypeSchemaImpl(const TypeSchema& type_schema)
 
 Result SqTypeSchemaImpl::get_name() const
 {
-    return std::make_unique<SqStringImpl>(type_schema_->name());
+    return std::make_shared<SqStringImpl>(type_schema_->name());
 }
 
 Result SqTypeSchemaImpl::get_doc() const
 {
-    return std::make_unique<SqStringImpl>(type_schema_->doc());
+    return std::make_shared<SqStringImpl>(type_schema_->doc());
 }
 
 Result SqTypeSchemaImpl::get_fields() const
@@ -35,7 +35,7 @@ Result SqTypeSchemaImpl::get_fields() const
     >{
         type_schema_->fields() | ranges::views::transform(
             [](const FieldSchema& fs) {
-                return std::make_unique<SqFieldSchemaImpl>(fs);
+                return std::make_shared<SqFieldSchemaImpl>(fs);
             }
         )
     };

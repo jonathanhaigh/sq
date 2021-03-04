@@ -21,23 +21,23 @@ using ArrayData = ResultTree::ArrayData;
  * Convert the result of accessing a field into a ResultTree containing data
  * ready for serialization and output.
  */
-class ResultViewToDataVisitor
+class ResultToDataVisitor
 {
 public:
-    explicit ResultViewToDataVisitor(const parser::Ast& ast)
+    explicit ResultToDataVisitor(const parser::Ast& ast)
         : ast_{&ast}
     { }
 
     [[nodiscard]] Data operator()(FieldPtr&& field) const;
 
-    template <ranges::category Cat> 
+    template <ranges::category Cat>
     [[nodiscard]] Data operator()(FieldRange<Cat>&& rng) const;
 
 private:
     gsl::not_null<const parser::Ast*> ast_;
 };
 
-Data ResultViewToDataVisitor::operator()(FieldPtr&& field) const
+Data ResultToDataVisitor::operator()(FieldPtr&& field) const
 {
     if (ast_->children().empty())
     {
@@ -49,27 +49,22 @@ Data ResultViewToDataVisitor::operator()(FieldPtr&& field) const
     {
         const auto& field_name = child.data().name();
         const auto& params = child.data().params();
-        const auto visitor = ResultViewToDataVisitor{child};
+        const auto visitor = ResultToDataVisitor{child};
         const auto filter = Filter::create(child.data().filter_spec());
-        auto child_result = filter->transform_result_for_requirements(
-            field->get(field_name, params)
-        );
-        auto child_result_view = get_result_view(child_result);
+        auto child_results = (*filter)(field->get(field_name, params));
         obj.emplace_back(
             field_name,
-            ResultTree{
-                std::visit(visitor, filter->view(std::move(child_result_view)))
-            }
+            ResultTree{std::visit(visitor, std::move(child_results))}
         );
     }
     return obj;
 }
 
 template <ranges::category Cat>
-Data ResultViewToDataVisitor::operator()(FieldRange<Cat>&& rng) const
+Data ResultToDataVisitor::operator()(FieldRange<Cat>&& rng) const
 {
     auto arr = ArrayData{};
-    for (auto field : rng)
+    for (auto field : std::move(rng))
     {
         arr.emplace_back(*ast_, std::move(field));
     }
@@ -78,8 +73,8 @@ Data ResultViewToDataVisitor::operator()(FieldRange<Cat>&& rng) const
 
 } // namespace
 
-ResultTree::ResultTree(const parser::Ast& ast, ResultView&& result_view)
-    : ResultTree{std::visit(ResultViewToDataVisitor{ast}, std::move(result_view))}
+ResultTree::ResultTree(const parser::Ast& ast, Result&& result)
+    : ResultTree{std::visit(ResultToDataVisitor{ast}, std::move(result))}
 { }
 
 ResultTree::ResultTree(Data&& data)

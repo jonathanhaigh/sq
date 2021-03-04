@@ -30,8 +30,7 @@ int run_sq(int argc, char** argv)
     auto tokens = sq::parser::TokenView{sq_command};
     auto parser = sq::parser::Parser(tokens);
     const auto ast = parser.parse();
-    auto root = sq::results::ResultView{sq::system::root()};
-    const auto results = sq::results::ResultTree(ast, std::move(root));
+    const auto results = sq::results::ResultTree(ast, sq::system::root());
 
     sq::serialization::serialize_results(std::cerr, results);
 

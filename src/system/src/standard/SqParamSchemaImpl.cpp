@@ -19,22 +19,22 @@ SqParamSchemaImpl::SqParamSchemaImpl(const ParamSchema& param_schema)
 
 Result SqParamSchemaImpl::get_name() const
 {
-    return std::make_unique<SqStringImpl>(param_schema_->name());
+    return std::make_shared<SqStringImpl>(param_schema_->name());
 }
 
 Result SqParamSchemaImpl::get_doc() const
 {
-    return std::make_unique<SqStringImpl>(param_schema_->doc());
+    return std::make_shared<SqStringImpl>(param_schema_->doc());
 }
 
 Result SqParamSchemaImpl::get_index() const
 {
-    return std::make_unique<SqIntImpl>(param_schema_->index());
+    return std::make_shared<SqIntImpl>(param_schema_->index());
 }
 
 Result SqParamSchemaImpl::get_type() const
 {
-    return std::make_unique<SqPrimitiveTypeSchemaImpl>(param_schema_->type());
+    return std::make_shared<SqPrimitiveTypeSchemaImpl>(param_schema_->type());
 }
 
 Primitive SqParamSchemaImpl::to_primitive() const
