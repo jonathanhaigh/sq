@@ -15,20 +15,18 @@
 
 namespace sq::system::standard {
 
-class SqTypeSchemaImpl
-    : public SqTypeSchema<SqTypeSchemaImpl>
-{
+class SqTypeSchemaImpl : public SqTypeSchema<SqTypeSchemaImpl> {
 public:
-    explicit SqTypeSchemaImpl(const TypeSchema& type_schema);
+  explicit SqTypeSchemaImpl(const TypeSchema &type_schema);
 
-    SQ_ND Result get_name() const;
-    SQ_ND Result get_doc() const;
-    SQ_ND Result get_fields() const;
+  SQ_ND Result get_name() const;
+  SQ_ND Result get_doc() const;
+  SQ_ND Result get_fields() const;
 
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND Primitive to_primitive() const override;
 
 private:
-    gsl::not_null<const TypeSchema*> type_schema_;
+  gsl::not_null<const TypeSchema *> type_schema_;
 };
 
 } // namespace sq::system::standard

@@ -17,14 +17,11 @@ namespace sq {
  * the programmer believes are dead code, but where the C++ language still
  * requires e.g. a return statement.
  */
-class InternalError
-    : public Exception
-{
+class InternalError : public Exception {
 public:
-    using Exception::Exception;
+  using Exception::Exception;
 };
 
 } // namespace sq
 
 #endif // SQ_INCLUDE_GUARD_field_types_InternalError_h_
-

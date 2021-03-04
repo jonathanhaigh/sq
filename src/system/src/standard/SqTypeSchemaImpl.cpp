@@ -14,36 +14,27 @@
 
 namespace sq::system::standard {
 
-SqTypeSchemaImpl::SqTypeSchemaImpl(const TypeSchema& type_schema)
-    : type_schema_{std::addressof(type_schema)}
-{ }
+SqTypeSchemaImpl::SqTypeSchemaImpl(const TypeSchema &type_schema)
+    : type_schema_{std::addressof(type_schema)} {}
 
-Result SqTypeSchemaImpl::get_name() const
-{
-    return std::make_shared<SqStringImpl>(type_schema_->name());
+Result SqTypeSchemaImpl::get_name() const {
+  return std::make_shared<SqStringImpl>(type_schema_->name());
 }
 
-Result SqTypeSchemaImpl::get_doc() const
-{
-    return std::make_shared<SqStringImpl>(type_schema_->doc());
+Result SqTypeSchemaImpl::get_doc() const {
+  return std::make_shared<SqStringImpl>(type_schema_->doc());
 }
 
-Result SqTypeSchemaImpl::get_fields() const
-{
-    return FieldRange<
-        ranges::category::random_access | ranges::category::sized
-    >{
-        type_schema_->fields() | ranges::views::transform(
-            [](const FieldSchema& fs) {
-                return std::make_shared<SqFieldSchemaImpl>(fs);
-            }
-        )
-    };
+Result SqTypeSchemaImpl::get_fields() const {
+  return FieldRange<ranges::category::random_access | ranges::category::sized>{
+      type_schema_->fields() |
+      ranges::views::transform([](const FieldSchema &fs) {
+        return std::make_shared<SqFieldSchemaImpl>(fs);
+      })};
 }
 
-Primitive SqTypeSchemaImpl::to_primitive() const
-{
-    return PrimitiveString{type_schema_->name()};
+Primitive SqTypeSchemaImpl::to_primitive() const {
+  return PrimitiveString{type_schema_->name()};
 }
 
 } // namespace sq::system::standard

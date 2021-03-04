@@ -19,32 +19,30 @@ namespace sq::parser {
 /**
  * A ranges::view of the input query split into tokens.
  */
-class TokenView
-    : public ranges::view_facade<TokenView>
-{
+class TokenView : public ranges::view_facade<TokenView> {
 public:
-    explicit TokenView(std::string_view str) noexcept;
+  explicit TokenView(std::string_view str) noexcept;
 
-    TokenView() noexcept = default;
-    TokenView(const TokenView&) noexcept = default;
-    TokenView(TokenView&&) noexcept = default;
-    TokenView& operator=(const TokenView&) noexcept = default;
-    TokenView& operator=(TokenView&&) noexcept = default;
-    ~TokenView() noexcept = default;
+  TokenView() noexcept = default;
+  TokenView(const TokenView &) noexcept = default;
+  TokenView(TokenView &&) noexcept = default;
+  TokenView &operator=(const TokenView &) noexcept = default;
+  TokenView &operator=(TokenView &&) noexcept = default;
+  ~TokenView() noexcept = default;
 
-    // required for ranges::view_facade
-    friend ranges::range_access;
+  // required for ranges::view_facade
+  friend ranges::range_access;
 
-    SQ_ND const Token& read() const;
-    SQ_ND bool equal(ranges::default_sentinel_t other) const noexcept;
-    void next();
+  SQ_ND const Token &read() const;
+  SQ_ND bool equal(ranges::default_sentinel_t other) const noexcept;
+  void next();
 
 private:
-    gsl::index whitespace_length() const;
+  gsl::index whitespace_length() const;
 
-    std::string_view str_;
-    gsl::index pos_ = 0;
-    mutable std::optional<Token> cache_ = std::nullopt;
+  std::string_view str_;
+  gsl::index pos_ = 0;
+  mutable std::optional<Token> cache_ = std::nullopt;
 };
 
 } // namespace sq::parser

@@ -13,17 +13,15 @@
 
 namespace sq::system::standard {
 
-class SqStringImpl
-    : public SqString<SqStringImpl>
-{
+class SqStringImpl : public SqString<SqStringImpl> {
 public:
-    explicit SqStringImpl(std::string_view value);
-    explicit SqStringImpl(PrimitiveString&& value);
+  explicit SqStringImpl(std::string_view value);
+  explicit SqStringImpl(PrimitiveString &&value);
 
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND Primitive to_primitive() const override;
 
 private:
-    PrimitiveString value_;
+  PrimitiveString value_;
 };
 
 } // namespace sq::system::standard

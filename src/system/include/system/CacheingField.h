@@ -13,29 +13,22 @@
 
 namespace sq::system {
 
-class CacheingField
-    : public Field
-{
+class CacheingField : public Field {
 public:
-    SQ_ND Result get(
-        std::string_view member,
-        const FieldCallParams& params
-    ) const override;
+  SQ_ND Result get(std::string_view member,
+                   const FieldCallParams &params) const override;
 
 private:
-    SQ_ND virtual Result dispatch(
-        std::string_view member,
-        const FieldCallParams& params
-    ) const = 0;
+  SQ_ND virtual Result dispatch(std::string_view member,
+                                const FieldCallParams &params) const = 0;
 
-    // NOTE: currently, don't distinguish between field calls made with
-    // different parameters. That should be okay because there isn't any
-    // query syntax that allows access to the same field with different
-    // parameters. That may change in the future though.
-    mutable std::map<std::string, Result, std::less<>> cache_;
+  // NOTE: currently, don't distinguish between field calls made with
+  // different parameters. That should be okay because there isn't any
+  // query syntax that allows access to the same field with different
+  // parameters. That may change in the future though.
+  mutable std::map<std::string, Result, std::less<>> cache_;
 };
 
 } // namespace sq::system
 
 #endif // SQ_INCLUDE_GUARD_system_CacheingField_h_
-
