@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_system_standard_SqStringImpl_h_
 
 #include "system/SqString.gen.h"
+#include "util/typeutil.h"
 
 #include <string_view>
 
@@ -19,7 +20,7 @@ public:
     explicit SqStringImpl(std::string_view value);
     explicit SqStringImpl(PrimitiveString&& value);
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     PrimitiveString value_;

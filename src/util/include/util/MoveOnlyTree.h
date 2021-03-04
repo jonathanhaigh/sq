@@ -34,31 +34,30 @@ public:
     MoveOnlyTree& operator=(MoveOnlyTree&&) noexcept = default;
     ~MoveOnlyTree() noexcept = default;
 
-    template <typename... Args>
-    explicit MoveOnlyTree(Args&&... args)
-        : data_{std::forward<Args>(args)...}
+    explicit MoveOnlyTree(auto&&... args)
+        : data_{SQ_FWD(args)...}
     { }
 
     ///@{
     /**
      * Get the data associated with this node.
      */
-    [[nodiscard]] const T& data() const noexcept { return data_; }
-    [[nodiscard]] T& data() noexcept { return data_; }
+    SQ_ND const T& data() const noexcept { return data_; }
+    SQ_ND T& data() noexcept { return data_; }
     ///@}
 
     ///@{
     /**
      * Get the child nodes of this node.
      */
-    [[nodiscard]] const Children& children() const noexcept { return children_; }
-    [[nodiscard]] Children& children() noexcept { return children_; }
+    SQ_ND const Children& children() const noexcept { return children_; }
+    SQ_ND Children& children() noexcept { return children_; }
     ///@}
 
-    [[nodiscard]] friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
+    SQ_ND friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
         return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;
     }
-    [[nodiscard]] friend bool operator!=(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
+    SQ_ND friend bool operator!=(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
         return !(lhs == rhs);
     }
  

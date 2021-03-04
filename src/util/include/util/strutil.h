@@ -68,7 +68,7 @@ namespace detail {
 struct VariantToStr
 {
     template <Printable... Types>
-    [[nodiscard]] std::string operator()(const std::variant<Types...>& var) const
+    SQ_ND std::string operator()(const std::variant<Types...> & var) const
     {
         auto ss = std::ostringstream{};
         std::visit(
@@ -82,7 +82,7 @@ struct VariantToStr
 struct OptionalToStr
 {
     template <Printable T>
-    [[nodiscard]] std::string operator()(const std::optional<T>& opt) const
+    SQ_ND std::string operator()(const std::optional<T>& opt) const
     {
         if (opt)
         {

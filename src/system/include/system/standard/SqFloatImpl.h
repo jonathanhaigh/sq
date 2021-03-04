@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_system_standard_SqFloatImpl_h_
 
 #include "system/SqFloat.gen.h"
+#include "util/typeutil.h"
 
 namespace sq::system::standard {
 
@@ -16,7 +17,7 @@ class SqFloatImpl
 public:
     explicit SqFloatImpl(PrimitiveFloat value);
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     PrimitiveFloat value_;

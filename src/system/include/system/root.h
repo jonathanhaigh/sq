@@ -7,10 +7,11 @@
 #define SQ_INCLUDE_GUARD_system_root_h_
 
 #include "common_types/Field.h"
+#include "util/typeutil.h"
 
 namespace sq::system {
 
-[[nodiscard]] FieldPtr root();
+SQ_ND FieldPtr root();
 
 } // namespace sq::system
 

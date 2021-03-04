@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_system_standard_SqTypeSchemaImpl_h_
 
 #include "system/SqTypeSchema.gen.h"
+#include "util/typeutil.h"
 
 #include "system/schema.h"
 
@@ -20,11 +21,11 @@ class SqTypeSchemaImpl
 public:
     explicit SqTypeSchemaImpl(const TypeSchema& type_schema);
 
-    [[nodiscard]] Result get_name() const;
-    [[nodiscard]] Result get_doc() const;
-    [[nodiscard]] Result get_fields() const;
+    SQ_ND Result get_name() const;
+    SQ_ND Result get_doc() const;
+    SQ_ND Result get_fields() const;
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     gsl::not_null<const TypeSchema*> type_schema_;

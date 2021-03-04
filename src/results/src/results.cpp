@@ -6,6 +6,7 @@
 #include "results/results.h"
 
 #include "results/Filter.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 
@@ -28,10 +29,8 @@ public:
         : ast_{&ast}
     { }
 
-    [[nodiscard]] Data operator()(FieldPtr&& field) const;
-
-    template <ranges::category Cat>
-    [[nodiscard]] Data operator()(FieldRange<Cat>&& rng) const;
+    SQ_ND Data operator()(FieldPtr&& field) const;
+    SQ_ND Data operator()(ranges::cpp20::view auto&& rng) const;
 
 private:
     gsl::not_null<const parser::Ast*> ast_;
@@ -60,11 +59,10 @@ Data ResultToDataVisitor::operator()(FieldPtr&& field) const
     return obj;
 }
 
-template <ranges::category Cat>
-Data ResultToDataVisitor::operator()(FieldRange<Cat>&& rng) const
+Data ResultToDataVisitor::operator()(ranges::cpp20::view auto&& rng) const
 {
     auto arr = ArrayData{};
-    for (auto field : std::move(rng))
+    for (auto field : SQ_FWD(rng))
     {
         arr.emplace_back(*ast_, std::move(field));
     }

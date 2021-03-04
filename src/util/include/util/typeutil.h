@@ -13,6 +13,11 @@
 #include <type_traits>
 #include <variant>
 
+#define SQ_FWD(x) static_cast<decltype(x)&&>(x)
+
+#define SQ_ND [[nodiscard]]
+#define SQ_MU [[maybe_unused]]
+
 namespace sq::util {
 
 /**
@@ -41,7 +46,6 @@ struct IsVariant<std::variant<Types...>>
 template <typename T>
 inline constexpr bool is_variant_v = IsVariant<T>::value;
 ///@}
-
 
 ///@{
 /**
@@ -96,14 +100,27 @@ inline constexpr bool is_convertible_to_alternative_v =
 template <typename T, typename V>
 concept ConvertibleToAlternative = is_convertible_to_alternative_v<T, V>;
 
+///@{
+/**
+ * A range whose distance can be obtained without invalidating the range.
+ *
+ * This is different to std::sized_range because it doesn't require:
+ * - that size(rng) is available;
+ * - that distance(rng) is a constant time operation.
+ *
+ * Essentially, it just rules out std::input_ranges without a known size.
+ */
+template <typename T>
+concept SlowSizedRange =
+    ranges::cpp20::forward_range<T> ||
+    ranges::cpp20::sized_range<T>;
 
 /**
  * Convert an integral value to a gsl::index.
  *
  * Throws if the value can't be represented by a gsl::index.
  */
-template <std::integral T>
-inline constexpr gsl::index to_index(T v)
+inline constexpr gsl::index to_index(std::integral auto v)
 {
     return gsl::narrow<gsl::index>(v);
 }
@@ -113,8 +130,7 @@ inline constexpr gsl::index to_index(T v)
  *
  * Throws if the value can't be represented by a std::size_t.
  */
-template <std::integral T>
-inline constexpr std::size_t to_size(T v)
+inline constexpr std::size_t to_size(std::integral auto v)
 {
     return gsl::narrow<std::size_t>(v);
 }
