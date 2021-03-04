@@ -29,8 +29,7 @@ namespace sq::util {
  * Prints "1*2*3*4"
  */
 template <ranges::cpp20::range R>
-requires Printable<ranges::range_value_t<R>>
-struct join {
+requires Printable<ranges::range_value_t<R>> struct join {
   explicit join(const R &rng) : rng_{std::addressof(rng)} {}
 
   join(const R &rng, std::string_view delim)

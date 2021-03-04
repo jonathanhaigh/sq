@@ -23,8 +23,7 @@ namespace sq::util {
 /**
  * Concept for types that can be dumped to a std::ostream.
  */
-template <typename T>
-concept Printable = requires(T x, std::ostream &os) {
+template <typename T> concept Printable = requires(T x, std::ostream &os) {
   os << x;
 };
 
@@ -45,9 +44,7 @@ template <typename T> inline constexpr bool is_variant_v = IsVariant<T>::value;
  * Get whether the type T is one of the alternative types of the variant V.
  */
 template <typename T, typename V>
-requires is_variant_v<V>
-struct IsAlternative : std::false_type {
-};
+requires is_variant_v<V> struct IsAlternative : std::false_type {};
 
 template <typename T, typename... Types>
 struct IsAlternative<T, std::variant<Types...>>
@@ -60,17 +57,14 @@ inline constexpr bool is_alternative_v = IsAlternative<T, V>::value;
 /**
  * Concept for types that are alternatives of the variant V.
  */
-template <typename T, typename V>
-concept Alternative = is_alternative_v<T, V>;
+template <typename T, typename V> concept Alternative = is_alternative_v<T, V>;
 
 ///@{
 /**
  * Get whether T can be converted to one of the variant V's alternatives.
  */
 template <typename T, typename V>
-requires is_variant_v<V>
-struct IsConvertibleToAlternative : std::false_type {
-};
+requires is_variant_v<V> struct IsConvertibleToAlternative : std::false_type {};
 
 template <typename T, typename... Types>
 struct IsConvertibleToAlternative<T, std::variant<Types...>>

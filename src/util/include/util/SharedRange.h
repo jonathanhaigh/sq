@@ -8,9 +8,7 @@
 
 namespace sq::util {
 
-template <typename R>
-requires ranges::cpp20::range<R>
-struct SharedRange {
+template <typename R> requires ranges::cpp20::range<R> struct SharedRange {
 public:
   explicit SharedRange(const std::shared_ptr<R> &base) : base_{base} {}
 
