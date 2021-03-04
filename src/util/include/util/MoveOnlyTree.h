@@ -20,66 +20,62 @@ namespace sq::util {
  * @param T type of data to store in each node of the tree.
  */
 template <typename T>
-    requires std::movable<T> && std::equality_comparable<T>
-class MoveOnlyTree
-{
+requires std::movable<T> && std::equality_comparable<T>
+class MoveOnlyTree {
 public:
-    using Children = std::vector<MoveOnlyTree<T>>;
+  using Children = std::vector<MoveOnlyTree<T>>;
 
-    MoveOnlyTree() = delete;
-    MoveOnlyTree(const MoveOnlyTree&) = delete;
-    MoveOnlyTree& operator=(const MoveOnlyTree&) = delete;
+  MoveOnlyTree() = delete;
+  MoveOnlyTree(const MoveOnlyTree &) = delete;
+  MoveOnlyTree &operator=(const MoveOnlyTree &) = delete;
 
-    MoveOnlyTree(MoveOnlyTree&&) noexcept = default;
-    MoveOnlyTree& operator=(MoveOnlyTree&&) noexcept = default;
-    ~MoveOnlyTree() noexcept = default;
+  MoveOnlyTree(MoveOnlyTree &&) noexcept = default;
+  MoveOnlyTree &operator=(MoveOnlyTree &&) noexcept = default;
+  ~MoveOnlyTree() noexcept = default;
 
-    explicit MoveOnlyTree(auto&&... args)
-        : data_{SQ_FWD(args)...}
-    { }
+  explicit MoveOnlyTree(auto &&...args) : data_{SQ_FWD(args)...} {}
 
-    ///@{
-    /**
-     * Get the data associated with this node.
-     */
-    SQ_ND const T& data() const noexcept { return data_; }
-    SQ_ND T& data() noexcept { return data_; }
-    ///@}
+  ///@{
+  /**
+   * Get the data associated with this node.
+   */
+  SQ_ND const T &data() const noexcept { return data_; }
+  SQ_ND T &data() noexcept { return data_; }
+  ///@}
 
-    ///@{
-    /**
-     * Get the child nodes of this node.
-     */
-    SQ_ND const Children& children() const noexcept { return children_; }
-    SQ_ND Children& children() noexcept { return children_; }
-    ///@}
+  ///@{
+  /**
+   * Get the child nodes of this node.
+   */
+  SQ_ND const Children &children() const noexcept { return children_; }
+  SQ_ND Children &children() noexcept { return children_; }
+  ///@}
 
-    SQ_ND friend bool operator==(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
-        return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;
-    }
-    SQ_ND friend bool operator!=(const MoveOnlyTree& lhs, const MoveOnlyTree& rhs) {
-        return !(lhs == rhs);
-    }
- 
+  SQ_ND friend bool operator==(const MoveOnlyTree &lhs,
+                               const MoveOnlyTree &rhs) {
+    return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;
+  }
+  SQ_ND friend bool operator!=(const MoveOnlyTree &lhs,
+                               const MoveOnlyTree &rhs) {
+    return !(lhs == rhs);
+  }
+
 private:
-    Children children_;
-    T data_;
+  Children children_;
+  T data_;
 };
 
 template <util::Printable T>
-std::ostream& operator<<(std::ostream& os, const MoveOnlyTree<T>& tree)
-{
-    os << tree.data();
-    if (!tree.children().empty())
-    {
-        os << " { ";
-        for (const auto& child : tree.children())
-        {
-            os << child << " ";
-        }
-        os << "} ";
+std::ostream &operator<<(std::ostream &os, const MoveOnlyTree<T> &tree) {
+  os << tree.data();
+  if (!tree.children().empty()) {
+    os << " { ";
+    for (const auto &child : tree.children()) {
+      os << child << " ";
     }
-    return os;
+    os << "} ";
+  }
+  return os;
 }
 
 } // namespace sq::util

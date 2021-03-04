@@ -11,16 +11,14 @@
 
 namespace sq::system::standard {
 
-class SqBoolImpl
-    : public SqBool<SqBoolImpl>
-{
+class SqBoolImpl : public SqBool<SqBoolImpl> {
 public:
-    explicit SqBoolImpl(PrimitiveBool value);
+  explicit SqBoolImpl(PrimitiveBool value);
 
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND Primitive to_primitive() const override;
 
 private:
-    PrimitiveBool value_;
+  PrimitiveBool value_;
 };
 
 } // namespace sq::system::standard

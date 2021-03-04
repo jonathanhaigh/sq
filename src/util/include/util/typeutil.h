@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <variant>
 
-#define SQ_FWD(x) static_cast<decltype(x)&&>(x)
+#define SQ_FWD(x) static_cast<decltype(x) &&>(x)
 
 #define SQ_ND [[nodiscard]]
 #define SQ_MU [[maybe_unused]]
@@ -24,27 +24,20 @@ namespace sq::util {
  * Concept for types that can be dumped to a std::ostream.
  */
 template <typename T>
-concept Printable = requires (T x, std::ostream& os)
-{
-    os << x;
+concept Printable = requires(T x, std::ostream &os) {
+  os << x;
 };
 
 ///@{
 /**
  * Get whether the type T is a specialization of std::variant.
  */
-template <typename T>
-struct IsVariant
-    : std::false_type
-{ };
+template <typename T> struct IsVariant : std::false_type {};
 
 template <typename... Types>
-struct IsVariant<std::variant<Types...>>
-    : std::true_type
-{ };
+struct IsVariant<std::variant<Types...>> : std::true_type {};
 
-template <typename T>
-inline constexpr bool is_variant_v = IsVariant<T>::value;
+template <typename T> inline constexpr bool is_variant_v = IsVariant<T>::value;
 ///@}
 
 ///@{
@@ -52,15 +45,13 @@ inline constexpr bool is_variant_v = IsVariant<T>::value;
  * Get whether the type T is one of the alternative types of the variant V.
  */
 template <typename T, typename V>
-    requires is_variant_v<V>
-struct IsAlternative
-    : std::false_type
-{ };
+requires is_variant_v<V>
+struct IsAlternative : std::false_type {
+};
 
 template <typename T, typename... Types>
 struct IsAlternative<T, std::variant<Types...>>
-    : std::disjunction<std::is_same<T, Types>...>
-{ };
+    : std::disjunction<std::is_same<T, Types>...> {};
 
 template <typename T, typename V>
 inline constexpr bool is_alternative_v = IsAlternative<T, V>::value;
@@ -72,21 +63,18 @@ inline constexpr bool is_alternative_v = IsAlternative<T, V>::value;
 template <typename T, typename V>
 concept Alternative = is_alternative_v<T, V>;
 
-
 ///@{
 /**
  * Get whether T can be converted to one of the variant V's alternatives.
  */
 template <typename T, typename V>
-    requires is_variant_v<V>
-struct IsConvertibleToAlternative
-    : std::false_type
-{ };
+requires is_variant_v<V>
+struct IsConvertibleToAlternative : std::false_type {
+};
 
 template <typename T, typename... Types>
 struct IsConvertibleToAlternative<T, std::variant<Types...>>
-    : std::disjunction<std::is_convertible<T, Types>...>
-{ };
+    : std::disjunction<std::is_convertible<T, Types>...> {};
 
 template <typename T, typename V>
 inline constexpr bool is_convertible_to_alternative_v =
@@ -112,17 +100,15 @@ concept ConvertibleToAlternative = is_convertible_to_alternative_v<T, V>;
  */
 template <typename T>
 concept SlowSizedRange =
-    ranges::cpp20::forward_range<T> ||
-    ranges::cpp20::sized_range<T>;
+    ranges::cpp20::forward_range<T> || ranges::cpp20::sized_range<T>;
 
 /**
  * Convert an integral value to a gsl::index.
  *
  * Throws if the value can't be represented by a gsl::index.
  */
-inline constexpr gsl::index to_index(std::integral auto v)
-{
-    return gsl::narrow<gsl::index>(v);
+inline constexpr gsl::index to_index(std::integral auto v) {
+  return gsl::narrow<gsl::index>(v);
 }
 
 /**
@@ -130,9 +116,8 @@ inline constexpr gsl::index to_index(std::integral auto v)
  *
  * Throws if the value can't be represented by a std::size_t.
  */
-inline constexpr std::size_t to_size(std::integral auto v)
-{
-    return gsl::narrow<std::size_t>(v);
+inline constexpr std::size_t to_size(std::integral auto v) {
+  return gsl::narrow<std::size_t>(v);
 }
 
 } // namespace sq::util
@@ -146,8 +131,7 @@ template <typename T>
 inline constexpr bool enable_view<gsl::span<T, gsl::dynamic_extent>> = true;
 
 // ... unless the size is zero.
-template <typename T>
-inline constexpr bool enable_view<gsl::span<T, 0>> = true;
+template <typename T> inline constexpr bool enable_view<gsl::span<T, 0>> = true;
 
 } // namespace ranges
 

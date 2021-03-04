@@ -11,16 +11,14 @@
 
 namespace sq::system::standard {
 
-class SqIntImpl
-    : public SqInt<SqIntImpl>
-{
+class SqIntImpl : public SqInt<SqIntImpl> {
 public:
-    explicit SqIntImpl(PrimitiveInt value);
+  explicit SqIntImpl(PrimitiveInt value);
 
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND Primitive to_primitive() const override;
 
 private:
-    PrimitiveInt value_;
+  PrimitiveInt value_;
 };
 
 } // namespace sq::system::standard

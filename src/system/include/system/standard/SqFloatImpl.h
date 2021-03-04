@@ -11,16 +11,14 @@
 
 namespace sq::system::standard {
 
-class SqFloatImpl
-    : public SqFloat<SqFloatImpl>
-{
+class SqFloatImpl : public SqFloat<SqFloatImpl> {
 public:
-    explicit SqFloatImpl(PrimitiveFloat value);
+  explicit SqFloatImpl(PrimitiveFloat value);
 
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND Primitive to_primitive() const override;
 
 private:
-    PrimitiveFloat value_;
+  PrimitiveFloat value_;
 };
 
 } // namespace sq::system::standard

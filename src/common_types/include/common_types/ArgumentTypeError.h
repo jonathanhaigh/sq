@@ -16,15 +16,13 @@ namespace sq {
 /**
  * Error indicating that a given parameter is of incorrect type.
  */
-class ArgumentTypeError
-    : public Exception
-{
+class ArgumentTypeError : public Exception {
 public:
-    /**
-     * @param received the value of the given parameter.
-     * @param type_expected the name of the type expected for the parameter.
-     */
-    ArgumentTypeError(const Primitive& received, std::string_view type_expected);
+  /**
+   * @param received the value of the given parameter.
+   * @param type_expected the name of the type expected for the parameter.
+   */
+  ArgumentTypeError(const Primitive &received, std::string_view type_expected);
 };
 
 } // namespace sq

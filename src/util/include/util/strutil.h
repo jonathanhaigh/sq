@@ -26,72 +26,55 @@ namespace sq::util {
  * E.g:
  *     auto ints = { 1, 2, 3, 4 };
  *     std::cout << join(ints, "*");
- * Prints "1*2*3*4" 
+ * Prints "1*2*3*4"
  */
-template<ranges::cpp20::range R>
-    requires Printable<ranges::range_value_t<R>>
-struct join
-{
-    explicit join(const R& rng)
-        : rng_{std::addressof(rng)}
-    { }
+template <ranges::cpp20::range R>
+requires Printable<ranges::range_value_t<R>>
+struct join {
+  explicit join(const R &rng) : rng_{std::addressof(rng)} {}
 
-    join(const R& rng, std::string_view delim)
-        : rng_{std::addressof(rng)}
-        , delim_{delim}
-    { }
+  join(const R &rng, std::string_view delim)
+      : rng_{std::addressof(rng)}, delim_{delim} {}
 
-    friend std::ostream& operator<<(std::ostream& os, const join<R>& j)
-    {
-        auto it = ranges::begin(*(j.rng_));
-        const auto end = ranges::end(*(j.rng_));
-        while (it != end)
-        {
-            os << (*it);
-            ++it;
-            if (it != end)
-            {
-                os << j.delim_;
-            }
-        }
-        return os;
+  friend std::ostream &operator<<(std::ostream &os, const join<R> &j) {
+    auto it = ranges::begin(*(j.rng_));
+    const auto end = ranges::end(*(j.rng_));
+    while (it != end) {
+      os << (*it);
+      ++it;
+      if (it != end) {
+        os << j.delim_;
+      }
     }
+    return os;
+  }
 
 private:
-    gsl::not_null<const R*> rng_;
-    std::string_view delim_ = ", ";
+  gsl::not_null<const R *> rng_;
+  std::string_view delim_ = ", ";
 };
-
 
 namespace detail {
 
-struct VariantToStr
-{
-    template <Printable... Types>
-    SQ_ND std::string operator()(const std::variant<Types...> & var) const
-    {
-        auto ss = std::ostringstream{};
-        std::visit(
-            [&ss](auto&& v) { ss << v; },
-            var
-        );
-        return ss.str();
-    }
+struct VariantToStr {
+  template <Printable... Types>
+  SQ_ND std::string operator()(const std::variant<Types...> &var) const {
+    auto ss = std::ostringstream{};
+    std::visit([&ss](auto &&v) { ss << v; }, var);
+    return ss.str();
+  }
 };
 
-struct OptionalToStr
-{
-    template <Printable T>
-    SQ_ND std::string operator()(const std::optional<T>& opt) const
-    {
-        if (opt)
-        {
-            auto ss = std::ostringstream{};
-            ss << opt.value();
-            return ss.str();
-        }
-        return std::string{};
+struct OptionalToStr {
+  template <Printable T>
+  SQ_ND std::string operator()(const std::optional<T> &opt) const {
+    if (opt) {
+      auto ss = std::ostringstream{};
+      ss << opt.value();
+      return ss.str();
     }
+    return std::string{};
+  }
 };
 
 } // namespace detail
