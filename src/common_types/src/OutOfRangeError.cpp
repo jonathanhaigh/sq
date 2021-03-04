@@ -15,24 +15,18 @@ namespace sq {
 
 namespace {
 
-SQ_ND std::string create_oor_message(
-    const Token& token,
-    std::string_view message
-)
-{
-    auto ss = std::ostringstream{};
-    ss << "OutOfRangeError at " << token
-       << ": " << message
-       << "\n" << token.query()
-       << "\n" << std::string(util::to_size(token.pos()), ' ') << "^\n";
-    return ss.str();
+SQ_ND std::string create_oor_message(const Token &token,
+                                     std::string_view message) {
+  auto ss = std::ostringstream{};
+  ss << "OutOfRangeError at " << token << ": " << message << "\n"
+     << token.query() << "\n"
+     << std::string(util::to_size(token.pos()), ' ') << "^\n";
+  return ss.str();
 }
 
 } // namespace
 
-OutOfRangeError::OutOfRangeError(const Token& token, std::string_view message)
-    : OutOfRangeError{create_oor_message(token, message)}
-{
-}
+OutOfRangeError::OutOfRangeError(const Token &token, std::string_view message)
+    : OutOfRangeError{create_oor_message(token, message)} {}
 
 } // namespace sq

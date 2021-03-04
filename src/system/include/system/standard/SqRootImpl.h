@@ -11,17 +11,15 @@
 
 namespace sq::system::standard {
 
-class SqRootImpl
-    : public SqRoot<SqRootImpl>
-{
+class SqRootImpl : public SqRoot<SqRootImpl> {
 public:
-    SQ_ND static Result get_schema();
-    SQ_ND static Result get_path(const PrimitiveString* path);
-    SQ_ND static Result get_int(PrimitiveInt value);
-    SQ_ND static Result get_ints(PrimitiveInt start, const PrimitiveInt* stop);
-    SQ_ND static Result get_bool(PrimitiveBool value);
-    SQ_ND static Result get_float(PrimitiveFloat value);
-    SQ_ND Primitive to_primitive() const override;
+  SQ_ND static Result get_schema();
+  SQ_ND static Result get_path(const PrimitiveString *path);
+  SQ_ND static Result get_int(PrimitiveInt value);
+  SQ_ND static Result get_ints(PrimitiveInt start, const PrimitiveInt *stop);
+  SQ_ND static Result get_bool(PrimitiveBool value);
+  SQ_ND static Result get_float(PrimitiveFloat value);
+  SQ_ND Primitive to_primitive() const override;
 };
 
 } // namespace sq::system::standard

@@ -20,12 +20,8 @@ using PrimitiveInt = std::int64_t;
 using PrimitiveFloat = double;
 using PrimitiveBool = bool;
 
-using Primitive = std::variant<
-    PrimitiveString,
-    PrimitiveInt,
-    PrimitiveFloat,
-    PrimitiveBool
->;
+using Primitive =
+    std::variant<PrimitiveString, PrimitiveInt, PrimitiveFloat, PrimitiveBool>;
 
 template <typename T>
 concept PrimitiveAlternative = util::Alternative<T, Primitive>;
@@ -33,15 +29,15 @@ concept PrimitiveAlternative = util::Alternative<T, Primitive>;
 template <typename T>
 concept PrimitiveLike = util::ConvertibleToAlternative<T, Primitive>;
 
-template <PrimitiveAlternative P>
-struct PrimitiveTypeName;
+template <PrimitiveAlternative P> struct PrimitiveTypeName;
 
 template <PrimitiveAlternative P>
-inline constexpr std::string_view primitive_type_name_v = PrimitiveTypeName<P>::value;
+inline constexpr std::string_view primitive_type_name_v =
+    PrimitiveTypeName<P>::value;
 
-SQ_ND std::string_view primitive_type_name(const Primitive& value);
-SQ_ND std::string primitive_to_str(const Primitive& value);
-SQ_ND std::string primitive_to_str(const PrimitiveAlternative auto& value);
+SQ_ND std::string_view primitive_type_name(const Primitive &value);
+SQ_ND std::string primitive_to_str(const Primitive &value);
+SQ_ND std::string primitive_to_str(const PrimitiveAlternative auto &value);
 
 } // namespace sq
 

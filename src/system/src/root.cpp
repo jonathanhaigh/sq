@@ -11,9 +11,6 @@
 
 namespace sq::system {
 
-FieldPtr root()
-{
-    return std::make_shared<standard::SqRootImpl>();
-}
+FieldPtr root() { return std::make_shared<standard::SqRootImpl>(); }
 
 } // namespace sq::system

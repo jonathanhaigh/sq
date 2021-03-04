@@ -15,37 +15,33 @@
 #include <iostream>
 
 namespace {
-int run_sq(int argc, char** argv)
-{
-    const auto args = gsl::span{argv, sq::util::to_size(argc)};
-    if (args.size() < 2) {
-        std::cerr << "Not enough args\n";
-        return 1;
-    }
-    if (args.size() > 2) {
-        std::cerr << "Too many args\n";
-        return 1;
-    }
-    const auto sq_command = std::string{args[1]};
-    auto tokens = sq::parser::TokenView{sq_command};
-    auto parser = sq::parser::Parser(tokens);
-    const auto ast = parser.parse();
-    const auto results = sq::results::ResultTree(ast, sq::system::root());
+int run_sq(int argc, char **argv) {
+  const auto args = gsl::span{argv, sq::util::to_size(argc)};
+  if (args.size() < 2) {
+    std::cerr << "Not enough args\n";
+    return 1;
+  }
+  if (args.size() > 2) {
+    std::cerr << "Too many args\n";
+    return 1;
+  }
+  const auto sq_command = std::string{args[1]};
+  auto tokens = sq::parser::TokenView{sq_command};
+  auto parser = sq::parser::Parser(tokens);
+  const auto ast = parser.parse();
+  const auto results = sq::results::ResultTree(ast, sq::system::root());
 
-    sq::serialization::serialize_results(std::cerr, results);
+  sq::serialization::serialize_results(std::cerr, results);
 
-    return 0;
+  return 0;
 }
 } // namespace
 
-int main(int argc, char** argv)
-{
-    try {
-        return run_sq(argc, argv);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
+int main(int argc, char **argv) {
+  try {
+    return run_sq(argc, argv);
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
 }

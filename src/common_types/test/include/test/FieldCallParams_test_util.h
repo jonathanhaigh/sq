@@ -16,8 +16,8 @@ namespace sq::test {
 using PosParam = FieldCallParams::PosParams::value_type;
 using NamedParam = FieldCallParams::NamedParams::value_type;
 
-SQ_ND FieldCallParams params(auto&&... args);
-SQ_ND NamedParam named(std::string_view name, PrimitiveLike auto&& np);
+SQ_ND FieldCallParams params(auto &&...args);
+SQ_ND NamedParam named(std::string_view name, PrimitiveLike auto &&np);
 
 } // namespace sq::test
 

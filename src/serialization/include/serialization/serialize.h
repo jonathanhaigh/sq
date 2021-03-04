@@ -12,7 +12,7 @@
 
 namespace sq::serialization {
 
-void serialize_results(std::ostream& os, const results::ResultTree& results);
+void serialize_results(std::ostream &os, const results::ResultTree &results);
 
 } // namespace sq::serialization
 

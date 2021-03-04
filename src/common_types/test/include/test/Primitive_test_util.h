@@ -14,8 +14,8 @@
 
 namespace sq::test {
 
-SQ_ND Primitive to_primitive(PrimitiveString&& v);
-SQ_ND Primitive to_primitive(const PrimitiveString& v);
+SQ_ND Primitive to_primitive(PrimitiveString &&v);
+SQ_ND Primitive to_primitive(const PrimitiveString &v);
 SQ_ND Primitive to_primitive(std::string_view v);
 SQ_ND Primitive to_primitive(gsl::czstring<> v);
 SQ_ND Primitive to_primitive(PrimitiveInt v);
