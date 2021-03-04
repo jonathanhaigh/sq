@@ -20,8 +20,7 @@ namespace sq::util {
  * @param T type of data to store in each node of the tree.
  */
 template <typename T>
-requires std::movable<T> && std::equality_comparable<T>
-class MoveOnlyTree {
+requires std::movable<T> &&std::equality_comparable<T> class MoveOnlyTree {
 public:
   using Children = std::vector<MoveOnlyTree<T>>;
 
