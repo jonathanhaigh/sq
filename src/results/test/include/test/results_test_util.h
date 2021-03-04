@@ -39,7 +39,24 @@ struct MockField
  * A mock field that complains if an unexpected method call happens.
  */
 using StrictMockField = testing::StrictMock<MockField>;
-using StrictMockFieldPtr = std::unique_ptr<StrictMockField>;
+using StrictMockFieldPtr = std::shared_ptr<StrictMockField>;
+
+/**
+ * A fixture for tests that use MockFields.
+ */
+struct MockFieldTest
+    : public ::testing::Test
+{
+    MockFieldTest()
+    {
+        ::testing::DefaultValue<Result>::SetFactory([](){
+            return Result{std::make_shared<MockField>()};
+        });
+        ::testing::DefaultValue<FieldPtr>::SetFactory([](){
+            return FieldPtr{std::make_shared<MockField>()};
+        });
+    }
+};
 
 /**
  * Represents a field upon whose accesses we *dont* have expectations.

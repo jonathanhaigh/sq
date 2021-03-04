@@ -5,13 +5,16 @@
 #ifndef SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
 #define SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
 
-#include "common_types/FieldCallParams.h"
 #include "common_types/InvalidFieldError.h"
+#include "common_types/FieldCallParams.h"
 
 namespace sq::system {
 
 template <typename Impl>
-Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const FieldCallParams& params) const
+Result {{= name }}<Impl>::dispatch(
+    std::string_view member,
+    [[maybe_unused]] const FieldCallParams& params
+) const
 {
 {{
     -- Convert a value into a string that can be used in C++ code as a literal
@@ -47,7 +50,9 @@ Result {{= name }}<Impl>::get(std::string_view member, [[maybe_unused]] const Fi
 }}
     if (member.compare("{{= field.name }}") == 0)
     {
-        return static_cast<const Impl&>(*this).get_{{= field.name }}({{= table.concat(param_strs, ", ") }});
+        return static_cast<const Impl&>(*this).get_{{= field.name }}({{=
+            table.concat(param_strs, ", ")
+        }});
     }
 {{ end }}
 

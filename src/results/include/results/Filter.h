@@ -8,7 +8,6 @@
 
 #include "common_types/Field.h"
 #include "parser/FilterSpec.h"
-#include "results/ResultView.h"
 
 #include <gsl/gsl>
 #include <memory>
@@ -26,22 +25,9 @@ struct Filter
     [[nodiscard]] static FilterPtr create(const parser::FilterSpec& spec);
 
     /**
-     * Transform a Result so that it satisfies the requirements of this filter.
-     *
-     * I.e. if this filter requires a category of range that result can't
-     * satisfy, transform it into a suitable range.
-     *
-     * E.g. FieldRange<ranges::category::input> can't handle element access
-     * with negative indeces so this function might slurp a
-     * FieldRange<ranges::category::input> into a FieldVector and return that
-     * vector.
+     * Apply this filter to a Result.
      */
-    [[nodiscard]] virtual Result transform_result_for_requirements(Result&& result) const = 0;
-
-    /**
-     * Apply this filter to a ResultView.
-     */
-    [[nodiscard]] virtual ResultView view(ResultView&& result) const = 0;
+    [[nodiscard]] virtual Result operator()(Result&& result) const = 0;
 
     virtual ~Filter() = default;
     Filter() = default;

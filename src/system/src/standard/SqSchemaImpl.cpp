@@ -16,7 +16,7 @@ namespace sq::system::standard {
 
 Result SqSchemaImpl::get_root_type()
 {
-    return std::make_unique<SqTypeSchemaImpl>(schema().root_type());
+    return std::make_shared<SqTypeSchemaImpl>(schema().root_type());
 }
 
 Result SqSchemaImpl::get_types()
@@ -26,7 +26,7 @@ Result SqSchemaImpl::get_types()
     >{
         schema().types() | ranges::views::transform(
             [](const TypeSchema& ts) {
-                return std::make_unique<SqTypeSchemaImpl>(ts);
+                return std::make_shared<SqTypeSchemaImpl>(ts);
             }
         )
     };
@@ -39,7 +39,7 @@ Result SqSchemaImpl::get_primitive_types()
     >{
         schema().primitive_types() | ranges::views::transform(
             [](const PrimitiveTypeSchema& ps) {
-                return std::make_unique<SqPrimitiveTypeSchemaImpl>(ps);
+                return std::make_shared<SqPrimitiveTypeSchemaImpl>(ps);
             }
         )
     };

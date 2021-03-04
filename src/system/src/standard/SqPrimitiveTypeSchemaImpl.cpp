@@ -16,12 +16,12 @@ SqPrimitiveTypeSchemaImpl::SqPrimitiveTypeSchemaImpl(const PrimitiveTypeSchema& 
 
 Result SqPrimitiveTypeSchemaImpl::get_name() const
 {
-    return std::make_unique<SqStringImpl>(primitive_type_schema_->name());
+    return std::make_shared<SqStringImpl>(primitive_type_schema_->name());
 }
 
 Result SqPrimitiveTypeSchemaImpl::get_doc() const
 {
-    return std::make_unique<SqStringImpl>(primitive_type_schema_->doc());
+    return std::make_shared<SqStringImpl>(primitive_type_schema_->doc());
 }
 
 Primitive SqPrimitiveTypeSchemaImpl::to_primitive() const
