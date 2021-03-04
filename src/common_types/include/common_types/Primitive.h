@@ -27,18 +27,21 @@ using Primitive = std::variant<
     PrimitiveBool
 >;
 
-template <util::Alternative<Primitive> P>
+template <typename T>
+concept PrimitiveAlternative = util::Alternative<T, Primitive>;
+
+template <typename T>
+concept PrimitiveLike = util::ConvertibleToAlternative<T, Primitive>;
+
+template <PrimitiveAlternative P>
 struct PrimitiveTypeName;
 
-template <util::Alternative<Primitive> P>
+template <PrimitiveAlternative P>
 inline constexpr std::string_view primitive_type_name_v = PrimitiveTypeName<P>::value;
 
-[[nodiscard]] std::string_view primitive_type_name(const Primitive& value);
-
-[[nodiscard]] std::string primitive_to_str(const Primitive& value);
-
-template <util::Alternative<Primitive> T>
-[[nodiscard]] std::string primitive_to_str(const T& value);
+SQ_ND std::string_view primitive_type_name(const Primitive& value);
+SQ_ND std::string primitive_to_str(const Primitive& value);
+SQ_ND std::string primitive_to_str(const PrimitiveAlternative auto& value);
 
 } // namespace sq
 

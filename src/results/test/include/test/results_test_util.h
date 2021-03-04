@@ -3,6 +3,7 @@
 
 #include "results/results.h"
 #include "test/Primitive_test_util.h"
+#include "util/typeutil.h"
 
 #include <functional>
 #include <gmock/gmock.h>
@@ -19,6 +20,7 @@ using Data = ResultTree::Data;
 using ObjData = ResultTree::ObjData;
 using ObjDataField = ObjData::value_type;
 using ArrayData = ResultTree::ArrayData;
+using results::ResultTreeDataAlternative;
 
 /**
  * Represents a Field upon whose accesses we have expectations.
@@ -71,11 +73,9 @@ struct FakeField
         Result(std::string_view, const FieldCallParams&)
     >;
 
-    template <util::ConvertibleToAlternative<Primitive> T>
-    FakeField(ResultGenerator result_generator, T&& primitive);
+    FakeField(ResultGenerator result_generator, PrimitiveLike auto&& primitive);
 
-    template <util::ConvertibleToAlternative<Primitive> T>
-    FakeField(T&& primitive);
+    FakeField(PrimitiveLike auto&& primitive);
 
     FakeField(Result&& result);
     FakeField(ResultGenerator result_generator);
@@ -86,12 +86,12 @@ struct FakeField
     FakeField& operator=(FakeField&&) = delete;
     ~FakeField() noexcept = default;
 
-    [[nodiscard]] Result get(
+    SQ_ND Result get(
         std::string_view member,
         const FieldCallParams& params
     ) const override;
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     ResultGenerator result_generator_;
@@ -102,8 +102,7 @@ private:
  * Place an expectation on a mock field that its to_primitive() method will be
  * called exactly once and will return the given value.
  */
-template <util::ConvertibleToAlternative<Primitive> T>
-void expect_one_primitive_access(MockField& mf, T&& retval);
+void expect_one_primitive_access(MockField& mf, PrimitiveLike auto&& retval);
 
 /**
  * Place an expectation on a mock field that its fields will be called
@@ -120,44 +119,39 @@ void expect_field_accesses(
  * Place an expectation on a mock field that its fields will be called
  * according to the given call specifications.
  */
-template <typename... Args>
 void expect_field_accesses(
     MockField& mf,
     std::string_view field_name,
     const FieldCallParams& params,
     Result&& retval,
-    Args&&... args
+    auto&&... args
 );
 
 /**
  * Create a MockField whose only access is expected to be one call to
  * to_primitive().
  */
-template <util::ConvertibleToAlternative<Primitive> T>
-[[nodiscard]] StrictMockFieldPtr field_with_one_primitive_access(T&& retval);
+SQ_ND StrictMockFieldPtr field_with_one_primitive_access(PrimitiveLike auto&& retval);
 
 /**
  * Create a MockField whose only accesses are expected to be the calls in the
  * given specs.
  */
-template <typename... Args>
-[[nodiscard]] StrictMockFieldPtr field_with_accesses(Args&&... args);
+SQ_ND StrictMockFieldPtr field_with_accesses(auto&&... args);
 
 /**
  * Create a ResultTree representing an object with the given field names and
  * values.
  */
-template <typename... Args>
-[[nodiscard]] ResultTree obj_data_tree(Args&&... args);
+SQ_ND ResultTree obj_data_tree(auto&&... args);
 
 /**
  * Create a ResultTree representing an array with the given values.
  */
 template <util::ConvertibleToAlternative<ResultTree::Data>... Args>
-[[nodiscard]] ResultTree array_data_tree(Args&&... args);
+SQ_ND ResultTree array_data_tree(Args&&... args);
 
-template <util::ConvertibleToAlternative<Primitive> T>
-[[nodiscard]] ResultTree primitive_tree(T&& primitive);
+SQ_ND ResultTree primitive_tree(PrimitiveLike auto&& primitive);
 
 inline constexpr auto input = ranges::category::input;
 inline constexpr auto forward = ranges::category::forward;
@@ -173,8 +167,7 @@ inline constexpr auto all_categories = {
 };
 
 
-template <ranges::cpp20::view T>
-[[nodiscard]] Result to_field_range(ranges::category cat, T&& rng);
+SQ_ND Result to_field_range(ranges::category cat, ranges::cpp20::view auto&& rng);
 
 } // namespace sq::test
 

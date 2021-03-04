@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqParamSchemaImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqParamSchemaImpl_h_
 
-#include "system/SqParamSchema.gen.h"
-
 #include "system/schema.h"
+#include "system/SqParamSchema.gen.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 
@@ -20,12 +20,12 @@ class SqParamSchemaImpl
 public:
     explicit SqParamSchemaImpl(const ParamSchema& param_schema);
 
-    [[nodiscard]] Result get_name() const;
-    [[nodiscard]] Result get_doc() const;
-    [[nodiscard]] Result get_index() const;
-    [[nodiscard]] Result get_type() const;
+    SQ_ND Result get_name() const;
+    SQ_ND Result get_doc() const;
+    SQ_ND Result get_index() const;
+    SQ_ND Result get_type() const;
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     gsl::not_null<const ParamSchema*> param_schema_;

@@ -14,7 +14,7 @@ namespace sq {
 
 namespace {
 
-[[nodiscard]] std::string create_parse_error_message(
+SQ_ND std::string create_parse_error_message(
     const Token& token,
     const Token::KindSet& expecting
 )

@@ -15,7 +15,7 @@ namespace sq {
 
 namespace {
 
-[[nodiscard]] std::string create_oor_message(
+SQ_ND std::string create_oor_message(
     const Token& token,
     std::string_view message
 )

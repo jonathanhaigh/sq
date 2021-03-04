@@ -8,6 +8,7 @@
 #include "common_types/Primitive.h"
 #include "util/ASSERT.h"
 #include "util/strutil.h"
+#include "util/typeutil.h"
 
 #include <iostream>
 
@@ -32,17 +33,17 @@ const char* comparison_operator_to_str(ComparisonOperator op)
 } // namespace
 
 
-std::ostream& operator<<(std::ostream& os, [[maybe_unused]] NoFilterSpec nlfs)
+std::ostream& operator<<(std::ostream& os, SQ_MU NoFilterSpec nlfs)
 {
     return os;
 }
 
-bool operator==([[maybe_unused]] NoFilterSpec lhs, [[maybe_unused]] NoFilterSpec rhs)
+bool operator==(SQ_MU NoFilterSpec lhs, SQ_MU NoFilterSpec rhs)
 {
     return true;
 }
 
-bool operator!=([[maybe_unused]] NoFilterSpec lhs, [[maybe_unused]] NoFilterSpec rhs)
+bool operator!=(SQ_MU NoFilterSpec lhs, SQ_MU NoFilterSpec rhs)
 {
     return !(lhs == rhs);
 }

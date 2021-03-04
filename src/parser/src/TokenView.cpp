@@ -124,7 +124,7 @@ gsl::index TokenView::whitespace_length() const
 }
 
 bool TokenView::equal(
-    [[maybe_unused]] ranges::default_sentinel_t other
+    SQ_MU ranges::default_sentinel_t other
 ) const noexcept
 {
     return pos_ == -1;

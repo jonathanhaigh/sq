@@ -16,10 +16,9 @@ namespace sq::test {
 
 namespace detail {
 
-template <util::ConvertibleToAlternative<Primitive> T>
-void add_params(FieldCallParams& fcp, T&& p)
+void add_params(FieldCallParams& fcp, PrimitiveLike auto&& p)
 {
-    fcp.pos_params().emplace_back(to_primitive(std::forward<T>(p)));
+    fcp.pos_params().emplace_back(to_primitive(SQ_FWD(p)));
 }
 
 inline void add_params(FieldCallParams& fcp, NamedParam&& p)
@@ -27,27 +26,24 @@ inline void add_params(FieldCallParams& fcp, NamedParam&& p)
     fcp.named_params().emplace(std::move(p));
 }
 
-template <typename T, typename... Args>
-void add_params(FieldCallParams& fct, T&& p, Args&&... args)
+void add_params(FieldCallParams& fct, auto&& p, auto&&... args)
 {
-    add_params(fct, std::forward<T>(p));
-    add_params(fct, std::forward<Args>(args)...);
+    add_params(fct, SQ_FWD(p));
+    add_params(fct, SQ_FWD(args)...);
 }
 
 } // namespace detail
 
-template <typename... Args>
-FieldCallParams params(Args&&... args)
+FieldCallParams params(auto&&... args)
 {
     auto ret = FieldCallParams{};
-    detail::add_params(ret, std::forward<Args>(args)...);
+    detail::add_params(ret, SQ_FWD(args)...);
     return ret;
 }
 
-template <util::ConvertibleToAlternative<Primitive> T>
-NamedParam named(std::string_view name, T&& np)
+NamedParam named(std::string_view name, PrimitiveLike auto&& np)
 {
-    return NamedParam{name, to_primitive(std::forward<T>(np))};
+    return NamedParam{name, to_primitive(SQ_FWD(np))};
 }
 
 } // namespace sq::test

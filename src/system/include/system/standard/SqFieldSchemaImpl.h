@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_system_standard_SqFieldSchemaImpl_h_
 #define SQ_INCLUDE_GUARD_system_standard_SqFieldSchemaImpl_h_
 
-#include "system/SqFieldSchema.gen.h"
-
 #include "system/schema.h"
+#include "system/SqFieldSchema.gen.h"
+#include "util/typeutil.h"
 
 #include <gsl/gsl>
 
@@ -20,13 +20,13 @@ class SqFieldSchemaImpl
 public:
     explicit SqFieldSchemaImpl(const FieldSchema& field_schema);
 
-    [[nodiscard]] Result get_name() const;
-    [[nodiscard]] Result get_doc() const;
-    [[nodiscard]] Result get_params() const;
-    [[nodiscard]] Result get_return_type() const;
-    [[nodiscard]] Result get_return_list() const;
+    SQ_ND Result get_name() const;
+    SQ_ND Result get_doc() const;
+    SQ_ND Result get_params() const;
+    SQ_ND Result get_return_type() const;
+    SQ_ND Result get_return_list() const;
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     gsl::not_null<const FieldSchema*> field_schema_;

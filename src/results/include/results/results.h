@@ -9,6 +9,7 @@
 #include "common_types/Field.h"
 #include "common_types/Primitive.h"
 #include "parser/Ast.h"
+#include "util/typeutil.h"
 
 #include <string>
 #include <utility>
@@ -46,16 +47,19 @@ public:
     /**
      * Get the data associated with this node.
      */
-    [[nodiscard]] const Data& data() const { return data_; }
-    [[nodiscard]] Data& data() { return data_; }
+    SQ_ND const Data& data() const { return data_; }
+    SQ_ND Data& data() { return data_; }
     ///@}
 
 private:
     Data data_;
 };
 
-[[nodiscard]] bool operator==(const ResultTree& lhs, const ResultTree& rhs);
-[[nodiscard]] bool operator!=(const ResultTree& lhs, const ResultTree& rhs);
+template <typename T>
+concept ResultTreeDataAlternative = util::Alternative<T, ResultTree::Data>;
+
+SQ_ND bool operator==(const ResultTree& lhs, const ResultTree& rhs);
+SQ_ND bool operator!=(const ResultTree& lhs, const ResultTree& rhs);
 
 } // namespace sq::results
 

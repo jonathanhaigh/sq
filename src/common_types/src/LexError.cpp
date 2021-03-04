@@ -14,7 +14,7 @@ namespace sq {
 
 namespace {
 
-[[nodiscard]] std::string lex_error_message(
+SQ_ND std::string lex_error_message(
     gsl::index pos,
     std::string_view query
 )

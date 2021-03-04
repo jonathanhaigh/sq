@@ -7,7 +7,6 @@
 #define SQ_INCLUDE_GUARD_common_types_FieldCallParams_h_
 
 #include "common_types/Primitive.h"
-
 #include "util/typeutil.h"
 
 #include <map>
@@ -41,16 +40,16 @@ public:
     /**
      * Get the positional parameters for the field access.
      */
-    [[nodiscard]] PosParams& pos_params();
-    [[nodiscard]] const PosParams& pos_params() const;
+    SQ_ND PosParams& pos_params();
+    SQ_ND const PosParams& pos_params() const;
     ///@}
 
     ///@{
     /**
      * Get the named parameters for the field access
      */
-    [[nodiscard]] NamedParams& named_params();
-    [[nodiscard]] const NamedParams& named_params() const;
+    SQ_ND NamedParams& named_params();
+    SQ_ND const NamedParams& named_params() const;
     ///@}
 
     /**
@@ -60,8 +59,8 @@ public:
      * If the parameter is present but is not of the requested type then an
      * ArgumentTypeError is thrown.
      */
-    template <util::Alternative<Primitive> ParamType>
-    [[nodiscard]] const ParamType& get(size_t index, std::string_view name) const;
+    template <PrimitiveAlternative ParamType>
+    SQ_ND const ParamType& get(size_t index, std::string_view name) const;
 
     /**
      * Get an optional parameter given its name, index and type.
@@ -70,8 +69,8 @@ public:
      * ArgumentTypeError if the parameter is present but is not of the
      * requested type.
      */
-    template <util::Alternative<Primitive> ParamType>
-    [[nodiscard]] const ParamType* get_optional(size_t index, std::string_view name) const;
+    template <PrimitiveAlternative ParamType>
+    SQ_ND const ParamType* get_optional(size_t index, std::string_view name) const;
 
     /**
      * Get an optional parameter if it is present, else return a default value.
@@ -82,8 +81,8 @@ public:
      * Throws ArgumentTypeError if the parameter is present but is not of the
      * requested type.
      */
-    template <util::Alternative<Primitive> ParamType>
-    [[nodiscard]] const ParamType& get_or(
+    template <PrimitiveAlternative ParamType>
+    SQ_ND const ParamType& get_or(
         size_t index,
         std::string_view name,
         const ParamType& default_value
@@ -96,8 +95,8 @@ private:
 };
 
 std::ostream& operator <<(std::ostream& os, const FieldCallParams& params);
-[[nodiscard]] bool operator==(const FieldCallParams& lhs, const FieldCallParams& rhs);
-[[nodiscard]] bool operator!=(const FieldCallParams& lhs, const FieldCallParams& rhs);
+SQ_ND bool operator==(const FieldCallParams& lhs, const FieldCallParams& rhs);
+SQ_ND bool operator!=(const FieldCallParams& lhs, const FieldCallParams& rhs);
 
 } // namespace sq
 

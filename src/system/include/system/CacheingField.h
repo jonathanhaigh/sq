@@ -6,6 +6,7 @@
 #define SQ_INCLUDE_GUARD_system_CacheingField_h_
 
 #include "common_types/Field.h"
+#include "util/typeutil.h"
 
 #include <map>
 #include <string>
@@ -16,13 +17,13 @@ class CacheingField
     : public Field
 {
 public:
-    [[nodiscard]] Result get(
+    SQ_ND Result get(
         std::string_view member,
         const FieldCallParams& params
     ) const override;
 
 private:
-    [[nodiscard]] virtual Result dispatch(
+    SQ_ND virtual Result dispatch(
         std::string_view member,
         const FieldCallParams& params
     ) const = 0;

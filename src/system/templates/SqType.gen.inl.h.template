@@ -7,13 +7,14 @@
 
 #include "common_types/InvalidFieldError.h"
 #include "common_types/FieldCallParams.h"
+#include "util/typeutil.h"
 
 namespace sq::system {
 
 template <typename Impl>
 Result {{= name }}<Impl>::dispatch(
     std::string_view member,
-    [[maybe_unused]] const FieldCallParams& params
+    SQ_MU const FieldCallParams& params
 ) const
 {
 {{

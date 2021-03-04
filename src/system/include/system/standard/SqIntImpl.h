@@ -7,6 +7,7 @@
 #define SQ_INCLUDE_GUARD_system_standard_SqIntImpl_h_
 
 #include "system/SqInt.gen.h"
+#include "util/typeutil.h"
 
 namespace sq::system::standard {
 
@@ -16,7 +17,7 @@ class SqIntImpl
 public:
     explicit SqIntImpl(PrimitiveInt value);
 
-    [[nodiscard]] Primitive to_primitive() const override;
+    SQ_ND Primitive to_primitive() const override;
 
 private:
     PrimitiveInt value_;

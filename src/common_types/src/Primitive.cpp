@@ -12,10 +12,9 @@ namespace {
 
 struct PrimitiveTypeNameVisitor
 {
-    template <util::Alternative<Primitive> T>
-    [[nodiscard]] std::string_view operator()([[maybe_unused]] const T& value) const
+    SQ_ND std::string_view operator()(SQ_MU const PrimitiveAlternative auto& value) const
     {
-        return primitive_type_name_v<T>;
+        return primitive_type_name_v<std::remove_cvref_t<decltype(value)>>;
     }
 };
 
