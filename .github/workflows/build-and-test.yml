@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and test SQ
     steps:
+      - uses: actions/checkout@v2
       - uses: jonathanhaigh/sq-docker-build@20210305_3
         with:
           build-type: "release"
