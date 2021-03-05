@@ -12,5 +12,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: jonathanhaigh/sq-docker-build@20210305_3
         with:
-          build-type: "release"
+          build_type: "release"
           coverage: true
