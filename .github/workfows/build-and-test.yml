@@ -1,0 +1,15 @@
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  build_and_test_sq:
+    runs-on: ubuntu-latest
+    name: Build and test SQ
+    steps:
+      - uses: jonathanhaigh/sq-docker-build@20210305_3
+        with:
+          build-type: "release"
+          coverage: true
