@@ -20,6 +20,10 @@ include(cpp_standard.cmake)
 # 3rdparty subdir.
 include(sanitizer_flags.cmake)
 
+# Include before 3rd party so that GoogleTest classes are instrumented for
+# coverage
+include(coverage_flags.cmake)
+
 add_subdirectory(3rdparty)
 
 # For CodeChecker
