@@ -3,14 +3,14 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-    
+
 jobs:
   build_and_test_sq:
     runs-on: ubuntu-latest
     name: Build and test SQ
     steps:
       - uses: actions/checkout@v2
-      - uses: jonathanhaigh/sq-docker-build@20210305_5
+      - uses: jonathanhaigh/sq-docker-build@20210306_3
         with:
           build_type: "release"
           coverage: true
