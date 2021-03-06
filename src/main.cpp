@@ -31,7 +31,7 @@ int run_sq(int argc, char **argv) {
   const auto ast = parser.parse();
   const auto results = sq::results::ResultTree(ast, sq::system::root());
 
-  sq::serialization::serialize_results(std::cerr, results);
+  sq::serialization::serialize_results(std::cout, results);
 
   return 0;
 }
