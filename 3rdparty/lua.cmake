@@ -12,7 +12,9 @@ set(SQ_LUA_MAKE_CONFIG
 # We're building lua for the host so we only want to forward CMake's build
 # settings on to the Lua build if those build settings are also for the host.
 # If CMake is cross compiling then just use the default Lua build settings.
-if(NOT CMAKE_CROSSCOMPILING)
+if(NOT CMAKE_CROSSCOMPILING
+   AND CMAKE_C_COMPILER
+)
     list(APPEND SQ_LUA_MAKE_CONFIG "CC=${CMAKE_C_COMPILER}")
     list(APPEND SQ_LUA_MAKE_CONFIG "MYCFLAGS=${CMAKE_C_FLAGS}")
     list(APPEND SQ_LUA_MAKE_CONFIG "MYLDFLAGS=${CMAKE_EXE_LINKER_FLAGS}")
