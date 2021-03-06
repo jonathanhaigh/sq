@@ -505,6 +505,22 @@
                             "default_value": 0.0
                         }
                     ]
+                },
+                {
+                    "name": "string",
+                    "doc": "Get an SqString system object",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "value",
+                            "doc": "the value of the string to get",
+                            "type": "PrimitiveString",
+                            "required": false,
+                            "default_value": ""
+                        }
+                    ]
                 }
             ]
         },

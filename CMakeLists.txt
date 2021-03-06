@@ -24,6 +24,8 @@ include(sanitizer_flags.cmake)
 # coverage
 include(coverage_flags.cmake)
 
+option(SQ_BUILD_TESTS "Build SQ's tests" FALSE)
+
 # We add the gtest repo with the equivalent of "add_subdirectory" so by default
 # gtest would be installed by "cmake --build . --target install". We don't want
 # that.
@@ -34,8 +36,10 @@ add_subdirectory(3rdparty)
 # For CodeChecker
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-enable_testing()
-include(GoogleTest)
+if (SQ_BUILD_TESTS)
+    enable_testing()
+    include(GoogleTest)
+endif()
 
 include(warning_flags.cmake)
 include(optimization_flags.cmake)
@@ -43,3 +47,6 @@ include(options.cmake)
 include(clang-tidy.cmake)
 
 add_subdirectory(src)
+if (SQ_BUILD_TESTS)
+    add_subdirectory(test)
+endif()
