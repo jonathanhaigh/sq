@@ -10,6 +10,7 @@
 #include "system/standard/SqIntImpl.h"
 #include "system/standard/SqPathImpl.h"
 #include "system/standard/SqSchemaImpl.h"
+#include "system/standard/SqStringImpl.h"
 
 #include <memory>
 #include <range/v3/view/iota.hpp>
@@ -52,6 +53,10 @@ Result SqRootImpl::get_bool(PrimitiveBool value) {
 
 Result SqRootImpl::get_float(PrimitiveFloat value) {
   return std::make_shared<SqFloatImpl>(value);
+}
+
+Result SqRootImpl::get_string(const PrimitiveString &value) {
+  return std::make_shared<SqStringImpl>(value);
 }
 
 Primitive SqRootImpl::to_primitive() const { return PrimitiveString("ROOT"); }

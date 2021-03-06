@@ -19,7 +19,9 @@ foreach(SQ_LIB ${SQ_ALL_LIBS})
     add_subdirectory("${SQ_LIB}")
     target_link_libraries(sq "sq_${SQ_LIB}")
 
-    add_subdirectory("${SQ_LIB}/test")
+    if (SQ_BUILD_TESTS)
+        add_subdirectory("${SQ_LIB}/test")
+    endif()
 endforeach()
 
 install(TARGETS sq RUNTIME)
