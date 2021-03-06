@@ -21,3 +21,5 @@ foreach(SQ_LIB ${SQ_ALL_LIBS})
 
     add_subdirectory("${SQ_LIB}/test")
 endforeach()
+
+install(TARGETS sq RUNTIME)

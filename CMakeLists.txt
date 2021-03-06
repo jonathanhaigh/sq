@@ -24,6 +24,11 @@ include(sanitizer_flags.cmake)
 # coverage
 include(coverage_flags.cmake)
 
+# We add the gtest repo with the equivalent of "add_subdirectory" so by default
+# gtest would be installed by "cmake --build . --target install". We don't want
+# that.
+set(INSTALL_GTEST OFF)
+
 add_subdirectory(3rdparty)
 
 # For CodeChecker
