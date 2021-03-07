@@ -10,6 +10,7 @@
 #include "util/typeutil.h"
 
 #include <map>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -59,7 +60,7 @@ public:
    * ArgumentTypeError is thrown.
    */
   template <PrimitiveAlternative ParamType>
-  SQ_ND const ParamType &get(size_t index, std::string_view name) const;
+  SQ_ND ParamType get(size_t index, std::string_view name) const;
 
   /**
    * Get an optional parameter given its name, index and type.
@@ -69,21 +70,18 @@ public:
    * requested type.
    */
   template <PrimitiveAlternative ParamType>
-  SQ_ND const ParamType *get_optional(size_t index,
-                                      std::string_view name) const;
+  SQ_ND std::optional<ParamType> get_optional(size_t index,
+                                              std::string_view name) const;
 
   /**
    * Get an optional parameter if it is present, else return a default value.
-   *
-   * Note that default_value is returned by reference when the parameter is
-   * not present so be careful about the lifetime of default_value.
    *
    * Throws ArgumentTypeError if the parameter is present but is not of the
    * requested type.
    */
   template <PrimitiveAlternative ParamType>
-  SQ_ND const ParamType &get_or(size_t index, std::string_view name,
-                                const ParamType &default_value) const;
+  SQ_ND ParamType get_or(size_t index, std::string_view name,
+                         const ParamType &default_value) const;
 
 private:
   PosParams pos_params_;
