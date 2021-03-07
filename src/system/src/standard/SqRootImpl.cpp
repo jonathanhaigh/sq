@@ -21,9 +21,9 @@ namespace sq::system::standard {
 
 Result SqRootImpl::get_schema() { return std::make_shared<SqSchemaImpl>(); }
 
-Result SqRootImpl::get_path(const PrimitiveString *path) {
-  if (path != nullptr) {
-    return std::make_shared<SqPathImpl>(*path);
+Result SqRootImpl::get_path(const std::optional<PrimitiveString> &path) {
+  if (path != std::nullopt) {
+    return std::make_shared<SqPathImpl>(path.value());
   }
   return std::make_shared<SqPathImpl>(std::filesystem::current_path());
 }
@@ -32,14 +32,15 @@ Result SqRootImpl::get_int(PrimitiveInt value) {
   return std::make_shared<SqIntImpl>(value);
 }
 
-Result SqRootImpl::get_ints(PrimitiveInt start, const PrimitiveInt *stop) {
+Result SqRootImpl::get_ints(PrimitiveInt start,
+                            const std::optional<PrimitiveInt> &stop) {
   auto int_to_sq_int = [](const auto i) {
     return std::make_shared<SqIntImpl>(i);
   };
-  if (stop != nullptr) {
+  if (stop != std::nullopt) {
     return FieldRange<ranges::category::bidirectional |
                       ranges::category::sized>{
-        ranges::views::iota(start, *stop) |
+        ranges::views::iota(start, stop.value()) |
         ranges::views::transform(int_to_sq_int)};
   }
   return FieldRange<ranges::category::bidirectional>{

@@ -10,7 +10,7 @@ jobs:
     name: Build and test SQ
     steps:
       - uses: actions/checkout@v2
-      - uses: jonathanhaigh/sq-docker-build@20210306_3
+      - uses: jonathanhaigh/sq-docker-build@20210307
         with:
           build_type: "release"
           coverage: true

@@ -15,13 +15,12 @@
 namespace sq {
 
 template <PrimitiveAlternative ParamType>
-const ParamType &FieldCallParams::get(size_t index,
-                                      std::string_view name) const {
+ParamType FieldCallParams::get(size_t index, std::string_view name) const {
   if (index < pos_params_.size()) {
-    const auto &value = pos_params_[index];
+    const auto &value = pos_params_.at(index);
     try {
-      return std::get<ParamType>(value);
-    } catch (const std::bad_variant_access &) {
+      return convert_primitive<ParamType>(value);
+    } catch (const InvalidConversionError &) {
       throw ArgumentTypeError{value, primitive_type_name_v<ParamType>};
     }
   }
@@ -38,18 +37,18 @@ const ParamType &FieldCallParams::get(size_t index,
 }
 
 template <PrimitiveAlternative ParamType>
-const ParamType *FieldCallParams::get_optional(size_t index,
-                                               std::string_view name) const {
+std::optional<ParamType>
+FieldCallParams::get_optional(size_t index, std::string_view name) const {
   try {
-    return &(get<ParamType>(index, name));
+    return get<ParamType>(index, name);
   } catch (const ArgumentMissingError &) {
-    return nullptr;
+    return std::nullopt;
   }
 }
 
 template <PrimitiveAlternative ParamType>
-const ParamType &FieldCallParams::get_or(size_t index, std::string_view name,
-                                         const ParamType &default_value) const {
+ParamType FieldCallParams::get_or(size_t index, std::string_view name,
+                                  const ParamType &default_value) const {
   try {
     return get<ParamType>(index, name);
   } catch (const ArgumentMissingError &) {

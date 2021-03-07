@@ -71,29 +71,29 @@ TEST_F(FieldCallParamsTest, TestCorrectGet) {
 TEST_F(FieldCallParamsTest, TestCorrectGetOptional) {
   SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-  const auto *s1 = fcp_.get_optional<PrimitiveString>(0, "s1");
-  ASSERT_NE(s1, nullptr);
-  EXPECT_EQ(*s1, "str1");
+  const auto s1 = fcp_.get_optional<PrimitiveString>(0, "s1");
+  ASSERT_NE(s1, std::nullopt);
+  EXPECT_EQ(s1, "str1");
 
-  const auto *i1 = fcp_.get_optional<PrimitiveInt>(1, "i1");
-  ASSERT_NE(i1, nullptr);
-  EXPECT_EQ(*i1, 1);
+  const auto i1 = fcp_.get_optional<PrimitiveInt>(1, "i1");
+  ASSERT_NE(i1, std::nullopt);
+  EXPECT_EQ(i1, 1);
 
-  const auto *s2a = fcp_.get_optional<PrimitiveString>(2, "s2");
-  ASSERT_NE(s2a, nullptr);
-  EXPECT_EQ(*s2a, "str2");
+  const auto s2a = fcp_.get_optional<PrimitiveString>(2, "s2");
+  ASSERT_NE(s2a, std::nullopt);
+  EXPECT_EQ(s2a, "str2");
 
-  const auto *s2b = fcp_.get_optional<PrimitiveString>(3, "s2");
-  ASSERT_NE(s2b, nullptr);
-  EXPECT_EQ(*s2b, "str2");
+  const auto s2b = fcp_.get_optional<PrimitiveString>(3, "s2");
+  ASSERT_NE(s2b, std::nullopt);
+  EXPECT_EQ(s2b, "str2");
 
-  const auto *i2a = fcp_.get_optional<PrimitiveInt>(2, "i2");
-  ASSERT_NE(i2a, nullptr);
-  EXPECT_EQ(*i2a, 2);
+  const auto i2a = fcp_.get_optional<PrimitiveInt>(2, "i2");
+  ASSERT_NE(i2a, std::nullopt);
+  EXPECT_EQ(i2a, 2);
 
-  const auto *i2b = fcp_.get_optional<PrimitiveInt>(3, "i2");
-  ASSERT_NE(i2b, nullptr);
-  EXPECT_EQ(*i2b, 2);
+  const auto i2b = fcp_.get_optional<PrimitiveInt>(3, "i2");
+  ASSERT_NE(i2b, std::nullopt);
+  EXPECT_EQ(i2b, 2);
 }
 
 TEST_F(FieldCallParamsTest, TestGetWithInvalidType) {
@@ -127,7 +127,7 @@ TEST_F(FieldCallParamsTest, TestGetWithMissingArgument) {
 TEST_F(FieldCallParamsTest, TestGetOptionalWithMissingArgument) {
   SCOPED_TRACE(testing::Message() << "fcp_= " << fcp_);
 
-  EXPECT_EQ(fcp_.get_optional<PrimitiveBool>(4, "s3"), nullptr);
+  EXPECT_EQ(fcp_.get_optional<PrimitiveBool>(4, "s3"), std::nullopt);
 }
 
 TEST_F(FieldCallParamsTest, TestEq) {
