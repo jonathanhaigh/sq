@@ -8,10 +8,36 @@ jobs:
   build_and_test_sq:
     runs-on: ubuntu-latest
     name: Build and test SQ
+    strategy:
+      matrix:
+        build_type: [ "Release", "Debug" ]
+        cxx_compiler: [ "clang++", "g++" ]
+        include:
+          # Generate a coverage report during the g++ Debug build
+          - build_type: "Debug"
+            cxx_compiler: "g++"
+            coverage: true
+            clang_tidy: false
+          # Run clang-tidy during the clang++ Debug build
+          - build_type: "Debug"
+            cxx_compiler: "clang++"
+            clang_tidy: true
+            coverage: false
+          - build_type: "Release"
+            cxx_compiler: "g++"
+            clang_tidy: false
+            coverage: false
+          - build_type: "Release"
+            cxx_compiler: "clang++"
+            clang_tidy: false
+            coverage: false
     steps:
       - uses: actions/checkout@v2
-      - uses: jonathanhaigh/sq-docker-build@20210307_2
+      - uses: jonathanhaigh/sq-docker-build@20210307_3
         with:
-          build_type: "release"
-          coverage: true
+          build_type: ${{ matrix.build_type }}
+          cxx_compiler: ${{ matrix.cxx_compiler }}
+          coverage: ${{ matrix.coverage }}
+          clang_tidy: ${{ matrix.clang_tidy }}
           coveralls_repo_token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          test: true
