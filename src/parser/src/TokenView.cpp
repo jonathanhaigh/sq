@@ -25,7 +25,7 @@ const auto &token_regex_map() {
       std::pair{Token::Kind::RBracket, std::regex{"\\]"}},
       std::pair{Token::Kind::Comma, std::regex{","}},
       std::pair{Token::Kind::Colon, std::regex{":"}},
-      std::pair{Token::Kind::DQString, std::regex{R"%("(?:[^"]|\\")*")%"}},
+      std::pair{Token::Kind::DQString, std::regex{R"%("(?:[^"\\]|\\.)*")%"}},
 
       // Order matters here:
       // * Prefer to match "<=" than "<" then "=".

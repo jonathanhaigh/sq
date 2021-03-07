@@ -4,13 +4,13 @@
 # ------------------------------------------------------------------------------
 
 find_package(Python3 COMPONENTS Interpreter)
-message("Python3 interpreter: ${Python3_EXECUTABLE}")
 
 execute_process(
     COMMAND "${Python3_EXECUTABLE}" -m pytest --version
     OUTPUT_QUIET
     ERROR_VARIABLE SQ_PYTEST_ERROR
-    RESULT_VARIABLE SQ_PYTEST_RESULT)
+    RESULT_VARIABLE SQ_PYTEST_RESULT
+)
 if(NOT "${SQ_PYTEST_RESULT}" EQUAL 0)
     message(FATAL_ERROR "Failed to get pytest version: ${SQ_PYTEST_ERROR}")
 endif()

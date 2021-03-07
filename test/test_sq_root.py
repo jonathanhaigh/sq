@@ -66,8 +66,8 @@ simple_tests.append(("bool(value=false)", { "bool": False }))
 invalid_args_tests.extend(f"bool({i})" for i in ('"true"', '"false"', "1", "1.0" ))
 
 # SqRoot::string
-simple_tests.extend((f'string("{i}")',       { "string": i }) for i in STRINGS)
-simple_tests.extend((f'string(value="{i}")', { "string": i }) for i in STRINGS)
+simple_tests.extend((f'string({util.quote(i)})',       { "string": i }) for i in STRINGS)
+simple_tests.extend((f'string(value={util.quote(i)})', { "string": i }) for i in STRINGS)
 invalid_args_tests.extend(f"string({i})" for i in ("-1" "1.0", "true", "false"))
 
 # SqRoot::ints
@@ -84,7 +84,7 @@ simple_tests.extend([
 ])
 
 # SqRoot::path
-simple_tests.extend((f'path("{i}")', { "path": i }) for i in PATH_STRS)
+simple_tests.extend((f'path({util.quote(i)})', { "path": i }) for i in PATH_STRS)
 
 @pytest.mark.parametrize("query,result", simple_tests)
 def test_simple(query, result):
