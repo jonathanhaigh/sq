@@ -39,6 +39,9 @@ SQ_ND std::string_view primitive_type_name(const Primitive &value);
 SQ_ND std::string primitive_to_str(const Primitive &value);
 SQ_ND std::string primitive_to_str(const PrimitiveAlternative auto &value);
 
+template <PrimitiveAlternative T>
+SQ_ND T convert_primitive(const Primitive &value);
+
 } // namespace sq
 
 #include "Primitive.inl.h"

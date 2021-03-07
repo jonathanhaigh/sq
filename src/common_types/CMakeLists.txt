@@ -26,6 +26,9 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/InternalError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/InternalError.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/InvalidConversionError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/InvalidConversionError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/InvalidFieldError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/InvalidFieldError.cpp"
 
