@@ -14,9 +14,10 @@ namespace sq::system::standard {
 class SqRootImpl : public SqRoot<SqRootImpl> {
 public:
   SQ_ND static Result get_schema();
-  SQ_ND static Result get_path(const PrimitiveString *path);
+  SQ_ND static Result get_path(const std::optional<PrimitiveString> &path);
   SQ_ND static Result get_int(PrimitiveInt value);
-  SQ_ND static Result get_ints(PrimitiveInt start, const PrimitiveInt *stop);
+  SQ_ND static Result get_ints(PrimitiveInt start,
+                               const std::optional<PrimitiveInt> &stop);
   SQ_ND static Result get_bool(PrimitiveBool value);
   SQ_ND static Result get_float(PrimitiveFloat value);
   SQ_ND static Result get_string(const PrimitiveString &value);
