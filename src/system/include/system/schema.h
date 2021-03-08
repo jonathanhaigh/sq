@@ -39,19 +39,23 @@ private:
 class ParamSchema {
 public:
   constexpr ParamSchema(std::string_view name, std::string_view doc,
-                        std::size_t index, std::size_t type_index)
-      : name_{name}, doc_{doc}, index_{index}, type_index_{type_index} {}
+                        std::size_t index, std::size_t type_index,
+                        bool required)
+      : name_{name}, doc_{doc}, index_{index},
+        type_index_{type_index}, required_{required} {}
 
   SQ_ND std::string_view name() const;
   SQ_ND std::string_view doc() const;
   SQ_ND std::size_t index() const;
   SQ_ND const PrimitiveTypeSchema &type() const;
+  SQ_ND bool required() const;
 
 private:
   std::string_view name_;
   std::string_view doc_;
   std::size_t index_;
   std::size_t type_index_;
+  bool required_;
 };
 
 class TypeSchema;
