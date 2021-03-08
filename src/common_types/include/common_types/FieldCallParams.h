@@ -9,6 +9,7 @@
 #include "common_types/Primitive.h"
 #include "util/typeutil.h"
 
+#include <compare>
 #include <map>
 #include <optional>
 #include <string>
@@ -83,14 +84,14 @@ public:
   SQ_ND ParamType get_or(size_t index, std::string_view name,
                          const ParamType &default_value) const;
 
+  SQ_ND auto operator<=>(const FieldCallParams &rhs) const = default;
+
 private:
   PosParams pos_params_;
   NamedParams named_params_;
 };
 
 std::ostream &operator<<(std::ostream &os, const FieldCallParams &params);
-SQ_ND bool operator==(const FieldCallParams &lhs, const FieldCallParams &rhs);
-SQ_ND bool operator!=(const FieldCallParams &lhs, const FieldCallParams &rhs);
 
 } // namespace sq
 

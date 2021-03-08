@@ -50,12 +50,4 @@ std::ostream &operator<<(std::ostream &os, const FieldCallParams &params) {
   return os;
 }
 
-bool operator==(const FieldCallParams &lhs, const FieldCallParams &rhs) {
-  return lhs.pos_params() == rhs.pos_params() &&
-         lhs.named_params() == rhs.named_params();
-}
-bool operator!=(const FieldCallParams &lhs, const FieldCallParams &rhs) {
-  return !(lhs == rhs);
-}
-
 } // namespace sq

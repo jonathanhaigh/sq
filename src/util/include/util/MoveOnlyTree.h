@@ -8,6 +8,7 @@
 
 #include "util/typeutil.h"
 
+#include <compare>
 #include <concepts>
 #include <iostream>
 #include <vector>
@@ -50,14 +51,7 @@ public:
   SQ_ND Children &children() noexcept { return children_; }
   ///@}
 
-  SQ_ND friend bool operator==(const MoveOnlyTree &lhs,
-                               const MoveOnlyTree &rhs) {
-    return lhs.children_ == rhs.children_ && lhs.data_ == rhs.data_;
-  }
-  SQ_ND friend bool operator!=(const MoveOnlyTree &lhs,
-                               const MoveOnlyTree &rhs) {
-    return !(lhs == rhs);
-  }
+  SQ_ND auto operator<=>(const MoveOnlyTree &) const = default;
 
 private:
   Children children_;

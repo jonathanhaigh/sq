@@ -11,6 +11,7 @@
 #include "util/MoveOnlyTree.h"
 #include "util/typeutil.h"
 
+#include <compare>
 #include <iosfwd>
 #include <string>
 #include <string_view>
@@ -68,14 +69,14 @@ public:
   SQ_ND FilterSpec &filter_spec() { return filter_spec_; }
   ///@}
 
+  SQ_ND auto operator<=>(const AstData &) const = default;
+
 private:
   std::string name_;
   FieldCallParams params_;
   FilterSpec filter_spec_;
 };
 std::ostream &operator<<(std::ostream &os, const AstData &ast_data);
-SQ_ND bool operator==(const AstData &lhs, const AstData &rhs);
-SQ_ND bool operator!=(const AstData &lhs, const AstData &rhs);
 
 using Ast = util::MoveOnlyTree<AstData>;
 
