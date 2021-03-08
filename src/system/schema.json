@@ -242,8 +242,7 @@
                         "* The parent of \"/home/user1/.file\" is \"/home/user1\".",
                         "* The parent of \"/usr/bin/sq\" is \"/usr/bin\".",
                         "* The parent of \"/usr/bin/\" is \"/usr/bin\".",
-                        "* The parent of \"/\" is \"/\".",
-                        "* The parent of \"C:\\\" is \"C:\\\"."
+                        "* The parent of \"/\" is \"/\"."
                     ],
                     "return_type": "SqPath",
                     "return_list": false,
@@ -260,8 +259,7 @@
                         "* The filename of \"/home/user1/.file\" is \".file\".",
                         "* The filename of \"/usr/bin/sq\" is \"sq\".",
                         "* The filename of \"/usr/bin/\" is \"\".",
-                        "* The filename of \"/\" is \"\".",
-                        "* The filename of \"C:\\\" is \"\"."
+                        "* The filename of \"/\" is \"\"."
                     ],
                     "return_type": "SqString",
                     "return_list": false,
@@ -279,8 +277,7 @@
                         "* The stem of \"/home/user1/.file\" is \".file\".",
                         "* The stem of \"/usr/bin/sq\" is \"sq\".",
                         "* The stem of \"/usr/bin/\" is \"\".",
-                        "* The stem of \"/\" is \"\".",
-                        "* The stem of \"C:\\\" is \"\"."
+                        "* The stem of \"/\" is \"\"."
                     ],
                     "return_type": "SqString",
                     "return_list": false,
@@ -301,8 +298,7 @@
                         "* The extension of \"/home/user1/.file\" is \"\".",
                         "* The extension of \"/usr/bin/sq\" is \"\".",
                         "* The extension of \"/usr/bin/\" is \"\".",
-                        "* The extension of \"/\" is \"\".",
-                        "* The extension of \"C:\\\" is \"\"."
+                        "* The extension of \"/\" is \"\"."
                     ],
                     "return_type": "SqString",
                     "return_list": false,
@@ -325,9 +321,7 @@
                         "Get the elements of the path in a list",
                         "Examples:",
                         "* The parts of \"/home/user1/Downloads/\" are:",
-                        "  [ \"/\", \"home\", \"user1\", \"Downloads\", \"\" ].",
-                        "* The parts of \"C:\\users\\user1\\file.tar.gz\" are:",
-                        "  [ \"C:\", \"/\", \"users\", \"user1\", \"file.tar.gz\" ]."
+                        "  [ \"/\", \"home\", \"user1\", \"Downloads\", \"\" ]."
                     ],
                     "return_type": "SqString",
                     "return_list": true,
