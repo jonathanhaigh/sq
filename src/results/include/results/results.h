@@ -11,6 +11,7 @@
 #include "parser/Ast.h"
 #include "util/typeutil.h"
 
+#include <compare>
 #include <string>
 #include <utility>
 #include <variant>
@@ -51,15 +52,14 @@ public:
   SQ_ND Data &data() { return data_; }
   ///@}
 
+  SQ_ND bool operator==(const ResultTree &) const = default;
+
 private:
   Data data_;
 };
 
 template <typename T>
 concept ResultTreeDataAlternative = util::Alternative<T, ResultTree::Data>;
-
-SQ_ND bool operator==(const ResultTree &lhs, const ResultTree &rhs);
-SQ_ND bool operator!=(const ResultTree &lhs, const ResultTree &rhs);
 
 } // namespace sq::results
 

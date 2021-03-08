@@ -20,13 +20,4 @@ std::ostream &operator<<(std::ostream &os, const AstData &ast_data) {
   return os;
 }
 
-bool operator==(const AstData &lhs, const AstData &rhs) {
-  return lhs.name() == rhs.name() && lhs.params() == rhs.params() &&
-         lhs.filter_spec() == rhs.filter_spec();
-}
-
-bool operator!=(const AstData &lhs, const AstData &rhs) {
-  return !(lhs == rhs);
-}
-
 } // namespace sq::parser

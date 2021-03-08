@@ -66,12 +66,4 @@ ResultTree::ResultTree(const parser::Ast &ast, Result &&result)
 
 ResultTree::ResultTree(Data &&data) : data_{std::move(data)} {}
 
-bool operator==(const ResultTree &lhs, const ResultTree &rhs) {
-  return lhs.data() == rhs.data();
-}
-
-bool operator!=(const ResultTree &lhs, const ResultTree &rhs) {
-  return !(lhs == rhs);
-}
-
 } // namespace sq::results
