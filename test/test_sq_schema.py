@@ -7,9 +7,11 @@ import copy
 import pytest
 import util
 
+
 def flatten_doc_list(entity):
     if isinstance(entity["doc"], list):
         entity["doc"] = "\n".join(entity["doc"])
+
 
 def test_schema(sq_schema):
     # We're going to test that the schema returned by SQ is (mostly) the same
@@ -20,7 +22,7 @@ def test_schema(sq_schema):
     # * doc arrays will have been converted to single strings with newlines.
     # * SqParamSchema::default_value and SqParamSchema::default_value_doc are
     #   not currently available when querying SQ.
-    # 
+    #
     # Modify the schema we got from schema.json to match what we think SQ
     # should return, then just do a test using "=="
     schema = copy.deepcopy(sq_schema)
@@ -35,15 +37,33 @@ def test_schema(sq_schema):
 
     result = util.sq(
         "schema {"
-            "types {"
-                "name doc fields { "
-                    "name doc return_type return_list params {"
-                        "name doc index type required"
-                    "}"
-                "}"
-            "}"
-            " primitive_types { name doc }"
-            " root_type"
+        "types {"
+        "name doc fields { "
+        "name doc return_type return_list params {"
+        "name doc index type required"
+        "}"
+        "}"
+        "}"
+        " primitive_types { name doc }"
+        " root_type"
         "}"
     )
-    assert result == { "schema": schema }
+    assert result == {"schema": schema}
+
+
+def test_schema_to_primitive(sq_schema):
+    assert util.sq('schema.types[="SqRoot"]') == {
+        "schema": {"types": ["SqRoot"]}
+    }
+
+    assert util.sq('schema.primitive_types[="PrimitiveInt"]') == {
+        "schema": {"primitive_types": ["PrimitiveInt"]}
+    }
+
+    assert util.sq('schema.types[="SqRoot"].fields[="schema"]') == {
+        "schema": {"types": [{"fields": ["schema"]}]}
+    }
+
+    assert util.sq(
+        'schema.types[="SqRoot"].fields[="int"].params[="value"]'
+    ) == {"schema": {"types": [{"fields": [{"params": ["value"]}]}]}}
