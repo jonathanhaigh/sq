@@ -19,6 +19,6 @@ add_test(
     NAME integration_tests
     COMMAND cmake -E env
         "SQ_BINARY=$<TARGET_FILE:sq>"
-        python3 -m pytest -p no:cacheprovider -v
+        python3 -m pytest -p no:cacheprovider -vv
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )

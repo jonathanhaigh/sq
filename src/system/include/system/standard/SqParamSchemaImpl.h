@@ -22,6 +22,7 @@ public:
   SQ_ND Result get_doc() const;
   SQ_ND Result get_index() const;
   SQ_ND Result get_type() const;
+  SQ_ND Result get_required() const;
 
   SQ_ND Primitive to_primitive() const override;
 

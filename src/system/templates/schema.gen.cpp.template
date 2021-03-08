@@ -88,11 +88,12 @@
             ))
             for _, param_schema in ipairs(field_schema.params) do
                 table.insert(param_schema_values, string.format(
-                    "ParamSchema{%q, %s, %d, %d }",
+                    "ParamSchema{%q, %s, %d, %d, %s }",
                     param_schema.name,
                     doc_to_str(param_schema.doc),
                     param_schema.index,
-                    pt_index_by_name[param_schema.type]
+                    pt_index_by_name[param_schema.type],
+                    tostring(param_schema.required)
                 ))
             end
         end
@@ -160,6 +161,11 @@ std::size_t ParamSchema::index() const
 const PrimitiveTypeSchema& ParamSchema::type() const
 {
     return g_pts.at(type_index_);
+}
+
+bool ParamSchema::required() const
+{
+  return required_;
 }
 
 std::string_view FieldSchema::name() const

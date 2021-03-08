@@ -5,6 +5,7 @@
 
 #include "system/standard/SqParamSchemaImpl.h"
 
+#include "system/standard/SqBoolImpl.h"
 #include "system/standard/SqIntImpl.h"
 #include "system/standard/SqPrimitiveTypeSchemaImpl.h"
 #include "system/standard/SqStringImpl.h"
@@ -30,6 +31,10 @@ Result SqParamSchemaImpl::get_index() const {
 
 Result SqParamSchemaImpl::get_type() const {
   return std::make_shared<SqPrimitiveTypeSchemaImpl>(param_schema_->type());
+}
+
+Result SqParamSchemaImpl::get_required() const {
+  return std::make_shared<SqBoolImpl>(param_schema_->required());
 }
 
 Primitive SqParamSchemaImpl::to_primitive() const {

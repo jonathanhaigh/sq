@@ -210,6 +210,13 @@
                     "return_type": "SqPrimitiveTypeSchema",
                     "return_list": false,
                     "params": []
+                },
+                {
+                    "name": "required",
+                    "doc": "Whether the parameter is required or not",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "params": []
                 }
             ]
         },
