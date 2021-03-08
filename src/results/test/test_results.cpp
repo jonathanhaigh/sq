@@ -52,7 +52,7 @@ struct ResultTreeTest : public MockFieldTest {};
 TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject) {
   const auto ast = generate_ast("a.b.c");
   const auto fcp = FieldCallParams{};
-  auto c = field_with_one_primitive_access(1);
+  auto c = field_with_no_accesses();
   auto b = field_with_accesses("c", fcp, std::move(c));
   auto a = field_with_accesses("b", fcp, std::move(b));
   auto root = field_with_accesses("a", fcp, std::move(a));
@@ -62,9 +62,9 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject) {
 TEST_F(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject) {
   const auto ast = generate_ast("a { b c d }");
   const auto fcp = FieldCallParams{};
-  auto b = field_with_one_primitive_access(1);
-  auto c = field_with_one_primitive_access(2);
-  auto d = field_with_one_primitive_access(3);
+  auto b = field_with_no_accesses();
+  auto c = field_with_no_accesses();
+  auto d = field_with_no_accesses();
   auto a = field_with_accesses("b", fcp, std::move(b), "c", fcp, std::move(c),
                                "d", fcp, std::move(d));
   auto root = field_with_accesses("a", fcp, std::move(a));
@@ -86,7 +86,7 @@ void test_minimal_system_calls_with_element_access(gsl::index index,
   ss << "a[" << index << "]";
   const auto ast = generate_ast(ss.str());
 
-  auto a0 = field_with_one_primitive_access(1);
+  auto a0 = field_with_no_accesses();
   auto mfg = testing::StrictMock<MockFieldGenerator>{};
   const auto normalized_index = (index >= 0) ? index : (size + index);
   EXPECT_CALL(mfg, get(normalized_index))
@@ -144,8 +144,7 @@ void test_minimal_system_calls_with_slice(std::optional<gsl::index> start,
   }
 
   for (auto i = start_v; compare(i, stop_v); i += step_v) {
-    EXPECT_CALL(mfg, get(i))
-        .WillOnce(Return(ByMove(field_with_one_primitive_access(1))));
+    EXPECT_CALL(mfg, get(i)).WillOnce(Return(ByMove(field_with_no_accesses())));
   }
   auto arange = FieldRange<Cat>{
       ranges::views::iota(gsl::index{0}, size) |
@@ -175,20 +174,26 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSlice) {
 
 template <ranges::category Cat>
 void test_minimal_system_calls_with_comparison_filter(
-    parser::ComparisonOperator op, gsl::index index, gsl::index size) {
+    std::string_view member, parser::ComparisonOperator op, gsl::index index,
+    gsl::index size) {
   SCOPED_TRACE(testing::Message()
                << "test_minimal_system_calls_with_comparison_filter<" << Cat
                << ">(" << op << ", " << index << ", " << size << ")");
 
   auto ss = std::stringstream{};
-  ss << "a[" << op << index << "]";
+  ss << "a[" << member << op << index << "]";
   const auto ast = generate_ast(ss.str());
 
   auto mfg = testing::StrictMock<MockFieldGenerator>{};
 
   for (int i = 0; i < size; ++i) {
-    EXPECT_CALL(mfg, get(i))
-        .WillOnce(Return(ByMove(std::make_shared<FakeField>(i))));
+    EXPECT_CALL(mfg, get(i)).WillOnce([&](gsl::index i) -> FieldPtr {
+      if (member.empty()) {
+        return std::make_shared<FakeField>(i);
+      }
+      return field_with_accesses(member, FieldCallParams{},
+                                 std::make_shared<FakeField>());
+    });
   }
 
   auto arange = FieldRange<Cat>{
@@ -203,20 +208,24 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter) {
   static constexpr auto size = gsl::index{5};
   for (const auto op : all_comparison_ops) {
     for (const auto i : {0, 3, 5}) {
-      test_minimal_system_calls_with_comparison_filter<input>(op, i, size);
-      test_minimal_system_calls_with_comparison_filter<forward>(op, i, size);
-      test_minimal_system_calls_with_comparison_filter<bidirectional>(op, i,
-                                                                      size);
-      test_minimal_system_calls_with_comparison_filter<random_access>(op, i,
-                                                                      size);
-      test_minimal_system_calls_with_comparison_filter<input | sized>(op, i,
-                                                                      size);
-      test_minimal_system_calls_with_comparison_filter<forward | sized>(op, i,
-                                                                        size);
-      test_minimal_system_calls_with_comparison_filter<bidirectional | sized>(
-          op, i, size);
-      test_minimal_system_calls_with_comparison_filter<random_access | sized>(
-          op, i, size);
+      for (const auto member : {"", "m"}) {
+        test_minimal_system_calls_with_comparison_filter<input>(member, op, i,
+                                                                size);
+        test_minimal_system_calls_with_comparison_filter<forward>(member, op, i,
+                                                                  size);
+        test_minimal_system_calls_with_comparison_filter<bidirectional>(
+            member, op, i, size);
+        test_minimal_system_calls_with_comparison_filter<random_access>(
+            member, op, i, size);
+        test_minimal_system_calls_with_comparison_filter<input | sized>(
+            member, op, i, size);
+        test_minimal_system_calls_with_comparison_filter<forward | sized>(
+            member, op, i, size);
+        test_minimal_system_calls_with_comparison_filter<bidirectional | sized>(
+            member, op, i, size);
+        test_minimal_system_calls_with_comparison_filter<random_access | sized>(
+            member, op, i, size);
+      }
     }
   }
 }
@@ -263,7 +272,7 @@ struct ResultTreeParamTest
 TEST_P(ResultTreeParamTest, TestParamPassing) {
   const auto [query, params] = GetParam();
   const auto ast = generate_ast(query);
-  auto a = field_with_one_primitive_access(0);
+  auto a = field_with_no_accesses();
   auto root = field_with_accesses("a", params, std::move(a));
   const auto results = ResultTree(ast, std::move(root));
 }
@@ -427,21 +436,35 @@ TEST_F(ResultTreeTest, TestSlice) {
   }
 }
 
-void test_comparison_filter(parser::ComparisonOperator op, ranges::category cat,
+void test_comparison_filter(std::string_view member,
+                            parser::ComparisonOperator op, ranges::category cat,
                             gsl::index index, gsl::index size) {
   SCOPED_TRACE(testing::Message() << "test_comparison_filter("
+                                  << "member=" << member << ", "
                                   << "op=" << op << ", "
                                   << "cat=" << cat << ", "
                                   << "index=" << index << ", "
                                   << "size=" << size << ")");
   auto ss = std::stringstream{};
-  ss << "a[" << op << index << "]";
+  ss << "a[" << member << op << index << "]";
   const auto ast = generate_ast(ss.str());
 
+  auto transformer = std::function<FieldPtr(PrimitiveInt)>{};
+  if (member.empty()) {
+    transformer = [](auto i) { return std::make_shared<FakeField>(i); };
+  } else {
+    transformer = [](auto i) {
+      return std::make_shared<FakeField>(
+          [=](SQ_MU std::string_view member,
+              SQ_MU const FieldCallParams &params) {
+            return std::make_shared<FakeField>(i);
+          });
+    };
+  }
+
   auto arange = to_field_range(cat, ranges::views::iota(PrimitiveInt{0}, size) |
-                                        ranges::views::transform([](auto i) {
-                                          return std::make_shared<FakeField>(i);
-                                        }));
+                                        ranges::views::transform(transformer));
+
   auto root = std::make_shared<FakeField>(std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
   ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
@@ -480,7 +503,11 @@ void test_comparison_filter(parser::ComparisonOperator op, ranges::category cat,
     const auto &prim = std::get<Primitive>(res_a_element);
     ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));
     const auto &primint = std::get<PrimitiveInt>(prim);
-    EXPECT_EQ(primint, begin_matching + i);
+    if (member.empty()) {
+      EXPECT_EQ(primint, begin_matching + i);
+    } else {
+      EXPECT_EQ(primint, 0);
+    }
   }
 }
 
@@ -490,7 +517,9 @@ TEST_F(ResultTreeTest, TestComparisonFilter) {
   for (const auto cat : all_categories) {
     for (const auto op : all_comparison_ops) {
       for (const auto index : ranges::views::iota(0, size)) {
-        test_comparison_filter(op, cat, index, size);
+        for (const auto member : {"", "m"}) {
+          test_comparison_filter(member, op, cat, index, size);
+        }
       }
     }
   }

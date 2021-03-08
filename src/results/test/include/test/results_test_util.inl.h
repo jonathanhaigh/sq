@@ -23,24 +23,11 @@ FakeField::FakeField(PrimitiveLike auto &&primitive)
       }},
       primitive_{test::to_primitive(SQ_FWD(primitive))} {}
 
-void expect_one_primitive_access(MockField &mf, PrimitiveLike auto &&retval) {
-  EXPECT_CALL(mf, to_primitive())
-      .Times(1)
-      .WillOnce(Return(to_primitive(SQ_FWD(retval))));
-}
-
 void expect_field_accesses(MockField &mf, std::string_view field_name,
                            const FieldCallParams &params, Result &&retval,
                            auto &&...args) {
   expect_field_accesses(mf, field_name, params, std::move(retval));
   expect_field_accesses(mf, SQ_FWD(args)...);
-}
-
-StrictMockFieldPtr
-field_with_one_primitive_access(PrimitiveLike auto &&retval) {
-  auto mf = std::make_shared<testing::StrictMock<MockField>>();
-  expect_one_primitive_access(*mf, SQ_FWD(retval));
-  return mf;
 }
 
 StrictMockFieldPtr field_with_accesses(auto &&...args) {
