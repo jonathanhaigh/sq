@@ -80,12 +80,13 @@ std::ostream &operator<<(std::ostream &os, const ComparisonOperator &op) {
 }
 
 std::ostream &operator<<(std::ostream &os, const ComparisonSpec &cs) {
-  os << cs.op_ << primitive_to_str(cs.value_);
+  os << cs.member_ << cs.op_ << primitive_to_str(cs.value_);
   return os;
 }
 
 bool operator==(const ComparisonSpec &lhs, const ComparisonSpec &rhs) {
-  return lhs.op_ == rhs.op_ && lhs.value_ == rhs.value_;
+  return lhs.member_ == rhs.member_ && lhs.op_ == rhs.op_ &&
+         lhs.value_ == rhs.value_;
 }
 
 bool operator!=(const ComparisonSpec &lhs, const ComparisonSpec &rhs) {

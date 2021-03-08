@@ -5,7 +5,9 @@
 
 #include "results/Filter.h"
 
+#include "common_types/FieldCallParams.h"
 #include "common_types/InternalError.h"
+#include "common_types/NotAScalarError.h"
 #include "common_types/NotAnArrayError.h"
 #include "common_types/OutOfRangeError.h"
 #include "util/ASSERT.h"
@@ -303,45 +305,7 @@ private:
 template <> struct FilterImpl<parser::ComparisonSpec> : Filter {
   using CompareFn = std::function<bool(const FieldPtr &)>;
 
-  static CompareFn create_compare_fn(const parser::ComparisonSpec &spec) {
-    switch (spec.op_) {
-    case parser::ComparisonOperator::GreaterThanOrEqualTo:
-      return [value = spec.value_](const FieldPtr &field) {
-        // https://bugs.llvm.org/show_bug.cgi?id=46235
-        // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
-        return field->to_primitive() >= value;
-      };
-    case parser::ComparisonOperator::GreaterThan:
-      return [value = spec.value_](const FieldPtr &field) {
-        // https://bugs.llvm.org/show_bug.cgi?id=46235
-        // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
-        return field->to_primitive() > value;
-      };
-    case parser::ComparisonOperator::LessThanOrEqualTo:
-      return [value = spec.value_](const FieldPtr &field) {
-        // https://bugs.llvm.org/show_bug.cgi?id=46235
-        // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
-        return field->to_primitive() <= value;
-      };
-    case parser::ComparisonOperator::LessThan:
-      return [value = spec.value_](const FieldPtr &field) {
-        // https://bugs.llvm.org/show_bug.cgi?id=46235
-        // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
-        return field->to_primitive() < value;
-      };
-    case parser::ComparisonOperator::Equals:
-      return [value = spec.value_](const FieldPtr &field) {
-        // https://bugs.llvm.org/show_bug.cgi?id=46235
-        // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
-        return field->to_primitive() == value;
-      };
-    }
-    ASSERT(false);
-    throw InternalError{"Invalid comparison operator"};
-  }
-
-  explicit FilterImpl(SQ_MU const parser::ComparisonSpec &spec)
-      : compare_{create_compare_fn(spec)} {}
+  explicit FilterImpl(SQ_MU const parser::ComparisonSpec &spec) : spec_{spec} {}
 
   SQ_ND Result operator()(Result &&result) const override {
     return std::visit(*this, std::move(result));
@@ -356,11 +320,53 @@ template <> struct FilterImpl<parser::ComparisonSpec> : Filter {
                      // If rng is allocating and constructing a new Field on
                      // every dereference, make sure we only do that once by
                      // caching the FieldPtr.
-                     ranges::views::cache1 | ranges::views::filter(compare_));
+                     ranges::views::cache1 |
+                     ranges::views::filter([&](const FieldPtr &field) {
+                       return compare(field);
+                     }));
   }
 
 private:
-  CompareFn compare_;
+  SQ_ND FieldPtr get_member(const FieldPtr &field) const {
+    if (spec_.member_.empty()) {
+      return field;
+    }
+    auto res = field->get(spec_.member_, FieldCallParams{});
+    if (std::holds_alternative<FieldPtr>(res)) {
+      return std::get<FieldPtr>(std::move(res));
+    }
+    auto ss = std::ostringstream{};
+    ss << "Cannot filter list by comparison of member \"" << spec_.member_
+       << "\" with value " << primitive_to_str(spec_.value_)
+       << " using operator \"" << spec_.op_ << "\": \"" << spec_.member_
+       << "\" is not a scalar field";
+    throw NotAScalarError(ss.str());
+  }
+
+  SQ_ND bool compare(const FieldPtr &field) const {
+    auto member_value = get_member(field)->to_primitive();
+    switch (spec_.op_) {
+    case parser::ComparisonOperator::GreaterThanOrEqualTo:
+      // https://bugs.llvm.org/show_bug.cgi?id=46235
+      // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+      return member_value >= spec_.value_;
+    case parser::ComparisonOperator::GreaterThan:
+      // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+      return member_value > spec_.value_;
+    case parser::ComparisonOperator::LessThanOrEqualTo:
+      // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+      return member_value <= spec_.value_;
+    case parser::ComparisonOperator::LessThan:
+      // NOLINTNEXTLINE(hicpp-use-nullptr,modernize-use-nullptr)
+      return member_value < spec_.value_;
+    case parser::ComparisonOperator::Equals:
+      return member_value == spec_.value_;
+    }
+    ASSERT(false);
+    throw InternalError{"Invalid comparison operator"};
+  }
+
+  parser::ComparisonSpec spec_;
 };
 
 struct FilterCreatorVisitor {

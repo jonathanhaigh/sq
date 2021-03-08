@@ -29,7 +29,10 @@ struct MockField : Field {
   MOCK_METHOD(Result, get,
               (std::string_view member, const FieldCallParams &params),
               (const, override));
-  MOCK_METHOD(Primitive, to_primitive, (), (const));
+
+  // Don't mock to_primitive() - we don't really care when it gets called - it
+  // should be cheap.
+  Primitive to_primitive() const override { return 0; }
 };
 
 /**
@@ -84,12 +87,6 @@ private:
 };
 
 /**
- * Place an expectation on a mock field that its to_primitive() method will be
- * called exactly once and will return the given value.
- */
-void expect_one_primitive_access(MockField &mf, PrimitiveLike auto &&retval);
-
-/**
  * Place an expectation on a mock field that its fields will be called
  * according to the given call specifications.
  */
@@ -105,17 +102,15 @@ void expect_field_accesses(MockField &mf, std::string_view field_name,
                            auto &&...args);
 
 /**
- * Create a MockField whose only access is expected to be one call to
- * to_primitive().
- */
-SQ_ND StrictMockFieldPtr
-field_with_one_primitive_access(PrimitiveLike auto &&retval);
-
-/**
  * Create a MockField whose only accesses are expected to be the calls in the
  * given specs.
  */
 SQ_ND StrictMockFieldPtr field_with_accesses(auto &&...args);
+
+/**
+ * Create a MockField with no expected accesses.
+ */
+SQ_ND StrictMockFieldPtr field_with_no_accesses();
 
 /**
  * Create a ResultTree representing an object with the given field names and

@@ -255,20 +255,26 @@ bool Parser::parse_slice_or_element_access(Ast &parent) {
   return true;
 }
 
-// condition: comparison_operator primitive_value
+// condition: Identifier? comparison_operator primitive_value
 bool Parser::parse_condition(Ast &parent) {
+
+  const auto opt_id = accept_token(Token::Kind::Identifier);
   const auto opt_op = parse_comparison_operator();
 
-  if (!opt_op) {
+  if (!opt_id && !opt_op) {
     return false;
   }
+  if (!opt_op) {
+    throw ParseError(tokens_.read(), expecting_);
+  }
+  const auto member = opt_id ? opt_id.value().view() : std::string_view{};
 
   auto prim = parse_primitive_value();
   if (!prim) {
     throw ParseError(tokens_.read(), expecting_);
   }
-  parent.data().filter_spec() =
-      ComparisonSpec{opt_op.value(), std::move(prim.value())};
+  parent.data().filter_spec() = ComparisonSpec{
+      std::string{member}, opt_op.value(), std::move(prim.value())};
   return true;
 }
 

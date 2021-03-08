@@ -31,6 +31,10 @@ void expect_field_accesses(MockField &mf, std::string_view field_name,
       .WillOnce(Return(ByMove(std::move(retval))));
 }
 
+StrictMockFieldPtr field_with_no_accesses() {
+  return std::make_shared<StrictMockField>();
+}
+
 namespace detail {
 
 void add_fields_to_obj_data(ObjData &obj, std::string_view field_name,

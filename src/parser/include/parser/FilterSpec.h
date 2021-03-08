@@ -59,6 +59,7 @@ enum class ComparisonOperator {
  * Represents a comparison to determine whether to keep a field or not.
  */
 struct ComparisonSpec {
+  std::string member_;
   ComparisonOperator op_;
   Primitive value_;
 };

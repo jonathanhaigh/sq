@@ -38,6 +38,9 @@ add_library(sq_common_types
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/NotAnArrayError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/NotAnArrayError.cpp"
 
+    "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/NotAScalarError.h"
+    "${SQ_COMMON_TYPES_SRC_DIR}/NotAScalarError.cpp"
+
     "${SQ_COMMON_TYPES_INCLUDE_DIR}/common_types/NotImplementedError.h"
     "${SQ_COMMON_TYPES_SRC_DIR}/NotImplementedError.cpp"
 
