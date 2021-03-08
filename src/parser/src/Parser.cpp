@@ -81,7 +81,7 @@ Ast *Parser::parse_dot_expression(Ast &parent) {
   return current_parent;
 }
 
-// field_call: Identifier parameter_list? list_filter?;
+// field_call: Identifier parameter_pack? list_filter?;
 bool Parser::parse_field_call(Ast &parent) {
   const auto opt_id = accept_token(Token::Kind::Identifier);
   if (!opt_id) {
@@ -93,37 +93,86 @@ bool Parser::parse_field_call(Ast &parent) {
   return true;
 }
 
-// parameter_pack: LParen parameter_list? Rparen
+// parameter_pack: LParen (
+//                    param_list_with_pos_params |
+//                    param_list_without_pos_params
+//                 )? RParen
+//
+// param_list_with_pos_params: positional_parameter
+//                             (Comma positional_parameter)*
+//                             (Comma named_parameter)*
+//
+// param_list_without_pos_params: named_parameter
+//                                (Comma named_parameter)*
+//
 bool Parser::parse_parameter_pack(Ast &parent) {
   if (!accept_token(Token::Kind::LParen)) {
     return false;
   }
-  (void)parse_parameter_list(parent);
+  // The code doesn't follow the same shape as the grammar (as written above)
+  // here because the grammar gets a bit messy but it's simple to say in code
+  // or English: A list of parameters, separated by commas, where parameters
+  // can be either positional or named, and all of the positional parameters
+  // must come before all of the named parameters.
+  auto pos_count = 0;
+  auto named_count = 0;
+  while (parse_parameter(parent, pos_count, named_count)) {
+  }
   (void)expect_token(Token::Kind::RParen);
   return true;
 }
 
-// parameter_list: parameter (Comma parameter)*
-bool Parser::parse_parameter_list(Ast &parent) {
-  if (!parse_parameter(parent)) {
+// Doesn't represent a symbol in the grammar because it's easier to code this
+// way.
+// Parses the next parameter in a parameter list, whether it's the first
+// argument or not, and whether it's positional or named.
+bool Parser::parse_parameter(Ast &parent, int &pos_count, int &named_count) {
+  // Require a comma unless we're parsing the first parameter
+  if ((pos_count + named_count) > 0 && !accept_token(Token::Kind::Comma)) {
     return false;
   }
-  while (accept_token(Token::Kind::Comma)) {
-    if (!parse_parameter(parent)) {
-      throw ParseError(tokens_.read(), expecting_);
-    }
+  // Only parse a positional parameter if we haven't seen any named ones yet.
+  if (named_count == 0 && parse_positional_parameter(parent)) {
+    ++pos_count;
+    return true;
   }
-  return true;
+  if (parse_named_parameter(parent)) {
+    ++named_count;
+    return true;
+  }
+  if ((pos_count + named_count) > 0) {
+    // We've seen a comma without a parameter after it
+    throw ParseError(tokens_.read(), expecting_);
+  }
+  return false;
 }
 
-// parameter: (primitive_value | named_parameter)
-bool Parser::parse_parameter(Ast &parent) {
+// positional_parameter: primitive_value
+bool Parser::parse_positional_parameter(Ast &parent) {
   if (auto opt_prim = parse_primitive_value()) {
     parent.data().params().pos_params().emplace_back(
         std::move(opt_prim.value()));
     return true;
   }
-  return parse_named_parameter(parent);
+  return false;
+}
+
+// named_parameter: Identifier Equals primitive_value
+bool Parser::parse_named_parameter(Ast &parent) {
+  const auto opt_id_token = accept_token(Token::Kind::Identifier);
+  if (!opt_id_token) {
+    return false;
+  }
+  const auto &id = opt_id_token.value().view();
+
+  (void)expect_token(Token::Kind::Equals);
+
+  auto opt_prim = parse_primitive_value();
+  if (!opt_prim) {
+    throw ParseError(tokens_.read(), expecting_);
+  }
+  parent.data().params().named_params().emplace(id, opt_prim.value());
+  return true;
 }
 
 // primitive_value: (Integer | DQString | bool)
@@ -197,24 +246,6 @@ std::optional<PrimitiveFloat> Parser::parse_float() {
   // has already told us that the token matches the pattern for a float.
   ASSERT(str_end == float_cstr + float_str.size());
   return ret;
-}
-
-// named_parameter: Identifier Equals primitive_value
-bool Parser::parse_named_parameter(Ast &parent) {
-  const auto opt_id_token = accept_token(Token::Kind::Identifier);
-  if (!opt_id_token) {
-    return false;
-  }
-  const auto &id = opt_id_token.value().view();
-
-  (void)expect_token(Token::Kind::Equals);
-
-  auto opt_prim = parse_primitive_value();
-  if (!opt_prim) {
-    throw ParseError(tokens_.read(), expecting_);
-  }
-  parent.data().params().named_params().emplace(id, opt_prim.value());
-  return true;
 }
 
 // list_filter: LBracket (slice_or_element_access | condition) RBracket

@@ -17,6 +17,7 @@
 
 #include <gsl/gsl>
 #include <gtest/gtest.h>
+#include <iostream>
 #include <range/v3/view/cartesian_product.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
@@ -264,7 +265,16 @@ TEST_F(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject) {
 // Param passing tests
 // -----------------------------------------------------------------------------
 
-using ParamPassingTestCase = std::tuple<std::string_view, FieldCallParams>;
+struct ParamPassingTestCase {
+  const char *query_;
+  FieldCallParams fcp_;
+};
+
+std::ostream &operator<<(std::ostream &os, const ParamPassingTestCase &pptc) {
+  os << "(query=" << pptc.query_ << ",fcp=" << pptc.fcp_ << ")";
+  return os;
+}
+
 struct ResultTreeParamTest
     : MockFieldTest,
       ::testing::WithParamInterface<ParamPassingTestCase> {};

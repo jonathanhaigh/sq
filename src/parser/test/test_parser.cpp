@@ -12,6 +12,7 @@
 #include "util/strutil.h"
 
 #include <gtest/gtest.h>
+#include <iostream>
 #include <limits>
 #include <string_view>
 #include <utility>
@@ -107,8 +108,18 @@ TEST(AstTest, MultipleEntrypoints) {
   expect_plain_leaf(b, "b");
 }
 
-using SimpleTestCase =
-    std::tuple<std::string_view, FieldCallParams, FilterSpec>;
+struct SimpleTestCase {
+  std::string_view query_;
+  FieldCallParams fcp_;
+  FilterSpec filter_spec_;
+};
+
+std::ostream &operator<<(std::ostream &os, const SimpleTestCase &tc) {
+  os << "(query=" << tc.query_ << ";fcp=" << tc.fcp_
+     << ";filter=" << util::variant_to_str(tc.filter_spec_) << ")";
+  return os;
+}
+
 class SimpleAstTest : public testing::TestWithParam<SimpleTestCase> {};
 
 TEST_P(SimpleAstTest, SimpleTest) {
@@ -417,7 +428,7 @@ INSTANTIATE_TEST_SUITE_P(
         SimpleTestCase{"a(false_n=1)", params(named("false_n", 1)),
                        no_filter_spec}));
 
-class InvalidQueryTest : public testing::TestWithParam<std::string_view> {};
+class InvalidQueryTest : public testing::TestWithParam<const char *> {};
 
 TEST_P(InvalidQueryTest, InvalidQuery) {
   try {
@@ -427,14 +438,13 @@ TEST_P(InvalidQueryTest, InvalidQuery) {
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    InvalidQueryTestInstantiation, InvalidQueryTest,
-    testing::Values(".a", "a.", "{", "a {", "}", "a }", "a { }", "{ }", "{ } a",
-                    "{ } a", "a(", "a)", "a(1", "a(\"str)", "a(p=)", "a(p)",
-                    "a(p=1,2)"
-                    "a(p-x)",
-                    "a[", "a]", "a[]", "a[=]", "a[10=]", "a[1.0]", "a[1.0:]",
-                    "a[:1.0:]", "a[::1.0]"));
+INSTANTIATE_TEST_SUITE_P(InvalidQueryTestInstantiation, InvalidQueryTest,
+                         testing::Values(".a", "a.", "{", "a {", "}", "a }",
+                                         "a { }", "{ }", "{ } a", "{ } a", "a(",
+                                         "a)", "a(1", "a(\"str)", "a(p=)",
+                                         "a(p)", "a(p=1,2)", "a(p-x)", "a[]",
+                                         "a[=]", "a[10=]", "a[1.0]", "a[1.0:]",
+                                         "a[:1.0:]", "a[::1.0]", "a(\")"));
 
 } // namespace
 } // namespace sq::test

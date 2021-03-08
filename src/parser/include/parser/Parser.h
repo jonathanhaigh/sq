@@ -42,13 +42,13 @@ private:
   SQ_ND Ast *parse_dot_expression(Ast &parent);
   SQ_ND bool parse_field_call(Ast &parent);
   SQ_ND bool parse_parameter_pack(Ast &parent);
-  SQ_ND bool parse_parameter_list(Ast &parent);
-  SQ_ND bool parse_parameter(Ast &parent);
+  SQ_ND bool parse_parameter(Ast &parent, int &pos_count, int &named_count);
+  SQ_ND bool parse_positional_parameter(Ast &parent);
+  SQ_ND bool parse_named_parameter(Ast &parent);
   SQ_ND std::optional<Primitive> parse_primitive_value();
   SQ_ND std::optional<PrimitiveString> parse_dqstring();
   SQ_ND std::optional<PrimitiveBool> parse_bool();
   SQ_ND std::optional<PrimitiveFloat> parse_float();
-  SQ_ND bool parse_named_parameter(Ast &parent);
   SQ_ND bool parse_list_filter(Ast &parent);
   SQ_ND bool parse_slice_or_element_access(Ast &parent);
   SQ_ND bool parse_condition(Ast &parent);
