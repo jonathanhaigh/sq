@@ -71,7 +71,7 @@ Result SqPathImpl::get_is_absolute() const {
 
 Result SqPathImpl::get_size() const {
   return std::make_shared<SqDataSizeImpl>(
-      gsl::narrow<std::size_t>(std::filesystem::file_size(value_)));
+      gsl::narrow<PrimitiveInt>(std::filesystem::file_size(value_)));
 }
 
 Primitive SqPathImpl::to_primitive() const { return value_.string(); }

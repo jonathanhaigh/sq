@@ -416,7 +416,7 @@
                     "params": [
                         {
                             "index": 0,
-                            "name": "path",
+                            "name": "value",
                             "doc": "the path to get",
                             "type": "PrimitiveString",
                             "required": false,
@@ -520,6 +520,22 @@
                             "type": "PrimitiveString",
                             "required": false,
                             "default_value": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "data_size",
+                    "doc": "Get an SqDataSize system object",
+                    "return_type": "SqDataSize",
+                    "return_list": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "bytes",
+                            "doc": "the size in bytes of the data",
+                            "type": "PrimitiveInt",
+                            "required": false,
+                            "default_value": 0
                         }
                     ]
                 }

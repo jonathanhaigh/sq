@@ -6,6 +6,7 @@
 #include "system/standard/SqRootImpl.h"
 
 #include "system/standard/SqBoolImpl.h"
+#include "system/standard/SqDataSizeImpl.h"
 #include "system/standard/SqFloatImpl.h"
 #include "system/standard/SqIntImpl.h"
 #include "system/standard/SqPathImpl.h"
@@ -58,6 +59,10 @@ Result SqRootImpl::get_float(PrimitiveFloat value) {
 
 Result SqRootImpl::get_string(const PrimitiveString &value) {
   return std::make_shared<SqStringImpl>(value);
+}
+
+Result SqRootImpl::get_data_size(PrimitiveInt bytes) {
+  return std::make_shared<SqDataSizeImpl>(bytes);
 }
 
 Primitive SqRootImpl::to_primitive() const { return PrimitiveString("ROOT"); }

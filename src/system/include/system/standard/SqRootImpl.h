@@ -21,6 +21,7 @@ public:
   SQ_ND static Result get_bool(PrimitiveBool value);
   SQ_ND static Result get_float(PrimitiveFloat value);
   SQ_ND static Result get_string(const PrimitiveString &value);
+  SQ_ND static Result get_data_size(PrimitiveInt bytes);
   SQ_ND Primitive to_primitive() const override;
 };
 
