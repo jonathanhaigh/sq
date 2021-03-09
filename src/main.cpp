@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   try {
     return run_sq(argc, argv);
   } catch (const std::exception &e) {
-    std::cerr << e.what() << std::endl;
+    std::cerr << sq::util::base_type_name(e) << ": " << e.what() << std::endl;
     return 1;
   }
 }

@@ -110,7 +110,7 @@ def sq_error(query, pattern=None, flags=re.I):
     log(f"SQ stderr: {e.value.stderr}")
     log(f"SQ stdout: {e.value.stdout}")
     if pattern:
-        assert re.match(pattern, e.value.stderr, flags)
+        assert re.search(pattern, e.value.stderr, flags)
 
 
 def quote(string):
