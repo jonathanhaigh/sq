@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <gsl/gsl>
 #include <range/v3/range/concepts.hpp>
+#include <string>
 #include <type_traits>
 #include <variant>
 
@@ -101,7 +102,7 @@ concept SlowSizedRange =
  *
  * Throws if the value can't be represented by a gsl::index.
  */
-inline constexpr gsl::index to_index(std::integral auto v) {
+SQ_ND inline constexpr gsl::index to_index(std::integral auto v) {
   return gsl::narrow<gsl::index>(v);
 }
 
@@ -110,9 +111,16 @@ inline constexpr gsl::index to_index(std::integral auto v) {
  *
  * Throws if the value can't be represented by a std::size_t.
  */
-inline constexpr std::size_t to_size(std::integral auto v) {
+SQ_ND inline constexpr std::size_t to_size(std::integral auto v) {
   return gsl::narrow<std::size_t>(v);
 }
+
+/**
+ * Get the name of the "base type" of the given expression.
+ *
+ * The "base type" is the type with no references or cv qualification.
+ */
+SQ_ND std::string base_type_name(const auto &thing);
 
 } // namespace sq::util
 
@@ -128,5 +136,7 @@ inline constexpr bool enable_view<gsl::span<T, gsl::dynamic_extent>> = true;
 template <typename T> inline constexpr bool enable_view<gsl::span<T, 0>> = true;
 
 } // namespace ranges
+
+#include "util/typeutil.inl.h"
 
 #endif // SQ_INCLUDE_GUARD_util_typeutil_h_
