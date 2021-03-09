@@ -5,6 +5,7 @@
 
 #include "system/standard/SqDataSizeImpl.h"
 
+#include "common_types/OutOfRangeError.h"
 #include "system/standard/SqFloatImpl.h"
 #include "system/standard/SqIntImpl.h"
 
@@ -30,17 +31,23 @@ inline constexpr Multiplier multiplier_Ti = multiplier_Gi * multiplier_Ki;
 inline constexpr Multiplier multiplier_Pi = multiplier_Ti * multiplier_Ki;
 inline constexpr Multiplier multiplier_Ei = multiplier_Pi * multiplier_Ki;
 
-Result size_in_units(std::size_t size, Multiplier multiplier) {
+Result size_in_units(PrimitiveInt size, Multiplier multiplier) {
   return std::make_shared<SqFloatImpl>(gsl::narrow<PrimitiveFloat>(size) /
                                        gsl::narrow<PrimitiveFloat>(multiplier));
 }
 
 } // namespace
 
-SqDataSizeImpl::SqDataSizeImpl(std::size_t value) : value_{value} {}
+SqDataSizeImpl::SqDataSizeImpl(PrimitiveInt value) : value_{value} {
+  if (value < 0) {
+    auto ss = std::ostringstream{};
+    ss << "Cannot create SqDataSize object with negative value " << value;
+    throw OutOfRangeError(ss.str());
+  }
+}
 
 Result SqDataSizeImpl::get_B() const {
-  return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(value_));
+  return std::make_shared<SqIntImpl>(value_);
 }
 
 Result SqDataSizeImpl::get_KiB() const {

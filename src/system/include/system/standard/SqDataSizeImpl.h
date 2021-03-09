@@ -15,7 +15,7 @@ namespace sq::system::standard {
 
 class SqDataSizeImpl : public SqDataSize<SqDataSizeImpl> {
 public:
-  explicit SqDataSizeImpl(std::size_t value);
+  explicit SqDataSizeImpl(PrimitiveInt value);
 
   SQ_ND Result get_B() const;
   SQ_ND Result get_KiB() const;
@@ -33,7 +33,7 @@ public:
   SQ_ND Primitive to_primitive() const override;
 
 private:
-  std::size_t value_;
+  PrimitiveInt value_;
 };
 
 } // namespace sq::system::standard
