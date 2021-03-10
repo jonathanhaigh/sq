@@ -8,10 +8,14 @@ import os
 import pathlib
 import pytest
 
-DEFAULT_SCHEMA = pathlib.Path(__file__).parent.parent / "src/system/schema.json"
+DEFAULT_SCHEMA = (
+    pathlib.Path(__file__).parent.parent / "src/system/schema.json"
+)
+
 
 def pytest_addoption(parser):
     parser.addoption("--schema", action="store", default=DEFAULT_SCHEMA)
+
 
 def pytest_generate_tests(metafunc):
     # This is called for every test. Only get/set command line arguments

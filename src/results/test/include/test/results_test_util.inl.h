@@ -10,6 +10,8 @@
 #include "util/ASSERT.h"
 #include "util/typeutil.h"
 
+#include <range/v3/range/conversion.hpp>
+
 namespace sq::test {
 
 FakeField::FakeField(ResultGenerator result_generator,
@@ -18,10 +20,14 @@ FakeField::FakeField(ResultGenerator result_generator,
                                                SQ_FWD(primitive))} {}
 
 FakeField::FakeField(PrimitiveLike auto &&primitive)
-    : result_generator_{[&](auto, auto) {
-        return std::make_shared<FakeField>();
+    : result_generator_{[=](const auto &, const auto &) {
+        return std::make_shared<FakeField>(primitive);
       }},
       primitive_{test::to_primitive(SQ_FWD(primitive))} {}
+
+FieldPtr fake_field(auto &&...args) {
+  return std::make_shared<FakeField>(SQ_FWD(args)...);
+}
 
 void expect_field_accesses(MockField &mf, std::string_view field_name,
                            const FieldCallParams &params, Result &&retval,
@@ -88,6 +94,21 @@ ResultTree array_data_tree(Args &&...args) {
   auto arr = ArrayData{};
   detail::add_items_to_array_data(arr, SQ_FWD(args)...);
   return ResultTree{std::move(arr)};
+}
+
+template <ranges::cpp20::view R>
+requires std::is_convertible_v<ranges::cpp20::range_value_t<R>, ResultTree>
+    ResultTree to_array_data_tree(R &&rng) {
+  return ResultTree{SQ_FWD(rng) | ranges::to<std::vector>()};
+}
+
+template <ranges::cpp20::view R>
+requires util::ConvertibleToAlternative<ranges::cpp20::range_value_t<R>,
+                                        ResultTree::Data>
+    ResultTree to_array_data_tree(R &&rng) {
+  return to_array_data_tree(SQ_FWD(rng) | rv::transform([](auto &&data) {
+                              return ResultTree{data};
+                            }));
 }
 
 ResultTree primitive_tree(PrimitiveLike auto &&primitive) {

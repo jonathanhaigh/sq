@@ -51,19 +51,14 @@ def test_schema(sq_schema):
     assert result == {"schema": schema}
 
 
-def test_schema_to_primitive(sq_schema):
-    assert util.sq('schema.types[="SqRoot"]') == {
-        "schema": {"types": ["SqRoot"]}
-    }
-
-    assert util.sq('schema.primitive_types[="PrimitiveInt"]') == {
-        "schema": {"primitive_types": ["PrimitiveInt"]}
-    }
-
-    assert util.sq('schema.types[="SqRoot"].fields[="schema"]') == {
-        "schema": {"types": [{"fields": ["schema"]}]}
-    }
-
+def test_schema_to_primitive():
+    assert util.sq('<schema.<types[="SqRoot"]') == ["SqRoot"]
+    assert util.sq('<schema.<primitive_types[="PrimitiveInt"]') == [
+        "PrimitiveInt"
+    ]
+    assert util.sq('<schema.<types[="SqRoot"].<fields[="schema"]') == [
+        ["schema"]
+    ]
     assert util.sq(
-        'schema.types[="SqRoot"].fields[="int"].params[="value"]'
-    ) == {"schema": {"types": [{"fields": [{"params": ["value"]}]}]}}
+        '<schema.<types[="SqRoot"].<fields[="int"].<params[="value"]'
+    ) == [[["value"]]]

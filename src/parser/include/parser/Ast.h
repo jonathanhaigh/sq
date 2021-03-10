@@ -20,6 +20,10 @@ namespace sq::parser {
 
 inline constexpr std::string_view ast_root_node_name = "root";
 
+enum class FieldAccessType { Default, Pullup };
+
+std::ostream &operator<<(std::ostream &os, const FieldAccessType &access_type);
+
 /**
  * The data for a node in an abstract syntax tree (AST) for an input query.
  *
@@ -46,12 +50,18 @@ public:
   AstData &operator=(AstData &&) = default;
   ~AstData() noexcept = default;
 
-  explicit AstData(std::string_view name) : name_(name) {}
+  AstData(std::string_view name, FieldAccessType access_type)
+      : name_{name}, access_type_{access_type} {}
 
   /**
    * Name of the field being accessed.
    */
   SQ_ND const std::string &name() const { return name_; }
+
+  /**
+   * The type of the field access.
+   */
+  SQ_ND FieldAccessType access_type() const { return access_type_; }
 
   ///@{
   /**
@@ -73,6 +83,7 @@ public:
 
 private:
   std::string name_;
+  FieldAccessType access_type_;
   FieldCallParams params_;
   FilterSpec filter_spec_;
 };
