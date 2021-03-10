@@ -93,9 +93,9 @@ void test_minimal_system_calls_with_element_access(gsl::index index,
   EXPECT_CALL(mfg, get(normalized_index))
       .WillOnce(Return(ByMove(std::move(a0))));
 
-  auto arange = FieldRange<Cat>{
-      ranges::views::iota(gsl::index{0}, size) |
-      ranges::views::transform([&](auto i) { return mfg.get(i); })};
+  auto arange =
+      FieldRange<Cat>{rv::iota(gsl::index{0}, size) |
+                      rv::transform([&](auto i) { return mfg.get(i); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
@@ -148,8 +148,8 @@ void test_minimal_system_calls_with_slice(std::optional<gsl::index> start,
     EXPECT_CALL(mfg, get(i)).WillOnce(Return(ByMove(field_with_no_accesses())));
   }
   auto arange = FieldRange<Cat>{
-      ranges::views::iota(gsl::index{0}, size) |
-      ranges::views::transform([&](auto index) { return mfg.get(index); })};
+      rv::iota(gsl::index{0}, size) |
+      rv::transform([&](auto index) { return mfg.get(index); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
@@ -190,16 +190,15 @@ void test_minimal_system_calls_with_comparison_filter(
   for (int i = 0; i < size; ++i) {
     EXPECT_CALL(mfg, get(i)).WillOnce([&](gsl::index i) -> FieldPtr {
       if (member.empty()) {
-        return std::make_shared<FakeField>(i);
+        return fake_field(i);
       }
-      return field_with_accesses(member, FieldCallParams{},
-                                 std::make_shared<FakeField>());
+      return field_with_accesses(member, FieldCallParams{}, fake_field());
     });
   }
 
-  auto arange = FieldRange<Cat>{
-      ranges::views::iota(gsl::index{0}, size) |
-      ranges::views::transform([&](auto i) { return mfg.get(i); })};
+  auto arange =
+      FieldRange<Cat>{rv::iota(gsl::index{0}, size) |
+                      rv::transform([&](auto i) { return mfg.get(i); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
@@ -237,7 +236,7 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter) {
 // -----------------------------------------------------------------------------
 TEST_F(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject) {
   const auto ast = generate_ast("a.b.c");
-  auto root = std::make_shared<FakeField>();
+  auto root = fake_field();
   const auto results = ResultTree{ast, std::move(root)};
 
   auto c = primitive_tree(0);
@@ -249,7 +248,7 @@ TEST_F(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject) {
 
 TEST_F(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject) {
   const auto ast = generate_ast("a {b c d}");
-  auto root = std::make_shared<FakeField>();
+  auto root = fake_field();
   const auto results = ResultTree{ast, std::move(root)};
 
   auto b = primitive_tree(0);
@@ -258,6 +257,49 @@ TEST_F(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject) {
   auto a =
       obj_data_tree("b", std::move(b), "c", std::move(c), "d", std::move(d));
   const auto expected = obj_data_tree("a", std::move(a));
+  EXPECT_EQ(results, expected);
+}
+
+TEST_F(ResultTreeTest, TestGeneratedTreeWithPullup) {
+  const auto ast = generate_ast("a.<b");
+  const auto results = ResultTree{ast, fake_field()};
+  EXPECT_EQ(results, obj_data_tree("a", primitive_tree(0)));
+}
+
+TEST_F(ResultTreeTest, TestGeneratedTreeWithDoublePullup) {
+  const auto ast = generate_ast("a.<b.<c");
+  const auto results = ResultTree{ast, fake_field()};
+  EXPECT_EQ(results, obj_data_tree("a", primitive_tree(0)));
+}
+
+TEST_F(ResultTreeTest, TestGeneratedTreeWithRootPullup) {
+  const auto ast = generate_ast("<a");
+  const auto results = ResultTree{ast, fake_field()};
+  EXPECT_EQ(results, primitive_tree(0));
+}
+
+TEST_F(ResultTreeTest, TestGeneratedTreeWithArrayPullup) {
+  const auto ast = generate_ast("a.<b");
+  auto root = fake_field(fake_field(fake_field_range(0, 10)));
+  const auto results = ResultTree{ast, std::move(root)};
+
+  const auto expected = obj_data_tree("a", int_array_data_tree(0, 10));
+  EXPECT_EQ(results, expected);
+}
+
+TEST_F(ResultTreeTest, TestGeneratedTreeWithDoubleArrayPullup) {
+  const auto ast = generate_ast("a.<b.<c");
+  auto a = fake_field([](auto, auto) {
+    return to_field_range(input, rv::iota(0, 10) | rv::transform([](int i) {
+                                   return fake_field(fake_field_range(0, i));
+                                 }));
+  });
+  const auto results = ResultTree{ast, fake_field(std::move(a))};
+
+  auto expected = obj_data_tree(
+      "a", to_array_data_tree(rv::iota(0, 10) | rv::transform([](auto i) {
+                                return int_array_data_tree(0, i);
+                              })));
   EXPECT_EQ(results, expected);
 }
 
@@ -323,11 +365,10 @@ void test_element_access(ranges::category cat, gsl::index index,
   const auto ast = generate_ast(ss.str());
 
   const auto normalized_index = (index >= 0) ? index : (size + index);
-  auto arange = to_field_range(cat, ranges::views::iota(PrimitiveInt{0}, size) |
-                                        ranges::views::transform([](auto i) {
-                                          return std::make_shared<FakeField>(i);
-                                        }));
-  auto root = std::make_shared<FakeField>(std::move(arange));
+  auto arange = to_field_range(
+      cat, rv::iota(PrimitiveInt{0}, size) |
+               rv::transform([](auto i) { return fake_field(i); }));
+  auto root = fake_field(std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
   ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
   const auto &res_root = std::get<ObjData>(results.data());
@@ -344,7 +385,7 @@ TEST_F(ResultTreeTest, TestElementAccess) {
   static constexpr auto size = gsl::index{4};
 
   for (const auto cat : all_categories) {
-    for (const auto index : ranges::views::iota(-size, size)) {
+    for (const auto index : rv::iota(-size, size)) {
       test_element_access(cat, index, size);
     }
   }
@@ -421,13 +462,11 @@ void test_slice(ranges::category cat, std::optional<gsl::index> start,
   auto expected_a = ResultTree{std::move(expected_a_data)};
   auto expected_root = obj_data_tree("a", std::move(expected_a));
 
-  auto system_a =
-      to_field_range(cat, ranges::views::iota(PrimitiveInt{0}, size) |
-                              ranges::views::transform([](auto i) {
-                                return std::make_shared<FakeField>(i);
-                              }));
+  auto system_a = to_field_range(
+      cat, rv::iota(PrimitiveInt{0}, size) |
+               rv::transform([](auto i) { return fake_field(i); }));
 
-  auto system_root = std::make_shared<FakeField>(std::move(system_a));
+  auto system_root = fake_field(std::move(system_a));
   const auto root = ResultTree(ast, std::move(system_root));
   ASSERT_EQ(root, expected_root);
 }
@@ -438,7 +477,7 @@ TEST_F(ResultTreeTest, TestSlice) {
   auto steps = OIL{std::nullopt, -3, -2, -1, 1, 2, 3};
 
   auto arg_packs =
-      ranges::views::cartesian_product(all_categories, indeces, indeces, steps);
+      rv::cartesian_product(all_categories, indeces, indeces, steps);
 
   for (auto arg_pack : arg_packs) {
     test_slice(std::get<0>(arg_pack), std::get<1>(arg_pack),
@@ -461,21 +500,19 @@ void test_comparison_filter(std::string_view member,
 
   auto transformer = std::function<FieldPtr(PrimitiveInt)>{};
   if (member.empty()) {
-    transformer = [](auto i) { return std::make_shared<FakeField>(i); };
+    transformer = [](auto i) { return fake_field(i); };
   } else {
     transformer = [](auto i) {
-      return std::make_shared<FakeField>(
+      return fake_field(
           [=](SQ_MU std::string_view member,
-              SQ_MU const FieldCallParams &params) {
-            return std::make_shared<FakeField>(i);
-          });
+              SQ_MU const FieldCallParams &params) { return fake_field(i); });
     };
   }
 
-  auto arange = to_field_range(cat, ranges::views::iota(PrimitiveInt{0}, size) |
-                                        ranges::views::transform(transformer));
+  auto arange = to_field_range(cat, rv::iota(PrimitiveInt{0}, size) |
+                                        rv::transform(transformer));
 
-  auto root = std::make_shared<FakeField>(std::move(arange));
+  auto root = fake_field(std::move(arange));
   const auto results = ResultTree(ast, std::move(root));
   ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
   const auto &res_root = std::get<ObjData>(results.data());
@@ -526,7 +563,7 @@ TEST_F(ResultTreeTest, TestComparisonFilter) {
 
   for (const auto cat : all_categories) {
     for (const auto op : all_comparison_ops) {
-      for (const auto index : ranges::views::iota(0, size)) {
+      for (const auto index : rv::iota(0, size)) {
         for (const auto member : {"", "m"}) {
           test_comparison_filter(member, op, cat, index, size);
         }
@@ -540,7 +577,7 @@ TEST_F(ResultTreeTest, TestNotAnArrayError) {
     SCOPED_TRACE(testing::Message() << "query=" << query);
 
     const auto ast = generate_ast(query);
-    auto root = std::make_shared<FakeField>();
+    auto root = fake_field();
 
     EXPECT_THROW({ auto results = ResultTree(ast, std::move(root)); },
                  NotAnArrayError);

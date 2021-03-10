@@ -25,9 +25,9 @@ BINARY_UNITS = ("B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB")
         for data_size in DATA_SIZES
         for base, units_tuple in ((1000, DECIMAL_UNITS), (1024, BINARY_UNITS))
         for exponent, unit in enumerate(units_tuple)
-    )
+    ),
 )
 def test_data_size_units(exponent, unit, base, data_size):
     size_in_units = data_size / (base ** exponent)
-    result = util.sq(f"data_size({data_size}).{unit}")["data_size"][unit]
+    result = util.sq(f"<data_size({data_size}).<{unit}")
     assert math.isclose(result, size_in_units)

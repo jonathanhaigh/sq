@@ -10,7 +10,8 @@
 namespace sq::test {
 
 FakeField::FakeField(Result &&result)
-    : result_generator_{[&](auto, auto) { return std::move(result); }} {}
+    : result_generator_{
+          [r = std::move(result)](const auto &, const auto &) { return r; }} {}
 
 FakeField::FakeField(ResultGenerator result_generator)
     : result_generator_{result_generator} {}
@@ -23,6 +24,13 @@ Result FakeField::get(std::string_view member,
 }
 
 Primitive FakeField::to_primitive() const { return primitive_; }
+
+Result fake_field_range(PrimitiveInt start, PrimitiveInt stop,
+                        ranges::category cat) {
+  return to_field_range(cat, rv::iota(start, stop) | rv::transform([](auto i) {
+                               return std::make_shared<FakeField>(i);
+                             }));
+}
 
 void expect_field_accesses(MockField &mf, std::string_view field_name,
                            const FieldCallParams &params, Result &&retval) {
@@ -47,6 +55,10 @@ void add_items_to_array_data(ArrayData &arr, ResultTree &&field_data) {
 }
 
 } // namespace detail
+
+ResultTree int_array_data_tree(PrimitiveInt start, PrimitiveInt stop) {
+  return to_array_data_tree(rv::iota(start, stop));
+}
 
 } // namespace sq::test
 

@@ -41,6 +41,7 @@ private:
   SQ_ND bool parse_brace_expression(Ast &parent);
   SQ_ND Ast *parse_dot_expression(Ast &parent);
   SQ_ND bool parse_field_call(Ast &parent);
+  SQ_ND FieldAccessType parse_field_access_type();
   SQ_ND bool parse_parameter_pack(Ast &parent);
   SQ_ND bool parse_parameter(Ast &parent, int &pos_count, int &named_count);
   SQ_ND bool parse_positional_parameter(Ast &parent);

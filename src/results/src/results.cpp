@@ -5,6 +5,7 @@
 
 #include "results/results.h"
 
+#include "common_types/PullupWithSiblingsError.h"
 #include "results/Filter.h"
 #include "util/typeutil.h"
 
@@ -45,8 +46,18 @@ Data ResultToDataVisitor::operator()(FieldPtr &&field) const {
     const auto visitor = ResultToDataVisitor{child};
     const auto filter = Filter::create(child.data().filter_spec());
     auto child_results = (*filter)(field->get(field_name, params));
-    obj.emplace_back(field_name,
-                     ResultTree{std::visit(visitor, std::move(child_results))});
+    auto child_data = std::visit(visitor, std::move(child_results));
+
+    if (child.data().access_type() == parser::FieldAccessType::Pullup) {
+      if (ast_->children().size() != 1) {
+        auto ss = std::ostringstream{};
+        ss << "Cannot use pullup access for field \"" << field_name
+           << "\": it has sibling fields.";
+        throw PullupWithSiblingsError{ss.str()};
+      }
+      return child_data;
+    }
+    obj.emplace_back(field_name, std::move(child_data));
   }
   return obj;
 }
@@ -54,7 +65,7 @@ Data ResultToDataVisitor::operator()(FieldPtr &&field) const {
 Data ResultToDataVisitor::operator()(ranges::cpp20::view auto &&rng) const {
   auto arr = ArrayData{};
   for (auto field : SQ_FWD(rng)) {
-    arr.emplace_back(*ast_, std::move(field));
+    arr.emplace_back(*ast_, field);
   }
   return arr;
 }

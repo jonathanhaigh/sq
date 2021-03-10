@@ -18,7 +18,7 @@ namespace sq::parser {
 Parser::Parser(const TokenView &tokens) : tokens_{tokens} {}
 
 Ast Parser::parse() {
-  auto ast = Ast{ast_root_node_name};
+  auto ast = Ast{ast_root_node_name, FieldAccessType::Default};
   if (!parse_query(ast)) {
     throw ParseError(tokens_.read(), expecting_);
   }
@@ -81,16 +81,28 @@ Ast *Parser::parse_dot_expression(Ast &parent) {
   return current_parent;
 }
 
-// field_call: Identifier parameter_pack? list_filter?;
+// field_call: field_access_type? Identifier parameter_pack? list_filter?;
 bool Parser::parse_field_call(Ast &parent) {
+  const auto fat = parse_field_access_type();
   const auto opt_id = accept_token(Token::Kind::Identifier);
-  if (!opt_id) {
+  if (fat == FieldAccessType::Default && !opt_id) {
     return false;
   }
-  auto &child = parent.children().emplace_back(opt_id.value().view());
+  if (!opt_id) {
+    throw ParseError(tokens_.read(), expecting_);
+  }
+  auto &child = parent.children().emplace_back(opt_id.value().view(), fat);
   (void)parse_parameter_pack(child);
   (void)parse_list_filter(child);
   return true;
+}
+
+// field_access_type: Pullup?
+FieldAccessType Parser::parse_field_access_type() {
+  if (accept_token(Token::Kind::LessThan)) {
+    return FieldAccessType::Pullup;
+  }
+  return FieldAccessType::Default;
 }
 
 // parameter_pack: LParen (

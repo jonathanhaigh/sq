@@ -8,13 +8,6 @@ import pytest
 import util
 
 
-@pytest.mark.parametrize("path", util.PATH_STRS)
-def test_string(path):
-    assert util.sq(f"path({util.quote(path)}).string") == {
-        "path": {"string": path}
-    }
-
-
 relative_path_infos = [
     {
         "path": ".",
@@ -150,6 +143,12 @@ absolute_path_infos = [
 all_path_infos = relative_path_infos + absolute_path_infos
 
 
+@pytest.mark.parametrize("path", util.PATH_STRS)
+def test_string(path):
+    result = util.sq(f"<path({util.quote(path)}).<string")
+    assert result == path
+
+
 @pytest.mark.parametrize("path_info", all_path_infos)
 def test_path(path_info):
     for attr in (
@@ -160,48 +159,48 @@ def test_path(path_info):
         "parts",
         "is_absolute",
     ):
-        assert util.sq(f"path({util.quote(path_info['path'])}).{attr}") == {
-            "path": {attr: path_info[attr]}
-        }
+        quoted_path = util.quote(path_info["path"])
+        result = util.sq(f"<path({quoted_path}).<{attr}")
+        assert result == path_info[attr]
 
 
 @pytest.mark.parametrize("path_info", all_path_infos)
 def test_absolute(path_info):
     path = path_info["path"]
+    quoted_path = util.quote(path)
 
     absolute_path = path_info["path"]
     if not path_info["is_absolute"]:
         absolute_path = f"{pathlib.Path.cwd()}/{path}"
 
-    assert util.sq(f"path({util.quote(path)}).absolute") == {
-        "path": {"absolute": absolute_path}
-    }
+    result = util.sq(f"<path({quoted_path}).<absolute")
+    assert result == absolute_path
 
 
 @pytest.mark.parametrize("path_info", relative_path_infos)
 def test_canonical(tmp_path, path_info):
     path = path_info["path"]
+    quoted_path = util.quote(path)
     canonical_path = (tmp_path / path).resolve()
     canonical_path.parent.mkdir(parents=True, exist_ok=True)
     canonical_path.touch(exist_ok=True)
-    assert util.sq(f"path({util.quote(path)}).canonical", cwd=tmp_path) == {
-        "path": {"canonical": str(canonical_path)}
-    }
+    result = util.sq(f"<path({quoted_path}).<canonical", cwd=tmp_path)
+    assert result == str(canonical_path)
 
 
 def test_size(tmp_path):
     path = tmp_path / "file"
+    quoted_path = util.quote(str(path))
     path.write_text("Some data")
     size = path.stat().st_size
-    assert util.sq(f"path({util.quote(str(path))}).size") == {
-        "path": {"size": size}
-    }
+    result = util.sq(f"<path({quoted_path}).<size")
+    assert result == size
 
 
 def test_children(tmp_path):
     children = [tmp_path / f for f in ("f1", "x", "achild")]
     for child in children:
         child.touch()
-    assert sorted(
-        util.sq(f"path.children", cwd=tmp_path)["path"]["children"]
-    ) == sorted([str(child) for child in children])
+    result = sorted(util.sq(f"<path.<children", cwd=tmp_path))
+    expected = sorted([str(child) for child in children])
+    assert result == expected
