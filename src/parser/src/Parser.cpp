@@ -5,10 +5,11 @@
 
 #include "parser/Parser.h"
 
-#include "common_types/ParseError.h"
+#include "common_types/errors.h"
 
 #include <cerrno>
 #include <cstdlib>
+#include <fmt/format.h>
 #include <gsl/gsl>
 #include <memory>
 #include <sstream>
@@ -20,17 +21,17 @@ Parser::Parser(const TokenView &tokens) : tokens_{tokens} {}
 Ast Parser::parse() {
   auto ast = Ast{ast_root_node_name, FieldAccessType::Default};
   if (!parse_query(ast)) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   return ast;
 }
 
-// query: field_tree_list Token::Kind::Eof
+// query: field_tree_list Eof
 bool Parser::parse_query(Ast &parent) {
   if (!parse_field_tree_list(parent)) {
     return false;
   };
-  (void)expect_token(Token::Kind::Eof);
+  (void)expect_token(TokenKind::Eof);
   return true;
 }
 
@@ -56,13 +57,13 @@ bool Parser::parse_field_tree(Ast &parent) {
 
 // brace_expression: LBrace field_tree_list RBrace
 bool Parser::parse_brace_expression(Ast &parent) {
-  if (!accept_token(Token::Kind::LBrace)) {
+  if (!accept_token(TokenKind::LBrace)) {
     return false;
   }
   if (!parse_field_tree_list(parent)) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
-  (void)expect_token(Token::Kind::RBrace);
+  (void)expect_token(TokenKind::RBrace);
   return true;
 }
 
@@ -72,9 +73,9 @@ Ast *Parser::parse_dot_expression(Ast &parent) {
     return nullptr;
   }
   auto current_parent = gsl::not_null{std::addressof(parent.children().back())};
-  while (accept_token(Token::Kind::Dot)) {
+  while (accept_token(TokenKind::Dot)) {
     if (!parse_field_call(*current_parent)) {
-      throw ParseError(tokens_.read(), expecting_);
+      throw ParseError{tokens_.read(), expecting_};
     }
     current_parent = std::addressof(current_parent->children().back());
   }
@@ -84,12 +85,12 @@ Ast *Parser::parse_dot_expression(Ast &parent) {
 // field_call: field_access_type? Identifier parameter_pack? list_filter?;
 bool Parser::parse_field_call(Ast &parent) {
   const auto fat = parse_field_access_type();
-  const auto opt_id = accept_token(Token::Kind::Identifier);
+  const auto opt_id = accept_token(TokenKind::Identifier);
   if (fat == FieldAccessType::Default && !opt_id) {
     return false;
   }
   if (!opt_id) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   auto &child = parent.children().emplace_back(opt_id.value().view(), fat);
   (void)parse_parameter_pack(child);
@@ -99,7 +100,7 @@ bool Parser::parse_field_call(Ast &parent) {
 
 // field_access_type: Pullup?
 FieldAccessType Parser::parse_field_access_type() {
-  if (accept_token(Token::Kind::LessThan)) {
+  if (accept_token(TokenKind::LessThan)) {
     return FieldAccessType::Pullup;
   }
   return FieldAccessType::Default;
@@ -118,7 +119,7 @@ FieldAccessType Parser::parse_field_access_type() {
 //                                (Comma named_parameter)*
 //
 bool Parser::parse_parameter_pack(Ast &parent) {
-  if (!accept_token(Token::Kind::LParen)) {
+  if (!accept_token(TokenKind::LParen)) {
     return false;
   }
   // The code doesn't follow the same shape as the grammar (as written above)
@@ -130,7 +131,7 @@ bool Parser::parse_parameter_pack(Ast &parent) {
   auto named_count = 0;
   while (parse_parameter(parent, pos_count, named_count)) {
   }
-  (void)expect_token(Token::Kind::RParen);
+  (void)expect_token(TokenKind::RParen);
   return true;
 }
 
@@ -140,7 +141,7 @@ bool Parser::parse_parameter_pack(Ast &parent) {
 // argument or not, and whether it's positional or named.
 bool Parser::parse_parameter(Ast &parent, int &pos_count, int &named_count) {
   // Require a comma unless we're parsing the first parameter
-  if ((pos_count + named_count) > 0 && !accept_token(Token::Kind::Comma)) {
+  if ((pos_count + named_count) > 0 && !accept_token(TokenKind::Comma)) {
     return false;
   }
   // Only parse a positional parameter if we haven't seen any named ones yet.
@@ -154,7 +155,7 @@ bool Parser::parse_parameter(Ast &parent, int &pos_count, int &named_count) {
   }
   if ((pos_count + named_count) > 0) {
     // We've seen a comma without a parameter after it
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   return false;
 }
@@ -171,17 +172,17 @@ bool Parser::parse_positional_parameter(Ast &parent) {
 
 // named_parameter: Identifier Equals primitive_value
 bool Parser::parse_named_parameter(Ast &parent) {
-  const auto opt_id_token = accept_token(Token::Kind::Identifier);
+  const auto opt_id_token = accept_token(TokenKind::Identifier);
   if (!opt_id_token) {
     return false;
   }
   const auto &id = opt_id_token.value().view();
 
-  (void)expect_token(Token::Kind::Equals);
+  (void)expect_token(TokenKind::Equals);
 
   auto opt_prim = parse_primitive_value();
   if (!opt_prim) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   parent.data().params().named_params().emplace(id, opt_prim.value());
   return true;
@@ -206,7 +207,7 @@ std::optional<Primitive> Parser::parse_primitive_value() {
 
 // DQString
 std::optional<PrimitiveString> Parser::parse_dqstring() {
-  const auto opt_token = accept_token(Token::Kind::DQString);
+  const auto opt_token = accept_token(TokenKind::DQString);
   if (!opt_token) {
     return std::nullopt;
   }
@@ -218,10 +219,10 @@ std::optional<PrimitiveString> Parser::parse_dqstring() {
 
 // bool: (BoolTrue | BoolFalse)
 std::optional<PrimitiveBool> Parser::parse_bool() {
-  if (accept_token(Token::Kind::BoolTrue)) {
+  if (accept_token(TokenKind::BoolTrue)) {
     return true;
   }
-  if (accept_token(Token::Kind::BoolFalse)) {
+  if (accept_token(TokenKind::BoolFalse)) {
     return false;
   }
   return std::nullopt;
@@ -234,7 +235,7 @@ std::optional<PrimitiveFloat> Parser::parse_float() {
   // doesn't seem to have implemented std::from_chars for floating point
   // types yet.
 
-  const auto opt_token = accept_token(Token::Kind::Float);
+  const auto opt_token = accept_token(TokenKind::Float);
   if (!opt_token) {
     return std::nullopt;
   }
@@ -247,12 +248,12 @@ std::optional<PrimitiveFloat> Parser::parse_float() {
   errno = 0;
   auto ret = std::strtod(float_cstr, &str_end);
   if (errno == ERANGE) {
-    auto ss = std::ostringstream{};
-    ss << "float " << float_str << " does not fit in required type; "
-       << "must be in the closed interval ["
-       << std::numeric_limits<PrimitiveFloat>::min() << ", "
-       << std::numeric_limits<PrimitiveFloat>::max() << "]";
-    throw OutOfRangeError(opt_token.value(), ss.str());
+    throw OutOfRangeError{
+        opt_token.value(),
+        fmt::format("float {} does not fit in required type;"
+                    " must be in the closed interval [{}, {}]",
+                    float_str, std::numeric_limits<PrimitiveFloat>::min(),
+                    std::numeric_limits<PrimitiveFloat>::max())};
   }
   // We shouldn't get errors other than range errors because the tokenizer
   // has already told us that the token matches the pattern for a float.
@@ -262,13 +263,13 @@ std::optional<PrimitiveFloat> Parser::parse_float() {
 
 // list_filter: LBracket (slice_or_element_access | condition) RBracket
 bool Parser::parse_list_filter(Ast &parent) {
-  if (!accept_token(Token::Kind::LBracket)) {
+  if (!accept_token(TokenKind::LBracket)) {
     return false;
   }
   if (!parse_slice_or_element_access(parent) && !parse_condition(parent)) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
-  (void)expect_token(Token::Kind::RBracket);
+  (void)expect_token(TokenKind::RBracket);
   return true;
 }
 
@@ -282,7 +283,7 @@ bool Parser::parse_slice_or_element_access(Ast &parent) {
   // tokens - they can both start with an Integer.
   //
   const auto opt_start = parse_integer<gsl::index>();
-  const auto opt_colon = accept_token(Token::Kind::Colon);
+  const auto opt_colon = accept_token(TokenKind::Colon);
   if (!opt_start && !opt_colon) {
     return false;
   }
@@ -291,7 +292,7 @@ bool Parser::parse_slice_or_element_access(Ast &parent) {
     return true;
   }
   const auto opt_stop = parse_integer<gsl::index>();
-  const auto opt_colon2 = accept_token(Token::Kind::Colon);
+  const auto opt_colon2 = accept_token(TokenKind::Colon);
   const auto opt_step = opt_colon2 ? parse_integer<gsl::index>() : std::nullopt;
 
   parent.data().filter_spec() = SliceSpec{opt_start, opt_stop, opt_step};
@@ -301,20 +302,20 @@ bool Parser::parse_slice_or_element_access(Ast &parent) {
 // condition: Identifier? comparison_operator primitive_value
 bool Parser::parse_condition(Ast &parent) {
 
-  const auto opt_id = accept_token(Token::Kind::Identifier);
+  const auto opt_id = accept_token(TokenKind::Identifier);
   const auto opt_op = parse_comparison_operator();
 
   if (!opt_id && !opt_op) {
     return false;
   }
   if (!opt_op) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   const auto member = opt_id ? opt_id.value().view() : std::string_view{};
 
   auto prim = parse_primitive_value();
   if (!prim) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   parent.data().filter_spec() = ComparisonSpec{
       std::string{member}, opt_op.value(), std::move(prim.value())};
@@ -329,19 +330,19 @@ bool Parser::parse_condition(Ast &parent) {
 //      Equals
 // )
 std::optional<ComparisonOperator> Parser::parse_comparison_operator() {
-  if (accept_token(Token::Kind::GreaterThanOrEqualTo)) {
+  if (accept_token(TokenKind::GreaterThanOrEqualTo)) {
     return ComparisonOperator::GreaterThanOrEqualTo;
   }
-  if (accept_token(Token::Kind::GreaterThan)) {
+  if (accept_token(TokenKind::GreaterThan)) {
     return ComparisonOperator::GreaterThan;
   }
-  if (accept_token(Token::Kind::LessThanOrEqualTo)) {
+  if (accept_token(TokenKind::LessThanOrEqualTo)) {
     return ComparisonOperator::LessThanOrEqualTo;
   }
-  if (accept_token(Token::Kind::LessThan)) {
+  if (accept_token(TokenKind::LessThan)) {
     return ComparisonOperator::LessThan;
   }
-  if (accept_token(Token::Kind::Equals)) {
+  if (accept_token(TokenKind::Equals)) {
     return ComparisonOperator::Equals;
   }
   return std::nullopt;
@@ -352,7 +353,7 @@ void Parser::shift_token() {
   expecting_.clear();
 }
 
-std::optional<Token> Parser::accept_token(Token::Kind kind) {
+std::optional<Token> Parser::accept_token(TokenKind kind) {
   Expects(ranges::begin(tokens_) != ranges::end(tokens_));
   if (tokens_.read().kind() == kind) {
     auto ret = tokens_.read();
@@ -363,10 +364,10 @@ std::optional<Token> Parser::accept_token(Token::Kind kind) {
   return std::nullopt;
 }
 
-Token Parser::expect_token(Token::Kind kind) {
+Token Parser::expect_token(TokenKind kind) {
   auto opt_token = accept_token(kind);
   if (!opt_token) {
-    throw ParseError(tokens_.read(), expecting_);
+    throw ParseError{tokens_.read(), expecting_};
   }
   return opt_token.value();
 }

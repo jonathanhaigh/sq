@@ -35,10 +35,8 @@ std::ostream &operator<<(std::ostream &os, const FieldAccessType &access_type) {
 
 std::ostream &operator<<(std::ostream &os, const AstData &ast_data) {
   Expects(!ast_data.name().empty());
-  os << ast_data.name() << "[" << ast_data.access_type() << "]("
-     << ast_data.params() << ")"
-     << "[" << util::variant_to_str(ast_data.filter_spec()) << "]";
-
+  os << fmt::format("{}[{}]({})[{}]", ast_data.name(), ast_data.access_type(),
+                    ast_data.params(), ast_data.filter_spec());
   return os;
 }
 

@@ -45,9 +45,7 @@ std::ostream &operator<<(std::ostream &os, ElementAccessSpec leas) {
 }
 
 std::ostream &operator<<(std::ostream &os, SliceSpec lss) {
-  os << util::optional_to_str(lss.start_) << ":"
-     << util::optional_to_str(lss.stop_) << ":"
-     << util::optional_to_str(lss.step_);
+  os << fmt::format("{}:{}:{}", lss.start_, lss.stop_, lss.step_);
   return os;
 }
 

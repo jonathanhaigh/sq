@@ -6,22 +6,13 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Primitive_h_
 #define SQ_INCLUDE_GUARD_common_types_Primitive_h_
 
+#include "Primitive.fwd.h"
+
 #include "util/typeutil.h"
 
-#include <cstdint>
-#include <string>
 #include <type_traits>
-#include <variant>
 
 namespace sq {
-
-using PrimitiveString = std::string;
-using PrimitiveInt = std::int64_t;
-using PrimitiveFloat = double;
-using PrimitiveBool = bool;
-
-using Primitive =
-    std::variant<PrimitiveString, PrimitiveInt, PrimitiveFloat, PrimitiveBool>;
 
 template <typename T>
 concept PrimitiveAlternative = util::Alternative<T, Primitive>;

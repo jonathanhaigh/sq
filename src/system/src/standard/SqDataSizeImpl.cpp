@@ -5,7 +5,7 @@
 
 #include "system/standard/SqDataSizeImpl.h"
 
-#include "common_types/OutOfRangeError.h"
+#include "common_types/errors.h"
 #include "system/standard/SqFloatImpl.h"
 #include "system/standard/SqIntImpl.h"
 
@@ -42,7 +42,7 @@ SqDataSizeImpl::SqDataSizeImpl(PrimitiveInt value) : value_{value} {
   if (value < 0) {
     auto ss = std::ostringstream{};
     ss << "Cannot create SqDataSize object with negative value " << value;
-    throw OutOfRangeError(ss.str());
+    throw OutOfRangeError{ss.str()};
   }
 }
 

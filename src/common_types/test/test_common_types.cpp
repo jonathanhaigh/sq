@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "common_types/ArgumentMissingError.h"
-#include "common_types/ArgumentTypeError.h"
 #include "common_types/FieldCallParams.h"
 #include "common_types/Primitive.h"
+#include "common_types/errors.h"
 #include "util/typeutil.h"
 
 #include <gtest/gtest.h>

@@ -6,14 +6,12 @@
 #include "results/Filter.h"
 
 #include "common_types/FieldCallParams.h"
-#include "common_types/InternalError.h"
-#include "common_types/NotAScalarError.h"
-#include "common_types/NotAnArrayError.h"
-#include "common_types/OutOfRangeError.h"
+#include "common_types/errors.h"
 #include "util/ASSERT.h"
 #include "util/SharedRange.h"
 #include "util/typeutil.h"
 
+#include <fmt/format.h>
 #include <functional>
 #include <gsl/gsl>
 #include <range/v3/range/conversion.hpp>
@@ -25,7 +23,6 @@
 #include <range/v3/view/reverse.hpp>
 #include <range/v3/view/stride.hpp>
 #include <range/v3/view/take.hpp>
-#include <sstream>
 
 namespace sq::results {
 
@@ -58,7 +55,7 @@ template <> struct FilterImpl<parser::ElementAccessSpec> : Filter {
   }
 
   SQ_ND Result operator()(SQ_MU const FieldPtr &fp) const {
-    throw NotAnArrayError("Cannot apply array filter to non-array field");
+    throw NotAnArrayError{"Cannot apply array filter to non-array field"};
   }
 
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {
@@ -81,14 +78,14 @@ private:
     auto end = ranges::end(rng);
     ranges::advance(it, index, end);
     if (it == end) {
-      std::ostringstream ss;
-      ss << "array element access (\"[" << index_ << "]\"): out of range";
+      auto message =
+          fmt::format("array element access (\"[{}]\"): out of range", index_);
       if constexpr (util::SlowSizedRange<decltype(rng)>) {
-        ss << "(size=" << ranges::distance(rng) << ")";
+        message += fmt::format("(size={})", ranges::distance(rng));
       }
       // clang-tidy bug: https://reviews.llvm.org/D72333
       // NOLINTNEXTLINE(readability-misleading-indentation)
-      throw OutOfRangeError(ss.str());
+      throw OutOfRangeError{message};
     }
     return std::move(*it);
   }
@@ -98,10 +95,9 @@ private:
     Expects(index < 0);
     auto nonneg_index = size + index;
     if (nonneg_index < 0) {
-      std::ostringstream ss;
-      ss << "array element access (\"[" << index_
-         << "]\"): out of range (size=" << size << ")";
-      throw OutOfRangeError(ss.str());
+      throw OutOfRangeError{
+          fmt::format("array element access (\"[{}]\"): out of range (size={})",
+                      index_, size)};
     }
     return nonnegative_index_access(SQ_FWD(rng), nonneg_index);
   }
@@ -118,7 +114,7 @@ template <> struct FilterImpl<parser::SliceSpec> : Filter {
   }
 
   SQ_ND Result operator()(SQ_MU const FieldPtr &fp) const {
-    throw NotAnArrayError("Cannot apply array filter to non-array field");
+    throw NotAnArrayError{"Cannot apply array filter to non-array field"};
   }
 
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {
@@ -312,7 +308,7 @@ template <> struct FilterImpl<parser::ComparisonSpec> : Filter {
   }
 
   SQ_ND Result operator()(SQ_MU const FieldPtr &field) const {
-    throw NotAnArrayError("Cannot apply array filter to non-array field");
+    throw NotAnArrayError{"Cannot apply array filter to non-array field"};
   }
 
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {
@@ -335,12 +331,12 @@ private:
     if (std::holds_alternative<FieldPtr>(res)) {
       return std::get<FieldPtr>(std::move(res));
     }
-    auto ss = std::ostringstream{};
-    ss << "Cannot filter list by comparison of member \"" << spec_.member_
-       << "\" with value " << primitive_to_str(spec_.value_)
-       << " using operator \"" << spec_.op_ << "\": \"" << spec_.member_
-       << "\" is not a scalar field";
-    throw NotAScalarError(ss.str());
+    throw NotAScalarError{
+        fmt::format("Cannot filter list by comparison of member \"{}\""
+                    " with value {} using operator \"{}\":"
+                    " \"{}\" is not a scalar field",
+                    spec_.member_, primitive_to_str(spec_.value_), spec_.op_,
+                    spec_.member_)};
   }
 
   SQ_ND bool compare(const FieldPtr &field) const {

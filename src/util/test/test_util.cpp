@@ -13,92 +13,24 @@ namespace sq::test {
 
 using namespace sq::util;
 
-TEST(UtilTest, JoinCStrings) {
-  const auto ints = {"0", "1", "2", "3", "4"};
-  std::ostringstream ss;
-  ss << join(ints);
-  EXPECT_EQ(ss.str(), "0, 1, 2, 3, 4");
+TEST(UtilTest, VariantFmtSpecialization) {
+  using Variant = std::variant<int, std::string>;
+
+  const auto v1 = Variant{10};
+  EXPECT_EQ(fmt::to_string(v1), std::string{"10"});
+
+  const auto v2 = Variant{std::string{"a string"}};
+  EXPECT_EQ(fmt::to_string(v2), std::string{"a string"});
 }
 
-TEST(UtilTest, JoinCStringsWithDelim) {
-  const auto ints = {"0", "1", "2", "3", "4"};
-  std::ostringstream ss;
-  ss << join(ints, "*");
-  EXPECT_EQ(ss.str(), "0*1*2*3*4");
-}
+TEST(UtilTest, OptionalFmtSpecialization) {
+  using Optional = std::optional<int>;
 
-TEST(UtilTest, JoinInts) {
-  const auto ints = {0, 1, 2, 3, 4};
-  std::ostringstream ss;
-  ss << join(ints);
-  EXPECT_EQ(ss.str(), "0, 1, 2, 3, 4");
-}
+  const auto o1 = Optional{10};
+  EXPECT_EQ(fmt::to_string(o1), std::string{"10"});
 
-TEST(UtilTest, JoinIntsWithDelim) {
-  const auto ints = {0, 1, 2, 3, 4};
-  std::ostringstream ss;
-  ss << join(ints, "()");
-  EXPECT_EQ(ss.str(), "0()1()2()3()4");
-}
-
-TEST(UtilTest, JoinIntsWithEmptyDelim) {
-  const auto ints = {0, 1, 2, 3, 4};
-  std::ostringstream ss;
-  ss << join(ints, "");
-  EXPECT_EQ(ss.str(), "01234");
-}
-
-TEST(UtilTest, Join0) {
-  const auto ints = std::initializer_list<int>{};
-  std::ostringstream ss;
-  ss << join(ints);
-  EXPECT_EQ(ss.str(), "");
-}
-
-TEST(UtilTest, Join0WithDelim) {
-  const auto ints = std::initializer_list<int>{};
-  std::ostringstream ss;
-  ss << join(ints, "*");
-  EXPECT_EQ(ss.str(), "");
-}
-
-TEST(UtilTest, Join1) {
-  const auto ints = {1};
-  std::ostringstream ss;
-  ss << join(ints);
-  EXPECT_EQ(ss.str(), "1");
-}
-
-TEST(UtilTest, Join1WithDelim) {
-  const auto ints = {1};
-  std::ostringstream ss;
-  ss << join(ints, "*");
-  EXPECT_EQ(ss.str(), "1");
-}
-
-TEST(UtilTest, VariantToStr) {
-  const auto ints = {0, 1, 2, 3, 4};
-  std::ostringstream ss;
-  for (auto i : ints) {
-    auto v = std::variant<int, std::string>{i};
-    ss << variant_to_str(v);
-    v = "*";
-    ss << variant_to_str(v);
-  }
-  EXPECT_EQ(ss.str(), "0*1*2*3*4*");
-}
-
-TEST(UtilTest, OptionalToStr) {
-  const auto ints = {0, 1, 2, 3, 4};
-  std::ostringstream ss;
-  for (auto i : ints) {
-    std::optional<int> opt;
-    if (i % 2) {
-      opt = i;
-    }
-    ss << optional_to_str(opt);
-  }
-  EXPECT_EQ(ss.str(), "13");
+  const auto o2 = Optional{};
+  EXPECT_EQ(fmt::to_string(o2), std::string{});
 }
 
 TEST(UtilTest, MoveOnlyTree) {

@@ -5,8 +5,7 @@
 
 #include "results/results.h"
 
-#include "common_types/NotAnArrayError.h"
-#include "common_types/OutOfRangeError.h"
+#include "common_types/errors.h"
 #include "parser/Ast.h"
 #include "parser/Parser.h"
 #include "parser/TokenView.h"
@@ -15,13 +14,14 @@
 #include "util/strutil.h"
 #include "util/typeutil.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <gsl/gsl>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <range/v3/view/cartesian_product.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
-#include <sstream>
 #include <utility>
 
 namespace sq::test {
@@ -83,9 +83,7 @@ void test_minimal_system_calls_with_element_access(gsl::index index,
                << "test_minimal_system_calls_with_element_access<" << Cat
                << ">(" << index << ", " << size << ")");
 
-  auto ss = std::stringstream{};
-  ss << "a[" << index << "]";
-  const auto ast = generate_ast(ss.str());
+  const auto ast = generate_ast(fmt::format("a[{}]", index));
 
   auto a0 = field_with_no_accesses();
   auto mfg = testing::StrictMock<MockFieldGenerator>{};
@@ -117,15 +115,12 @@ void test_minimal_system_calls_with_slice(std::optional<gsl::index> start,
                                           gsl::index size) {
   SCOPED_TRACE(testing::Message()
                << "test_minimal_system_calls_with_slice<" << Cat << ">("
-               << util::optional_to_str(start) << ", "
-               << util::optional_to_str(stop) << ", "
-               << util::optional_to_str(step) << ", " << size << ")");
+               << fmt::to_string(start) << ", " << fmt::to_string(stop) << ", "
+               << fmt::to_string(step) << ", " << size << ")");
 
-  auto ss = std::ostringstream{};
-  ss << "a[" << util::optional_to_str(start) << ":"
-     << util::optional_to_str(stop) << ":" << util::optional_to_str(step)
-     << "]";
-  const auto ast = generate_ast(ss.str());
+  const auto query = fmt::format("a[{}:{}:{}]", start, stop, step);
+  const auto ast = generate_ast(query);
+
   auto mfg = testing::StrictMock<MockFieldGenerator>{};
   auto step_v = step.value_or(1);
   auto start_v = start.value_or(0);
@@ -181,9 +176,7 @@ void test_minimal_system_calls_with_comparison_filter(
                << "test_minimal_system_calls_with_comparison_filter<" << Cat
                << ">(" << op << ", " << index << ", " << size << ")");
 
-  auto ss = std::stringstream{};
-  ss << "a[" << member << op << index << "]";
-  const auto ast = generate_ast(ss.str());
+  const auto ast = generate_ast(fmt::format("a[{}{}{}]", member, op, index));
 
   auto mfg = testing::StrictMock<MockFieldGenerator>{};
 
@@ -360,9 +353,8 @@ void test_element_access(ranges::category cat, gsl::index index,
                                   << "cat=" << cat << ", "
                                   << "index=" << index << ", "
                                   << "size=" << size << ")");
-  auto ss = std::stringstream{};
-  ss << "a[" << index << "]";
-  const auto ast = generate_ast(ss.str());
+
+  const auto ast = generate_ast(fmt::format("a[{}]", index));
 
   const auto normalized_index = (index >= 0) ? index : (size + index);
   auto arange = to_field_range(
@@ -403,18 +395,15 @@ TEST_F(ResultTreeTest, TestElementAccessOutOfRange) {
 void test_slice(ranges::category cat, std::optional<gsl::index> start,
                 std::optional<gsl::index> stop, std::optional<gsl::index> step,
                 gsl::index size) {
-  SCOPED_TRACE(testing::Message()
-               << "test_slice("
-               << "cat=" << cat << ", "
-               << "start=" << util::optional_to_str(start) << ", "
-               << "stop=" << util::optional_to_str(stop) << ", "
-               << "step=" << util::optional_to_str(step) << ", "
-               << "size=" << size << ")");
-  auto ss = std::ostringstream{};
-  ss << "a[" << util::optional_to_str(start) << ":"
-     << util::optional_to_str(stop) << ":" << util::optional_to_str(step)
-     << "]";
-  const auto ast = generate_ast(ss.str());
+  SCOPED_TRACE(testing::Message() << "test_slice("
+                                  << "cat=" << cat << ", "
+                                  << "start=" << fmt::to_string(start) << ", "
+                                  << "stop=" << fmt::to_string(stop) << ", "
+                                  << "step=" << fmt::to_string(step) << ", "
+                                  << "size=" << size << ")");
+
+  const auto query = fmt::format("a[{}:{}:{}]", start, stop, step);
+  const auto ast = generate_ast(query);
   auto step_v = step.value_or(1);
   auto start_v = gsl::index{0};
   auto stop_v = gsl::index{0};
@@ -494,9 +483,7 @@ void test_comparison_filter(std::string_view member,
                                   << "cat=" << cat << ", "
                                   << "index=" << index << ", "
                                   << "size=" << size << ")");
-  auto ss = std::stringstream{};
-  ss << "a[" << member << op << index << "]";
-  const auto ast = generate_ast(ss.str());
+  const auto ast = generate_ast(fmt::format("a[{}{}{}]", member, op, index));
 
   auto transformer = std::function<FieldPtr(PrimitiveInt)>{};
   if (member.empty()) {

@@ -112,3 +112,11 @@ into any SQ binaries.
 * License name: JSON License
 * License file: [3rdparty/LICENSE.RapidJSON.FULL](3rdparty/LICENSE.RapidJSON.FULL)
 * SPDX-License-Identifier: JSON
+
+### `{fmt}`
+The [`{fmt}`](https://fmt.dev) source code is downloaded as part of the SQ
+build process. It is incorporated into the main SQ binary and the SQ test
+binaries.
+* License name: MIT License
+* License file: [3rdparty/LICENSE.fmt.MIT](3rdparty/LICENSE.fmt.MIT)
+* SPDX-License-Identifier: MIT

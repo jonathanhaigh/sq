@@ -8,7 +8,7 @@
 
 #include <charconv>
 
-#include "common_types/OutOfRangeError.h"
+#include "common_types/errors.h"
 #include "util/ASSERT.h"
 
 #include <gsl/gsl>
@@ -16,7 +16,7 @@
 namespace sq::parser {
 
 template <std::integral Int> std::optional<Int> Parser::parse_integer() {
-  const auto opt_token = accept_token(Token::Kind::Integer);
+  const auto opt_token = accept_token(TokenKind::Integer);
   if (!opt_token) {
     return std::nullopt;
   }
@@ -38,7 +38,7 @@ template <std::integral Int> std::optional<Int> Parser::parse_integer() {
     ss << "integer " << str_view << " does not fit in required type; "
        << "must be in the closed interval [" << std::numeric_limits<Int>::min()
        << ", " << std::numeric_limits<Int>::max() << "]";
-    throw OutOfRangeError(token, ss.str());
+    throw OutOfRangeError{token, ss.str()};
   }
   ASSERT(ec == std::errc{});
   ASSERT(ptr == end);

@@ -5,7 +5,7 @@
 
 #include "results/results.h"
 
-#include "common_types/PullupWithSiblingsError.h"
+#include "common_types/errors.h"
 #include "results/Filter.h"
 #include "util/typeutil.h"
 
