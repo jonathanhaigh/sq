@@ -13,49 +13,49 @@ namespace sq {
 
 namespace {
 
-constexpr std::string_view token_kind_to_str(Token::Kind kind) {
+constexpr std::string_view token_kind_to_str(TokenKind kind) {
   switch (kind) {
-  case Token::Kind::BoolFalse:
+  case TokenKind::BoolFalse:
     return "BoolFalse";
-  case Token::Kind::BoolTrue:
+  case TokenKind::BoolTrue:
     return "BoolTrue";
-  case Token::Kind::Colon:
+  case TokenKind::Colon:
     return "Colon";
-  case Token::Kind::Comma:
+  case TokenKind::Comma:
     return "Comma";
-  case Token::Kind::Dot:
+  case TokenKind::Dot:
     return "Dot";
-  case Token::Kind::DQString:
+  case TokenKind::DQString:
     return "DQString";
-  case Token::Kind::Eof:
+  case TokenKind::Eof:
     return "Eof";
-  case Token::Kind::Equals:
+  case TokenKind::Equals:
     return "Equals";
-  case Token::Kind::Float:
+  case TokenKind::Float:
     return "Float";
-  case Token::Kind::GreaterThan:
+  case TokenKind::GreaterThan:
     return "GreaterThan";
-  case Token::Kind::GreaterThanOrEqualTo:
+  case TokenKind::GreaterThanOrEqualTo:
     return "GreaterThanOrEqualTo";
-  case Token::Kind::Identifier:
+  case TokenKind::Identifier:
     return "Identifier";
-  case Token::Kind::Integer:
+  case TokenKind::Integer:
     return "Integer";
-  case Token::Kind::LBrace:
+  case TokenKind::LBrace:
     return "LBrace";
-  case Token::Kind::LBracket:
+  case TokenKind::LBracket:
     return "LBracket";
-  case Token::Kind::LessThan:
+  case TokenKind::LessThan:
     return "LessThan";
-  case Token::Kind::LessThanOrEqualTo:
+  case TokenKind::LessThanOrEqualTo:
     return "LessThanOrEqualTo";
-  case Token::Kind::LParen:
+  case TokenKind::LParen:
     return "LParen";
-  case Token::Kind::RBrace:
+  case TokenKind::RBrace:
     return "RBrace";
-  case Token::Kind::RBracket:
+  case TokenKind::RBracket:
     return "RBracket";
-  case Token::Kind::RParen:
+  case TokenKind::RParen:
     return "RParen";
   }
   return "UnknownTokenKind";
@@ -64,7 +64,7 @@ constexpr std::string_view token_kind_to_str(Token::Kind kind) {
 } // namespace
 
 Token::Token(std::string_view query, gsl::index pos, gsl::index len,
-             Kind kind) noexcept
+             TokenKind kind) noexcept
     : query_{query}, pos_{pos}, len_{len}, kind_{kind} {}
 
 std::string_view Token::query() const noexcept { return query_; }
@@ -77,9 +77,9 @@ std::string_view Token::view() const noexcept {
   return query_.substr(util::to_size(pos_), util::to_size(len_));
 }
 
-Token::Kind Token::kind() const noexcept { return kind_; }
+TokenKind Token::kind() const noexcept { return kind_; }
 
-std::ostream &operator<<(std::ostream &os, Token::Kind kind) {
+std::ostream &operator<<(std::ostream &os, TokenKind kind) {
   os << token_kind_to_str(kind);
   return os;
 }

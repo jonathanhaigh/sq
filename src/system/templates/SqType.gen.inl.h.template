@@ -5,7 +5,7 @@
 #ifndef SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
 #define SQ_INCLUDE_GUARD__{{= name }}_gen_inl_h_
 
-#include "common_types/InvalidFieldError.h"
+#include "common_types/errors.h"
 #include "common_types/FieldCallParams.h"
 #include "util/typeutil.h"
 
@@ -57,7 +57,7 @@ Result {{= name }}<Impl>::dispatch(
     }
 {{ end }}
 
-    throw InvalidFieldError("{{= name }}", member);
+    throw InvalidFieldError{"{{= name }}", member};
 }
 
 } // namespace sq::system

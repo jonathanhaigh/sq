@@ -6,8 +6,7 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
 #define SQ_INCLUDE_GUARD_common_types_FieldCallParams_inl_h_
 
-#include "common_types/ArgumentMissingError.h"
-#include "common_types/ArgumentTypeError.h"
+#include "common_types/errors.h"
 #include "util/typeutil.h"
 
 #include <stdexcept>

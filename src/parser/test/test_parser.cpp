@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "common_types/ParseError.h"
+#include "common_types/errors.h"
 #include "parser/Ast.h"
 #include "parser/FilterSpec.h"
 #include "parser/Parser.h"
@@ -11,6 +11,7 @@
 #include "test/FieldCallParams_test_util.h"
 #include "util/strutil.h"
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <limits>
@@ -36,8 +37,8 @@ void expect_node(const Ast &node, std::string_view name, FieldAccessType fat,
                  Size noof_children) {
   SCOPED_TRACE(testing::Message()
                << "expect_node(node, " << std::quoted(name) << ", " << fat
-               << ", " << params << ", " << util::variant_to_str(filter_spec)
-               << ", " << noof_children << ")");
+               << ", " << params << ", " << fmt::to_string(filter_spec) << ", "
+               << noof_children << ")");
   EXPECT_EQ(node.data().name(), name);
   EXPECT_EQ(node.data().access_type(), fat);
   EXPECT_EQ(node.data().params(), params);
@@ -119,7 +120,7 @@ struct SimpleTestCase {
 
 std::ostream &operator<<(std::ostream &os, const SimpleTestCase &tc) {
   os << "(query=" << tc.query_ << ";fat=" << tc.fat_ << ";fcp=" << tc.fcp_
-     << ";filter=" << util::variant_to_str(tc.filter_spec_) << ")";
+     << ";filter=" << fmt::to_string(tc.filter_spec_) << ")";
   return os;
 }
 

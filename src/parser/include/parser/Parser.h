@@ -58,11 +58,11 @@ private:
   template <std::integral Int> SQ_ND std::optional<Int> parse_integer();
 
   void shift_token();
-  SQ_ND std::optional<Token> accept_token(Token::Kind kind);
-  SQ_ND Token expect_token(Token::Kind kind);
+  SQ_ND std::optional<Token> accept_token(TokenKind kind);
+  SQ_ND Token expect_token(TokenKind kind);
 
   TokenView tokens_;
-  Token::KindSet expecting_;
+  TokenKindSet expecting_;
 };
 
 } // namespace sq::parser

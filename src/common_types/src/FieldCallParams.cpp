@@ -7,9 +7,9 @@
 
 #include "util/strutil.h"
 
+#include <fmt/format.h>
 #include <range/v3/view/concat.hpp>
 #include <range/v3/view/transform.hpp>
-#include <sstream>
 
 namespace sq {
 
@@ -30,23 +30,19 @@ const FieldCallParams::NamedParams &FieldCallParams::named_params() const {
 }
 
 std::ostream &operator<<(std::ostream &os, const FieldCallParams &params) {
+
   auto named_param_to_str = [](const auto &np) {
-    std::ostringstream oss;
-    oss << np.first << "=" << util::variant_to_str(np.second);
-    return oss.str();
+    return fmt::format("{}={}", np.first, np.second);
   };
 
-  auto pos =
-      params.pos_params() | ranges::views::transform(util::variant_to_str);
+  auto pos = params.pos_params();
 
   auto named =
       params.named_params() | ranges::views::transform(named_param_to_str);
 
   auto all = ranges::concat_view(pos, named);
 
-  auto joined = util::join(all, ", ");
-
-  os << joined;
+  os << fmt::format("{}", fmt::join(all, ", "));
   return os;
 }
 

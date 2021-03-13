@@ -5,7 +5,7 @@
 
 #include "parser/TokenView.h"
 
-#include "common_types/LexError.h"
+#include "common_types/errors.h"
 #include "util/ASSERT.h"
 #include "util/typeutil.h"
 
@@ -17,43 +17,43 @@ namespace {
 
 const auto &token_regex_map() {
   static const auto map = std::array{
-      std::pair{Token::Kind::LParen, std::regex{"[(]"}},
-      std::pair{Token::Kind::RParen, std::regex{"[)]"}},
-      std::pair{Token::Kind::LBrace, std::regex{"[{]"}},
-      std::pair{Token::Kind::RBrace, std::regex{"[}]"}},
-      std::pair{Token::Kind::LBracket, std::regex{"\\["}},
-      std::pair{Token::Kind::RBracket, std::regex{"\\]"}},
-      std::pair{Token::Kind::Comma, std::regex{","}},
-      std::pair{Token::Kind::Colon, std::regex{":"}},
-      std::pair{Token::Kind::DQString, std::regex{R"%("(?:[^"\\]|\\.)*")%"}},
+      std::pair{TokenKind::LParen, std::regex{"[(]"}},
+      std::pair{TokenKind::RParen, std::regex{"[)]"}},
+      std::pair{TokenKind::LBrace, std::regex{"[{]"}},
+      std::pair{TokenKind::RBrace, std::regex{"[}]"}},
+      std::pair{TokenKind::LBracket, std::regex{"\\["}},
+      std::pair{TokenKind::RBracket, std::regex{"\\]"}},
+      std::pair{TokenKind::Comma, std::regex{","}},
+      std::pair{TokenKind::Colon, std::regex{":"}},
+      std::pair{TokenKind::DQString, std::regex{R"%("(?:[^"\\]|\\.)*")%"}},
 
       // Order matters here:
       // * Prefer to match "<=" than "<" then "=".
       // * Prefer to match ">=" than ">" then "=".
-      std::pair{Token::Kind::LessThanOrEqualTo, std::regex{"<="}},
-      std::pair{Token::Kind::LessThan, std::regex{"<"}},
-      std::pair{Token::Kind::GreaterThanOrEqualTo, std::regex{">="}},
-      std::pair{Token::Kind::GreaterThan, std::regex{">"}},
-      std::pair{Token::Kind::Equals, std::regex{"="}},
+      std::pair{TokenKind::LessThanOrEqualTo, std::regex{"<="}},
+      std::pair{TokenKind::LessThan, std::regex{"<"}},
+      std::pair{TokenKind::GreaterThanOrEqualTo, std::regex{">="}},
+      std::pair{TokenKind::GreaterThan, std::regex{">"}},
+      std::pair{TokenKind::Equals, std::regex{"="}},
 
       // Order matters here:
       // * Prefer to match "true" and "false" before identifiers but only if
       //   it doesn't look like "true" or "false" is just the start of a
       //   longer identifier (e.g. "true1", "false_id")
-      std::pair{Token::Kind::BoolTrue, std::regex{"true(?![A-Za-z_0-9])"}},
-      std::pair{Token::Kind::BoolFalse, std::regex{"false(?![A-Za-z_0-9])"}},
-      std::pair{Token::Kind::Identifier, std::regex{"[A-Za-z_][A-Za-z_0-9]*"}},
+      std::pair{TokenKind::BoolTrue, std::regex{"true(?![A-Za-z_0-9])"}},
+      std::pair{TokenKind::BoolFalse, std::regex{"false(?![A-Za-z_0-9])"}},
+      std::pair{TokenKind::Identifier, std::regex{"[A-Za-z_][A-Za-z_0-9]*"}},
 
       // Note that order matters here:
       // * Prefer to match an Integer to a Float, but only if there's no
       //   "." after the integer.
       // * Prefer to match a Float to a Dot.
-      std::pair{Token::Kind::Integer, std::regex{"-?[0-9]+(?![0-9.])"}},
+      std::pair{TokenKind::Integer, std::regex{"-?[0-9]+(?![0-9.])"}},
       std::pair{
-          Token::Kind::Float,
+          TokenKind::Float,
           std::regex{
               "[+-]?(?=[.]?[0-9])[0-9]*(?:[.][0-9]*)?(?:[Ee][+-]?[0-9]+)?"}},
-      std::pair{Token::Kind::Dot, std::regex{"[.]"}}};
+      std::pair{TokenKind::Dot, std::regex{"[.]"}}};
   return map;
 }
 
@@ -72,7 +72,7 @@ const Token &TokenView::read() const {
   const auto remaining = str_.substr(util::to_size(pos));
 
   if (std::ssize(remaining) == 0) {
-    cache_ = Token(str_, pos, 0, Token::Kind::Eof);
+    cache_ = Token(str_, pos, 0, TokenKind::Eof);
     return cache_.value();
   }
 
@@ -93,7 +93,7 @@ void TokenView::next() {
     (void)read();
     ASSERT(cache_);
   }
-  if (cache_.value().kind() == Token::Kind::Eof) {
+  if (cache_.value().kind() == TokenKind::Eof) {
     pos_ = -1;
     cache_ = std::nullopt;
     return;

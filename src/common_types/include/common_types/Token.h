@@ -6,59 +6,44 @@
 #ifndef SQ_INCLUDE_GUARD_common_types_Token_h_
 #define SQ_INCLUDE_GUARD_common_types_Token_h_
 
+#include "Token.fwd.h"
+
 #include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <iosfwd>
 #include <regex>
 #include <string_view>
-#include <unordered_set>
 #include <vector>
 
 namespace sq {
 
-/**
- * Represents a single token of an SQ query.
- *
- * Token objects do not own the string of characters that make up the token
- * text. I.e. they contain a reference to the characters in the original query
- * string and that reference is only valid as long as the original query string
- * is alive.
- */
+enum class TokenKind : int {
+  BoolFalse,
+  BoolTrue,
+  Colon,
+  Comma,
+  Dot,
+  DQString,
+  Eof,
+  Equals,
+  Float,
+  GreaterThan,
+  GreaterThanOrEqualTo,
+  Identifier,
+  Integer,
+  LBrace,
+  LBracket,
+  LessThan,
+  LessThanOrEqualTo,
+  LParen,
+  RBrace,
+  RBracket,
+  RParen
+};
+
 class Token {
 public:
-  /**
-   * Kind of token.
-   */
-  enum class Kind {
-    BoolFalse,
-    BoolTrue,
-    Colon,
-    Comma,
-    Dot,
-    DQString,
-    Eof,
-    Equals,
-    Float,
-    GreaterThan,
-    GreaterThanOrEqualTo,
-    Identifier,
-    Integer,
-    LBrace,
-    LBracket,
-    LessThan,
-    LessThanOrEqualTo,
-    LParen,
-    RBrace,
-    RBracket,
-    RParen
-  };
-
-  /**
-   * A set of token kinds.
-   */
-  using KindSet = std::unordered_set<Kind>;
-
   /**
    * Create a Token object.
    *
@@ -69,7 +54,7 @@ public:
    * @param kind the kind of the token.
    */
   Token(std::string_view query, gsl::index pos, gsl::index len,
-        Kind kind) noexcept;
+        TokenKind kind) noexcept;
 
   /**
    * Get the full query string in which the token was found.
@@ -95,16 +80,16 @@ public:
   /**
    * Get the kind of the token.
    */
-  SQ_ND Kind kind() const noexcept;
+  SQ_ND TokenKind kind() const noexcept;
 
 private:
   std::string_view query_;
   gsl::index pos_;
   gsl::index len_;
-  Kind kind_;
+  TokenKind kind_;
 };
 
-std::ostream &operator<<(std::ostream &os, Token::Kind kind);
+std::ostream &operator<<(std::ostream &os, TokenKind kind);
 
 /**
  * Print information about a token.
