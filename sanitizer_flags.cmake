@@ -20,8 +20,6 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
     elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL GNU)
         set(SQ_SANITIZER_FLAGS
             -fsanitize=address
-            -fsanitize=pointer-compare
-            -fsanitize=pointer-subtract
             -fsanitize=leak
             -fsanitize=undefined
             -fsanitize=float-divide-by-zero
