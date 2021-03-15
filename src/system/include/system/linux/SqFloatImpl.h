@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqFloatImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqFloatImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqFloatImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqFloatImpl_h_
 
 #include "system/SqFloat.gen.h"
 #include "util/typeutil.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqFloatImpl : public SqFloat<SqFloatImpl> {
 public:
@@ -21,6 +21,6 @@ private:
   PrimitiveFloat value_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqFloatImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqFloatImpl_h_

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqFloatImpl.h"
+#include "system/linux/SqFloatImpl.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqFloatImpl::SqFloatImpl(PrimitiveFloat value) : value_{value} {}
 
 Primitive SqFloatImpl::to_primitive() const { return value_; }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

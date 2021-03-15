@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqPathImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqPathImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqPathImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqPathImpl_h_
 
 #include "system/SqPath.gen.h"
 #include "util/typeutil.h"
 
 #include <filesystem>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqPathImpl : public SqPath<SqPathImpl> {
 public:
@@ -35,6 +35,6 @@ private:
   std::filesystem::path value_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqPathImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqPathImpl_h_

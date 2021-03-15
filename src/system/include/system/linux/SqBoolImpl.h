@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqBoolImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqBoolImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqBoolImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqBoolImpl_h_
 
 #include "system/SqBool.gen.h"
 #include "util/typeutil.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqBoolImpl : public SqBool<SqBoolImpl> {
 public:
@@ -21,6 +21,6 @@ private:
   PrimitiveBool value_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqBoolImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqBoolImpl_h_

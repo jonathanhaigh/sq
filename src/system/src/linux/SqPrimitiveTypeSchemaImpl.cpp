@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqPrimitiveTypeSchemaImpl.h"
-#include "system/standard/SqStringImpl.h"
+#include "system/linux/SqPrimitiveTypeSchemaImpl.h"
+#include "system/linux/SqStringImpl.h"
 
 #include <memory>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqPrimitiveTypeSchemaImpl::SqPrimitiveTypeSchemaImpl(
     const PrimitiveTypeSchema &primitive_type_schema)
@@ -26,4 +26,4 @@ Primitive SqPrimitiveTypeSchemaImpl::to_primitive() const {
   return PrimitiveString{primitive_type_schema_->name()};
 }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

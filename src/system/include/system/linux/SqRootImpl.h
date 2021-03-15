@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqRootImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqRootImpl_h_
 
 #include "system/SqRoot.gen.h"
 #include "util/typeutil.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqRootImpl : public SqRoot<SqRootImpl> {
 public:
@@ -22,9 +22,10 @@ public:
   SQ_ND static Result get_float(PrimitiveFloat value);
   SQ_ND static Result get_string(const PrimitiveString &value);
   SQ_ND static Result get_data_size(PrimitiveInt bytes);
+  SQ_ND static Result get_devices();
   SQ_ND Primitive to_primitive() const override;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqRootImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqRootImpl_h_

@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqSchemaImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqSchemaImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqSchemaImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqSchemaImpl_h_
 
 #include "system/SqSchema.gen.h"
 #include "system/schema.h"
 #include "util/typeutil.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqSchemaImpl : public SqSchema<SqSchemaImpl> {
 public:
@@ -21,6 +21,6 @@ public:
   SQ_ND Primitive to_primitive() const override;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqSchemaImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqSchemaImpl_h_

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqPrimitiveTypeSchemaImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqPrimitiveTypeSchemaImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqPrimitiveTypeSchemaImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqPrimitiveTypeSchemaImpl_h_
 
 #include "system/SqPrimitiveTypeSchema.gen.h"
 #include "system/schema.h"
@@ -12,7 +12,7 @@
 
 #include <gsl/gsl>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqPrimitiveTypeSchemaImpl
     : public SqPrimitiveTypeSchema<SqPrimitiveTypeSchemaImpl> {
@@ -29,6 +29,6 @@ private:
   gsl::not_null<const PrimitiveTypeSchema *> primitive_type_schema_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqPrimitiveTypeSchemaImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqPrimitiveTypeSchemaImpl_h_

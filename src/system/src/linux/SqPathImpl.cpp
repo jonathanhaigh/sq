@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqPathImpl.h"
+#include "system/linux/SqPathImpl.h"
 
-#include "system/standard/SqBoolImpl.h"
-#include "system/standard/SqDataSizeImpl.h"
-#include "system/standard/SqStringImpl.h"
+#include "system/linux/SqBoolImpl.h"
+#include "system/linux/SqDataSizeImpl.h"
+#include "system/linux/SqStringImpl.h"
 
 #include <gsl/gsl>
 #include <memory>
 #include <range/v3/iterator_range.hpp>
 #include <range/v3/view/transform.hpp>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqPathImpl::SqPathImpl(const std::filesystem::path &value) : value_{value} {}
 
@@ -76,4 +76,4 @@ Result SqPathImpl::get_size() const {
 
 Primitive SqPathImpl::to_primitive() const { return value_.string(); }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqParamSchemaImpl.h"
+#include "system/linux/SqParamSchemaImpl.h"
 
-#include "system/standard/SqBoolImpl.h"
-#include "system/standard/SqIntImpl.h"
-#include "system/standard/SqPrimitiveTypeSchemaImpl.h"
-#include "system/standard/SqStringImpl.h"
+#include "system/linux/SqBoolImpl.h"
+#include "system/linux/SqIntImpl.h"
+#include "system/linux/SqPrimitiveTypeSchemaImpl.h"
+#include "system/linux/SqStringImpl.h"
 
 #include <memory>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqParamSchemaImpl::SqParamSchemaImpl(const ParamSchema &param_schema)
     : param_schema_{std::addressof(param_schema)} {}
@@ -41,4 +41,4 @@ Primitive SqParamSchemaImpl::to_primitive() const {
   return PrimitiveString{param_schema_->name()};
 }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqFieldSchemaImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqFieldSchemaImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqFieldSchemaImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqFieldSchemaImpl_h_
 
 #include "system/SqFieldSchema.gen.h"
 #include "system/schema.h"
@@ -12,7 +12,7 @@
 
 #include <gsl/gsl>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqFieldSchemaImpl : public SqFieldSchema<SqFieldSchemaImpl> {
 public:
@@ -30,6 +30,6 @@ private:
   gsl::not_null<const FieldSchema *> field_schema_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqFieldSchemaImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqFieldSchemaImpl_h_
