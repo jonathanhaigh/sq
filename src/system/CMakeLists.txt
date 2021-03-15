@@ -10,8 +10,8 @@
 #   calls into the system to the implementation libraries.  Essentially, these
 #   classes are for resolving SQ type field names into actual method calls.
 #
-# * The platform specific sq_system_* implementation libraries that actually
-#   provide the data from the system.
+# * The platform specific sq_system_linux library that provides an
+#   implementation of the system for Linux.
 #
 # * The sq_system_schema library that contains binary schema information
 #   generated from the schema JSON file.
@@ -20,7 +20,7 @@
 
 include(sq_functions.cmake)
 include(sq_system_dispatch.cmake)
-include(sq_system_standard.cmake)
+include(sq_system_linux.cmake)
 include(sq_system_schema.cmake)
 
 set(SQ_SYSTEM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -32,5 +32,5 @@ set(SQ_SYSTEM_SRC
     "${SQ_SYSTEM_SRC_DIR}/root.cpp"
 )
 add_library(sq_system ${SQ_SYSTEM_SRC})
-target_link_libraries(sq_system sq_system_standard)
+target_link_libraries(sq_system sq_system_linux)
 target_include_directories(sq_system PUBLIC "${SQ_SYSTEM_INCLUDE_DIR}")

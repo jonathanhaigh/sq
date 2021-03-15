@@ -122,6 +122,40 @@
             ]
         },
         {
+            "name": "SqDevice",
+            "doc": "A device",
+            "fields": [
+                {
+                    "name": "sys_path",
+                    "doc": "The path for the device in /sys",
+                    "return_type": "SqPath",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "sys_name",
+                    "doc": "The name of the device",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "subsystem",
+                    "doc": "The subsystem to which the device belongs",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "params": []
+                },
+                {
+                    "name": "dev_node",
+                    "doc": "The node for the device in /dev",
+                    "return_type": "SqPath",
+                    "return_list": false,
+                    "params": []
+                }
+            ]
+        },
+        {
             "name": "SqFieldSchema",
             "doc": "The schema of a field",
             "fields": [
@@ -538,6 +572,13 @@
                             "default_value": 0
                         }
                     ]
+                },
+                {
+                    "name": "devices",
+                    "doc": "Get a list of devices in the system",
+                    "return_type": "SqDevice",
+                    "return_list": true,
+                    "params": []
                 }
             ]
         },

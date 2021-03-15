@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqDataSizeImpl.h"
+#include "system/linux/SqDataSizeImpl.h"
 
 #include "common_types/errors.h"
-#include "system/standard/SqFloatImpl.h"
-#include "system/standard/SqIntImpl.h"
+#include "system/linux/SqFloatImpl.h"
+#include "system/linux/SqIntImpl.h"
 
 #include <cstdint>
 #include <gsl/gsl>
 #include <memory>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 namespace {
 
 using Multiplier = std::int64_t;
@@ -102,4 +102,4 @@ Primitive SqDataSizeImpl::to_primitive() const {
   return gsl::narrow<PrimitiveInt>(value_);
 }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

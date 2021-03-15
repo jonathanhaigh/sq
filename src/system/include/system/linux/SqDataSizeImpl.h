@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqDataSizeImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqDataSizeImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqDataSizeImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqDataSizeImpl_h_
 
 #include "system/SqDataSize.gen.h"
 #include "util/typeutil.h"
 
 #include <cstdint>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqDataSizeImpl : public SqDataSize<SqDataSizeImpl> {
 public:
@@ -36,6 +36,6 @@ private:
   PrimitiveInt value_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqDataSizeImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqDataSizeImpl_h_

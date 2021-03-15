@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqIntImpl.h"
+#include "system/linux/SqIntImpl.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqIntImpl::SqIntImpl(PrimitiveInt value) : value_{value} {}
 
 Primitive SqIntImpl::to_primitive() const { return value_; }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

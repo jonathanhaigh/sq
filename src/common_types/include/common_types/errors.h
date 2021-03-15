@@ -157,6 +157,13 @@ class PullupWithSiblingsError : public Exception {
   using Exception::Exception;
 };
 
+/**
+ * Error indicating that the udev library returned an error.
+ */
+class UdevError : public Exception {
+  using Exception::Exception;
+};
+
 } // namespace sq
 
 #endif // SQ_INCLUDE_GUARD_common_types_errors_h_

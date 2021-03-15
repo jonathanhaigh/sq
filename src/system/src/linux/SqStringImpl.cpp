@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqStringImpl.h"
+#include "system/linux/SqStringImpl.h"
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqStringImpl::SqStringImpl(std::string_view value) : value_{value} {}
 
@@ -14,4 +14,4 @@ SqStringImpl::SqStringImpl(PrimitiveString &&value)
 
 Primitive SqStringImpl::to_primitive() const { return value_; }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

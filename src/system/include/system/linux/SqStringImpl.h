@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#ifndef SQ_INCLUDE_GUARD_system_standard_SqStringImpl_h_
-#define SQ_INCLUDE_GUARD_system_standard_SqStringImpl_h_
+#ifndef SQ_INCLUDE_GUARD_system_linux_SqStringImpl_h_
+#define SQ_INCLUDE_GUARD_system_linux_SqStringImpl_h_
 
 #include "system/SqString.gen.h"
 #include "util/typeutil.h"
 
 #include <string_view>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 class SqStringImpl : public SqString<SqStringImpl> {
 public:
@@ -24,6 +24,6 @@ private:
   PrimitiveString value_;
 };
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux
 
-#endif // SQ_INCLUDE_GUARD_system_standard_SqStringImpl_h_
+#endif // SQ_INCLUDE_GUARD_system_linux_SqStringImpl_h_

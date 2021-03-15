@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "system/standard/SqTypeSchemaImpl.h"
+#include "system/linux/SqTypeSchemaImpl.h"
 
-#include "system/standard/SqFieldSchemaImpl.h"
-#include "system/standard/SqStringImpl.h"
+#include "system/linux/SqFieldSchemaImpl.h"
+#include "system/linux/SqStringImpl.h"
 #include "util/typeutil.h" // for ranges::enable_view<gsl::span<T, N>>
 
 #include <memory>
 #include <range/v3/view/transform.hpp>
 
-namespace sq::system::standard {
+namespace sq::system::linux {
 
 SqTypeSchemaImpl::SqTypeSchemaImpl(const TypeSchema &type_schema)
     : type_schema_{std::addressof(type_schema)} {}
@@ -37,4 +37,4 @@ Primitive SqTypeSchemaImpl::to_primitive() const {
   return PrimitiveString{type_schema_->name()};
 }
 
-} // namespace sq::system::standard
+} // namespace sq::system::linux

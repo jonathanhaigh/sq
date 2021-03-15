@@ -7,6 +7,7 @@ function(sq_expand_for_each_type FORMAT_STRING OUTPUT_VAR)
     set(SQ_TYPES
         SqBool
         SqDataSize
+        SqDevice
         SqFieldSchema
         SqFloat
         SqInt

@@ -81,6 +81,9 @@ out_of_range_tests.extend(
     f"data_size({i})" for i in util.OUT_OF_RANGE_INT_STRS
 )
 
+# SqRoot::devices
+simple_tests.append(("<devices[sys_name=\"null\"]", ["null"]))
+
 
 @pytest.mark.parametrize("query,result", simple_tests)
 def test_simple(query, result):
