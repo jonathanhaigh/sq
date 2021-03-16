@@ -5,6 +5,18 @@
 
 cmake_minimum_required(VERSION 3.15)
 
+# If the variable for an option is already set when the option() command is
+# used, use the value in the existing variable rather than resetting it.
+# This is required so that when the INSTALL_GTEST variable is set to OFF,
+# GoogleTest actually honours the value OFF rather than using its default
+# value of ON.
+#
+# We can't use e.g. policy(SET CMP0077 NEW) because the GoogleTest cmake file's
+# cmake_minimum_required() command would undo that in GoogleTest's
+# subdirectory. See https://gitlab.kitware.com/cmake/cmake/-/issues/20312 for
+# details.
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 project(Sq
     VERSION 0.0.1
     DESCRIPTION "Command line tool to obtain system information in JSON"
