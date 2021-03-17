@@ -27,12 +27,17 @@ class ResultToDataVisitor {
 public:
   explicit ResultToDataVisitor(const parser::Ast &ast) : ast_{&ast} {}
 
+  SQ_ND Data operator()(PrimitiveNull &&null) const;
   SQ_ND Data operator()(FieldPtr &&field) const;
   SQ_ND Data operator()(ranges::cpp20::view auto &&rng) const;
 
 private:
   gsl::not_null<const parser::Ast *> ast_;
 };
+
+Data ResultToDataVisitor::operator()(PrimitiveNull &&null) const {
+  return null;
+}
 
 Data ResultToDataVisitor::operator()(FieldPtr &&field) const {
   if (ast_->children().empty()) {

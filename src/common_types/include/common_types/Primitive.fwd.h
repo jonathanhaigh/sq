@@ -16,9 +16,10 @@ using PrimitiveString = std::string;
 using PrimitiveInt = std::int64_t;
 using PrimitiveFloat = double;
 using PrimitiveBool = bool;
+struct PrimitiveNull;
 
-using Primitive =
-    std::variant<PrimitiveString, PrimitiveInt, PrimitiveFloat, PrimitiveBool>;
+using Primitive = std::variant<PrimitiveString, PrimitiveInt, PrimitiveFloat,
+                               PrimitiveBool, PrimitiveNull>;
 
 } // namespace sq
 

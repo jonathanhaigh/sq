@@ -27,7 +27,7 @@ using FieldRange = ranges::any_view<FieldPtr, Cat>;
  * The result of accessing a field of a system object.
  */
 using Result = std::variant<
-    FieldPtr, FieldRange<ranges::category::input>,
+    PrimitiveNull, FieldPtr, FieldRange<ranges::category::input>,
     FieldRange<ranges::category::input | ranges::category::sized>,
     FieldRange<ranges::category::forward>,
     FieldRange<ranges::category::forward | ranges::category::sized>,

@@ -5,6 +5,7 @@
 
 #include "system/linux/SqParamSchemaImpl.h"
 
+#include "system/linux/SqAnyPrimitiveImpl.h"
 #include "system/linux/SqBoolImpl.h"
 #include "system/linux/SqIntImpl.h"
 #include "system/linux/SqPrimitiveTypeSchemaImpl.h"
@@ -35,6 +36,22 @@ Result SqParamSchemaImpl::get_type() const {
 
 Result SqParamSchemaImpl::get_required() const {
   return std::make_shared<SqBoolImpl>(param_schema_->required());
+}
+
+Result SqParamSchemaImpl::get_default_value() const {
+  auto opt_prim = param_schema_->default_value();
+  if (opt_prim) {
+    return std::make_shared<SqAnyPrimitiveImpl>(opt_prim.value());
+  }
+  return primitive_null;
+}
+
+Result SqParamSchemaImpl::get_default_value_doc() const {
+  auto doc = param_schema_->default_value_doc();
+  if (doc.data() != nullptr) {
+    return std::make_shared<SqStringImpl>(doc);
+  }
+  return primitive_null;
 }
 
 Primitive SqParamSchemaImpl::to_primitive() const {

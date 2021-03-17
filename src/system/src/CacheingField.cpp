@@ -16,6 +16,7 @@ struct ShouldCache {
     return std::visit(*this, value);
   }
 
+  SQ_ND bool operator()(SQ_MU const PrimitiveNull &value) const { return true; }
   SQ_ND bool operator()(SQ_MU const FieldPtr &value) const { return true; }
 
   SQ_ND bool operator()(SQ_MU const ranges::cpp20::range auto &rng) const {

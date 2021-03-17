@@ -31,12 +31,10 @@ public:
                     true /* copy */
     );
   }
-
   void operator()(const PrimitiveInt &i) { writer_->Int64(i); }
-
   void operator()(const PrimitiveBool &b) { writer_->Bool(b); }
-
   void operator()(const PrimitiveFloat &f) { writer_->Double(f); }
+  void operator()(SQ_MU const PrimitiveNull &pn) { writer_->Null(); }
 
 private:
   gsl::not_null<Writer *> writer_;

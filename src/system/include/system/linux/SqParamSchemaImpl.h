@@ -23,6 +23,8 @@ public:
   SQ_ND Result get_index() const;
   SQ_ND Result get_type() const;
   SQ_ND Result get_required() const;
+  SQ_ND Result get_default_value() const;
+  SQ_ND Result get_default_value_doc() const;
 
   SQ_ND Primitive to_primitive() const override;
 

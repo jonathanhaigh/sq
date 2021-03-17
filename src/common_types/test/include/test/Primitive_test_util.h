@@ -22,6 +22,7 @@ SQ_ND Primitive to_primitive(PrimitiveInt v);
 SQ_ND Primitive to_primitive(int v);
 SQ_ND Primitive to_primitive(PrimitiveFloat v);
 SQ_ND Primitive to_primitive(PrimitiveBool v);
+SQ_ND Primitive to_primitive(PrimitiveNull v);
 
 } // namespace sq::test
 

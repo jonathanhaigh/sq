@@ -26,6 +26,14 @@ Ast Parser::parse() {
   return ast;
 }
 
+Primitive Parser::parse_primitive() {
+  auto opt_prim = parse_primitive_value();
+  if (!opt_prim) {
+    throw ParseError{tokens_.read(), expecting_};
+  }
+  return opt_prim.value();
+}
+
 // query: field_tree_list Eof
 bool Parser::parse_query(Ast &parent) {
   if (!parse_field_tree_list(parent)) {

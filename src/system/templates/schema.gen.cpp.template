@@ -61,8 +61,23 @@
     local noof_pts = pt_index
 
     function doc_to_str(doc)
+        if doc == nil then
+            return "std::string_view{}"
+        end
         local str = (type(doc) == "table") and table.concat(doc, "\n") or doc
         return string.format("R\"*DOC*STRING*(%s)*DOC*STRING*\"", str)
+    end
+
+    function primitive_to_str(value, typ)
+        if value == nil then
+            return ""
+        end
+        if typ == "PrimitiveString" then
+            value = value:gsub("\\", "\\\\")
+            value = value:gsub("\"", "\\\"")
+            return string.format("\"%s\"", value)
+        end
+        return tostring(value)
     end
 
     local type_schema_values = {}
@@ -78,22 +93,25 @@
         ))
         for _, field_schema in ipairs(type_schema.fields) do
             table.insert(field_schema_values, string.format(
-                "FieldSchema{%q, %s, %d, %d, %d, %s}",
+                "FieldSchema{%q, %s, %d, %d, %d, %s, %s}",
                 field_schema.name,
                 doc_to_str(field_schema.doc),
                 field_schema.params_begin_index,
                 field_schema.params_end_index,
                 type_index_by_name[field_schema.return_type],
-                tostring(field_schema.return_list)
+                tostring(field_schema.return_list),
+                tostring(field_schema.null)
             ))
             for _, param_schema in ipairs(field_schema.params) do
                 table.insert(param_schema_values, string.format(
-                    "ParamSchema{%q, %s, %d, %d, %s }",
+                    "ParamSchema{%q, %s, %d, %d, %s, %q, %s }",
                     param_schema.name,
                     doc_to_str(param_schema.doc),
                     param_schema.index,
                     pt_index_by_name[param_schema.type],
-                    tostring(param_schema.required)
+                    tostring(param_schema.required),
+                    primitive_to_str(param_schema.default_value, param_schema.type),
+                    doc_to_str(param_schema.default_value_doc)
                 ))
             end
         end
@@ -109,6 +127,9 @@
     end
 }}
 #include "system/schema.h"
+
+#include "parser/Parser.h"
+#include "parser/TokenView.h"
 
 namespace sq::system {
 namespace {
@@ -168,6 +189,20 @@ bool ParamSchema::required() const
   return required_;
 }
 
+std::optional<Primitive> ParamSchema::default_value() const
+{
+  if (default_value_str_.empty()) {
+    return std::nullopt;
+  }
+  auto tokens = parser::TokenView{default_value_str_};
+  return parser::Parser{tokens}.parse_primitive();
+}
+
+std::string_view ParamSchema::default_value_doc() const
+{
+  return default_value_doc_;
+}
+
 std::string_view FieldSchema::name() const
 {
     return name_;
@@ -194,6 +229,11 @@ const TypeSchema& FieldSchema::return_type() const
 bool FieldSchema::return_list() const
 {
     return return_list_;
+}
+
+bool FieldSchema::null() const
+{
+  return null_;
 }
 
 std::string_view TypeSchema::name() const

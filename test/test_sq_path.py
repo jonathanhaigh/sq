@@ -188,13 +188,25 @@ def test_canonical(tmp_path, path_info):
     assert result == str(canonical_path)
 
 
-def test_size(tmp_path):
+def test_size_of_file(tmp_path):
     path = tmp_path / "file"
     quoted_path = util.quote(str(path))
     path.write_text("Some data")
     size = path.stat().st_size
     result = util.sq(f"<path({quoted_path}).<size")
     assert result == size
+
+def test_size_of_directory(tmp_path):
+    path = tmp_path / "dir"
+    quoted_path = util.quote(str(path))
+    path.mkdir()
+    result = util.sq(f"<path({quoted_path}).<size")
+    assert result == None
+
+def test_size_of_non_existent(tmp_path):
+    path = tmp_path / "nonexistent"
+    quoted_path = util.quote(str(path))
+    result = util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
 
 
 def test_children(tmp_path):

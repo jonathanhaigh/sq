@@ -43,6 +43,10 @@ Result SqFieldSchemaImpl::get_return_list() const {
   return std::make_shared<SqBoolImpl>(field_schema_->return_list());
 }
 
+Result SqFieldSchemaImpl::get_null() const {
+  return std::make_shared<SqBoolImpl>(field_schema_->null());
+}
+
 Primitive SqFieldSchemaImpl::to_primitive() const {
   return PrimitiveString{field_schema_->name()};
 }
