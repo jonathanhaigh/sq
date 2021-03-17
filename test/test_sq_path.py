@@ -208,7 +208,6 @@ def test_size_of_non_existent(tmp_path):
     quoted_path = util.quote(str(path))
     result = util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
 
-
 def test_children(tmp_path):
     children = [tmp_path / f for f in ("f1", "x", "achild")]
     for child in children:
@@ -216,3 +215,12 @@ def test_children(tmp_path):
     result = sorted(util.sq(f"<path.<children", cwd=tmp_path))
     expected = sorted([str(child) for child in children])
     assert result == expected
+
+def test_exists(tmp_path):
+    quoted_path = util.quote(str(tmp_path))
+    assert util.sq(f"<path({quoted_path}).<exists") == True
+
+def test_not_exists(tmp_path):
+    path = tmp_path / "nonexistent"
+    quoted_path = util.quote(str(path))
+    assert util.sq(f"<path({quoted_path}).<exists") == False

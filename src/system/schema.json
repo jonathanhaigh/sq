@@ -378,6 +378,14 @@
                     "params": []
                 },
                 {
+                    "name": "exists",
+                    "doc": "Get whether the file exists or not",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
                     "name": "extension",
                     "doc": [
                         "Get the extension component of the path",
