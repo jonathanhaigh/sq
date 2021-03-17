@@ -115,6 +115,15 @@ Result SqPathImpl::get_size() const {
   }
 }
 
+Result SqPathImpl::get_exists() const {
+  try {
+    return std::make_shared<SqBoolImpl>(fs::exists(value_));
+  } catch (fs::filesystem_error &e) {
+    throw FilesystemError{fmt::format(
+        "Failed to determine whether file \"{}\" exists: ", e.what())};
+  }
+}
+
 Primitive SqPathImpl::to_primitive() const { return value_.string(); }
 
 } // namespace sq::system::linux
