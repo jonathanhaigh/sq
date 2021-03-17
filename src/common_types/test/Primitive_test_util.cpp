@@ -15,5 +15,6 @@ Primitive to_primitive(PrimitiveInt v) { return v; }
 Primitive to_primitive(int v) { return PrimitiveInt{v}; }
 Primitive to_primitive(PrimitiveFloat v) { return v; }
 Primitive to_primitive(PrimitiveBool v) { return v; }
+Primitive to_primitive(PrimitiveNull v) { return v; }
 
 } // namespace sq::test

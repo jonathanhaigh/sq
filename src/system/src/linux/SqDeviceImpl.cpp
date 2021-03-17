@@ -21,12 +21,20 @@ Result SqDeviceImpl::get_sys_name() const {
 
 Result SqDeviceImpl::get_subsystem() const {
   Expects(dev_ != nullptr);
-  return std::make_shared<SqStringImpl>(dev_->subsystem());
+  auto subsystem = dev_->subsystem();
+  if (subsystem.empty()) {
+    return primitive_null;
+  }
+  return std::make_shared<SqStringImpl>(std::move(subsystem));
 }
 
 Result SqDeviceImpl::get_dev_node() const {
   Expects(dev_ != nullptr);
-  return std::make_shared<SqPathImpl>(dev_->dev_node());
+  auto devnode = dev_->dev_node();
+  if (devnode.empty()) {
+    return primitive_null;
+  }
+  return std::make_shared<SqPathImpl>(std::move(devnode));
 }
 
 Primitive SqDeviceImpl::to_primitive() const {

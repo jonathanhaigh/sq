@@ -34,6 +34,11 @@ public:
    */
   SQ_ND Ast parse();
 
+  /**
+   * Parse the input query as a Primitive.
+   */
+  SQ_ND Primitive parse_primitive();
+
 private:
   SQ_ND bool parse_query(Ast &parent);
   SQ_ND bool parse_field_tree_list(Ast &parent);

@@ -33,6 +33,15 @@ SQ_ND std::string primitive_to_str(const PrimitiveAlternative auto &value);
 template <PrimitiveAlternative T>
 SQ_ND T convert_primitive(const Primitive &value);
 
+struct PrimitiveNull {
+  auto operator<=>(const PrimitiveNull &) const noexcept = default;
+  bool operator==(const PrimitiveNull &) const noexcept = default;
+};
+
+std::ostream &operator<<(std::ostream &os, const PrimitiveNull &pn);
+
+inline constexpr auto primitive_null = PrimitiveNull{};
+
 } // namespace sq
 
 #include "Primitive.inl.h"

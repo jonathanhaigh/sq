@@ -23,6 +23,7 @@ public:
   SQ_ND Result get_params() const;
   SQ_ND Result get_return_type() const;
   SQ_ND Result get_return_list() const;
+  SQ_ND Result get_null() const;
 
   SQ_ND Primitive to_primitive() const override;
 

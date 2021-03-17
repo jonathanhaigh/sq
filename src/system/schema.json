@@ -20,6 +20,11 @@
     "root_type": "SqRoot",
     "types": [
         {
+            "name": "SqAnyPrimitive",
+            "doc": "A primitive value of unspecified type",
+            "fields": []
+        },
+        {
             "name": "SqBool",
             "doc": "A boolean type",
             "fields": []
@@ -33,6 +38,7 @@
                     "doc": "Size of the data in bytes",
                     "return_type": "SqInt",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -40,6 +46,7 @@
                     "doc": "Size of the data in kibibytes (1KiB = 1024 bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -47,6 +54,7 @@
                     "doc": "Size of the data in kilobytes (1kB = 1000 bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -54,6 +62,7 @@
                     "doc": "Size of the data in mebibytes (1MiB = 1024\\ :sup:`2` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -61,6 +70,7 @@
                     "doc": "Size of the data in megabytes (1MB = 1000 \\ :sup:`2` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -68,6 +78,7 @@
                     "doc": "Size of the data in gibibytes (1GiB = 1024\\ :sup:`3` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -75,6 +86,7 @@
                     "doc": "Size of the data in gigabytes (1GB = 1000\\ :sup:`3` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -82,6 +94,7 @@
                     "doc": "Size of the data in tebibytes (1TiB = 1024\\ :sup:`4` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -89,6 +102,7 @@
                     "doc": "Size of the data in terabytes (1TB = 1000\\ :sup:`4` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -96,6 +110,7 @@
                     "doc": "Size of the data in pebibytes (1PiB = 1024\\ :sup:`5` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -103,6 +118,7 @@
                     "doc": "Size of the data in petabytes (1PB = 1000\\ :sup:`5` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -110,6 +126,7 @@
                     "doc": "Size of the data in exbibytes (1EiB = 1024\\ :sup:`6` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -117,6 +134,7 @@
                     "doc": "Size of the data in exabytes (1EB = 1000\\ :sup:`6` bytes)",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 }
             ]
@@ -130,6 +148,7 @@
                     "doc": "The path for the device in /sys",
                     "return_type": "SqPath",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -137,6 +156,7 @@
                     "doc": "The name of the device",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -144,6 +164,7 @@
                     "doc": "The subsystem to which the device belongs",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": true,
                     "params": []
                 },
                 {
@@ -151,6 +172,7 @@
                     "doc": "The node for the device in /dev",
                     "return_type": "SqPath",
                     "return_list": false,
+                    "null": true,
                     "params": []
                 }
             ]
@@ -164,6 +186,7 @@
                     "doc": "The name of the field",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -171,6 +194,7 @@
                     "doc": "The documentation for the field",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -178,6 +202,7 @@
                     "doc": "The field's parameters",
                     "return_type": "SqParamSchema",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -185,6 +210,7 @@
                     "doc": "The fields return type",
                     "return_type": "SqTypeSchema",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -192,6 +218,15 @@
                     "doc": "Whether the field returns multiple values or not",
                     "return_type": "SqBool",
                     "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "null",
+                    "doc": "Whether the field can return null values or not",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "null": false,
                     "params": []
                 }
             ]
@@ -216,6 +251,7 @@
                     "doc": "The name of the parameter",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -223,6 +259,7 @@
                     "doc": "The documentation for the parameter",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -233,6 +270,7 @@
                     ],
                     "return_type": "SqInt",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -243,6 +281,7 @@
                     ],
                     "return_type": "SqPrimitiveTypeSchema",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -250,6 +289,23 @@
                     "doc": "Whether the parameter is required or not",
                     "return_type": "SqBool",
                     "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "default_value",
+                    "doc": "A default value for the parameter",
+                    "return_type": "SqAnyPrimitive",
+                    "return_list": false,
+                    "null": true,
+                    "params": []
+                },
+                {
+                    "name": "default_value_doc",
+                    "doc": "The documentation for the parameter's default value",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": true,
                     "params": []
                 }
             ]
@@ -263,6 +319,7 @@
                     "doc": "Get the path as an SqString",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -280,6 +337,7 @@
                     ],
                     "return_type": "SqPath",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -297,6 +355,7 @@
                     ],
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -315,6 +374,7 @@
                     ],
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -336,6 +396,7 @@
                     ],
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -347,6 +408,7 @@
                     ],
                     "return_type": "SqPath",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -359,6 +421,7 @@
                     ],
                     "return_type": "SqString",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -374,6 +437,7 @@
                     ],
                     "return_type": "SqPath",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -389,6 +453,7 @@
                     ],
                     "return_type": "SqPath",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -396,6 +461,7 @@
                     "doc": "Get whether the path is absolute",
                     "return_type": "SqBool",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -403,6 +469,7 @@
                     "doc": "Get the size of the file referred to by the path",
                     "return_type": "SqDataSize",
                     "return_list": false,
+                    "null": true,
                     "params": []
                 }
             ]
@@ -416,6 +483,7 @@
                     "doc": "The name of the primitive type",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -423,6 +491,7 @@
                     "doc": "The documentation for the primitive type",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 }
             ]
@@ -440,6 +509,7 @@
                     "doc": "Get the system schema",
                     "return_type": "SqSchema",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -447,6 +517,7 @@
                     "doc": "Get an SqPath system object",
                     "return_type":  "SqPath",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -464,6 +535,7 @@
                     "doc": "Get an SqInt system object",
                     "return_type": "SqInt",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -489,6 +561,7 @@
                     ],
                     "return_type": "SqInt",
                     "return_list": true,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -514,6 +587,7 @@
                     "doc": "Get an SqBool system object",
                     "return_type": "SqBool",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -530,6 +604,7 @@
                     "doc": "Get an SqFloat system object",
                     "return_type": "SqFloat",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -546,6 +621,7 @@
                     "doc": "Get an SqString system object",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -562,6 +638,7 @@
                     "doc": "Get an SqDataSize system object",
                     "return_type": "SqDataSize",
                     "return_list": false,
+                    "null": false,
                     "params": [
                         {
                             "index": 0,
@@ -578,6 +655,7 @@
                     "doc": "Get a list of devices in the system",
                     "return_type": "SqDevice",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 }
             ]
@@ -591,6 +669,7 @@
                     "doc": "The SQ root type",
                     "return_type": "SqTypeSchema",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -598,6 +677,7 @@
                     "doc": "a list of the SQ primitive types",
                     "return_type": "SqPrimitiveTypeSchema",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -605,6 +685,7 @@
                     "doc": "a list of the SQ system object types",
                     "return_type": "SqTypeSchema",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 }
             ]
@@ -623,6 +704,7 @@
                     "doc": "The name of the type",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -630,6 +712,7 @@
                     "doc": "The documentation for the SQ system object type",
                     "return_type": "SqString",
                     "return_list": false,
+                    "null": false,
                     "params": []
                 },
                 {
@@ -637,6 +720,7 @@
                     "doc": "a list of the type's fields",
                     "return_type": "SqFieldSchema",
                     "return_list": true,
+                    "null": false,
                     "params": []
                 }
             ]

@@ -27,4 +27,9 @@ std::string primitive_to_str(const Primitive &value) {
   return std::visit(detail::PrimitiveToStrVisitor{}, value);
 }
 
+std::ostream &operator<<(std::ostream &os, SQ_MU const PrimitiveNull &pn) {
+  os << "null";
+  return os;
+}
+
 } // namespace sq

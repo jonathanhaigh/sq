@@ -58,6 +58,10 @@ template <> struct FilterImpl<parser::ElementAccessSpec> : Filter {
     throw NotAnArrayError{"Cannot apply array filter to non-array field"};
   }
 
+  SQ_ND Result operator()(SQ_MU const PrimitiveNull &pn) const {
+    throw NotAnArrayError{"Cannot apply array filter to null field"};
+  }
+
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {
     if (index_ >= 0) {
       return nonnegative_index_access(SQ_FWD(rng), index_);
@@ -115,6 +119,10 @@ template <> struct FilterImpl<parser::SliceSpec> : Filter {
 
   SQ_ND Result operator()(SQ_MU const FieldPtr &fp) const {
     throw NotAnArrayError{"Cannot apply array filter to non-array field"};
+  }
+
+  SQ_ND Result operator()(SQ_MU const PrimitiveNull &pn) const {
+    throw NotAnArrayError{"Cannot apply array filter to null field"};
   }
 
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {
@@ -309,6 +317,10 @@ template <> struct FilterImpl<parser::ComparisonSpec> : Filter {
 
   SQ_ND Result operator()(SQ_MU const FieldPtr &field) const {
     throw NotAnArrayError{"Cannot apply array filter to non-array field"};
+  }
+
+  SQ_ND Result operator()(SQ_MU const PrimitiveNull &pn) const {
+    throw NotAnArrayError{"Cannot apply array filter to null field"};
   }
 
   SQ_ND Result operator()(ranges::cpp20::view auto &&rng) const {

@@ -28,6 +28,7 @@ TEST(CommonTypesTest, TestPrimitive) {
   test_primitive_type<PrimitiveInt>();
   test_primitive_type<PrimitiveFloat>();
   test_primitive_type<PrimitiveBool>();
+  test_primitive_type<PrimitiveNull>();
 }
 
 TEST(CommonTypesTest, TestPrimitiveToStr) {
@@ -42,6 +43,7 @@ TEST(CommonTypesTest, TestPrimitiveToStr) {
   EXPECT_EQ(primitive_to_str(Primitive{PrimitiveFloat{-1.1}}), "-1.1");
   EXPECT_EQ(primitive_to_str(Primitive{PrimitiveBool{true}}), "true");
   EXPECT_EQ(primitive_to_str(Primitive{PrimitiveBool{false}}), "false");
+  EXPECT_EQ(primitive_to_str(Primitive{primitive_null}), "null");
 }
 
 class FieldCallParamsTest : public testing::Test {

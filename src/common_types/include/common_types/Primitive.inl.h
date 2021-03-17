@@ -35,6 +35,10 @@ template <> struct PrimitiveTypeName<PrimitiveBool> {
   static constexpr std::string_view value = "PrimitiveBool";
 };
 
+template <> struct PrimitiveTypeName<PrimitiveNull> {
+  static constexpr std::string_view value = "PrimitiveNull";
+};
+
 namespace detail {
 
 struct PrimitiveToStrVisitor {

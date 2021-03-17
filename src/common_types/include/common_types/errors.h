@@ -10,6 +10,7 @@
 #include "common_types/Token.fwd.h"
 
 #include <cstddef>
+#include <filesystem>
 #include <gsl/gsl>
 #include <stdexcept>
 #include <string_view>
@@ -162,6 +163,23 @@ class PullupWithSiblingsError : public Exception {
  */
 class UdevError : public Exception {
   using Exception::Exception;
+};
+
+/**
+ * Error indicating that a filesystem error ocurred.
+ */
+class FilesystemError : public Exception {
+  using Exception::Exception;
+};
+
+/**
+ * Error indicating that a file does not exist.
+ */
+class FileNotFoundError : public FilesystemError {
+public:
+  using FilesystemError::FilesystemError;
+
+  FileNotFoundError(const std::filesystem::path &path);
 };
 
 } // namespace sq

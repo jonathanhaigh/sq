@@ -20,8 +20,7 @@ def test_schema(sq_schema):
     # There are a couple of things that will be different between the two
     # schemas though:
     # * doc arrays will have been converted to single strings with newlines.
-    # * SqParamSchema::default_value and SqParamSchema::default_value_doc are
-    #   not currently available when querying SQ.
+    # * optional fields will always exist but might be null.
     #
     # Modify the schema we got from schema.json to match what we think SQ
     # should return, then just do a test using "=="
@@ -32,20 +31,23 @@ def test_schema(sq_schema):
             flatten_doc_list(f)
             for p in f["params"]:
                 flatten_doc_list(p)
-                p.pop("default_value", None)
-                p.pop("default_value_doc", None)
+                if "default_value" not in p:
+                    p["default_value"] = None
+                if "default_value_doc" not in p:
+                    p["default_value_doc"] = None
 
     result = util.sq(
         "schema {"
-        "types {"
-        "name doc fields { "
-        "name doc return_type return_list params {"
-        "name doc index type required"
-        "}"
-        "}"
-        "}"
-        " primitive_types { name doc }"
-        " root_type"
+            "types {"
+                "name doc fields { "
+                    "name doc return_type return_list null params {"
+                        "name doc index type required "
+                        "default_value default_value_doc"
+                    "}"
+                "}"
+            "}"
+            " primitive_types { name doc }"
+            " root_type"
         "}"
     )
     assert result == {"schema": schema}

@@ -6,10 +6,12 @@
 #ifndef SQ_INCLUDE_GUARD_system_schema_h_
 #define SQ_INCLUDE_GUARD_system_schema_h_
 
+#include "common_types/Primitive.h"
 #include "util/typeutil.h"
 
 #include <cstddef>
 #include <gsl/gsl>
+#include <optional>
 #include <string_view>
 
 namespace sq::system {
@@ -40,15 +42,19 @@ class ParamSchema {
 public:
   constexpr ParamSchema(std::string_view name, std::string_view doc,
                         std::size_t index, std::size_t type_index,
-                        bool required)
-      : name_{name}, doc_{doc}, index_{index},
-        type_index_{type_index}, required_{required} {}
+                        bool required, std::string_view default_value_str,
+                        std::string_view default_value_doc)
+      : name_{name}, doc_{doc}, index_{index}, type_index_{type_index},
+        required_{required}, default_value_str_{default_value_str},
+        default_value_doc_{default_value_doc} {}
 
   SQ_ND std::string_view name() const;
   SQ_ND std::string_view doc() const;
   SQ_ND std::size_t index() const;
   SQ_ND const PrimitiveTypeSchema &type() const;
   SQ_ND bool required() const;
+  SQ_ND std::optional<Primitive> default_value() const;
+  SQ_ND std::string_view default_value_doc() const;
 
 private:
   std::string_view name_;
@@ -56,6 +62,8 @@ private:
   std::size_t index_;
   std::size_t type_index_;
   bool required_;
+  std::string_view default_value_str_;
+  std::string_view default_value_doc_;
 };
 
 class TypeSchema;
@@ -68,16 +76,19 @@ public:
   constexpr FieldSchema(std::string_view name, std::string_view doc,
                         std::size_t params_begin_index,
                         std::size_t params_end_index,
-                        std::size_t return_type_index, bool return_list)
+                        std::size_t return_type_index, bool return_list,
+                        bool null)
       : name_{name}, doc_{doc}, params_begin_index_{params_begin_index},
         params_end_index_{params_end_index},
-        return_type_index_{return_type_index}, return_list_{return_list} {}
+        return_type_index_{return_type_index},
+        return_list_{return_list}, null_{null} {}
 
   SQ_ND std::string_view name() const;
   SQ_ND std::string_view doc() const;
   SQ_ND gsl::span<const ParamSchema> params() const;
   SQ_ND const TypeSchema &return_type() const;
   SQ_ND bool return_list() const;
+  SQ_ND bool null() const;
 
 private:
   std::string_view name_;
@@ -86,6 +97,7 @@ private:
   std::size_t params_end_index_;
   std::size_t return_type_index_;
   bool return_list_;
+  bool null_;
 };
 
 /**
