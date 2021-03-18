@@ -33,7 +33,7 @@ jobs:
             coverage: false
     steps:
       - uses: actions/checkout@v2
-      - uses: jonathanhaigh/sq-docker-build@20210316
+      - uses: docker://jonathanhaigh/builder:20210316
         with:
           build_type: ${{ matrix.build_type }}
           cxx_compiler: ${{ matrix.cxx_compiler }}
