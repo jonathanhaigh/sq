@@ -9,9 +9,6 @@ namespace sq::system::linux {
 
 SqStringImpl::SqStringImpl(std::string_view value) : value_{value} {}
 
-SqStringImpl::SqStringImpl(PrimitiveString &&value)
-    : value_{std::move(value)} {}
-
 Primitive SqStringImpl::to_primitive() const { return value_; }
 
 } // namespace sq::system::linux

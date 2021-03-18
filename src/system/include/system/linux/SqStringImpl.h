@@ -16,7 +16,6 @@ namespace sq::system::linux {
 class SqStringImpl : public SqString<SqStringImpl> {
 public:
   explicit SqStringImpl(std::string_view value);
-  explicit SqStringImpl(PrimitiveString &&value);
 
   SQ_ND Primitive to_primitive() const override;
 

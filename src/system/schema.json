@@ -383,7 +383,16 @@
                     "return_type": "SqBool",
                     "return_list": false,
                     "null": false,
-                    "params": []
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": true
+                        }
+                    ]
                 },
                 {
                     "name": "extension",
@@ -478,7 +487,33 @@
                     "return_type": "SqDataSize",
                     "return_list": false,
                     "null": true,
-                    "params": []
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": true
+                        }
+                    ]
+                },
+                {
+                    "name": "type",
+                    "doc": "Get the type of the file referred to by the path",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": true
+                        }
+                    ]
                 }
             ]
         },

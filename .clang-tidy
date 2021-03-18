@@ -3,6 +3,7 @@ Checks: >-
     *,
     -altera-struct-pack-align,
     -fuchsia-default-arguments-calls,
+    -fuchsia-default-arguments-declarations,
     -fuchsia-overloaded-operator,
     -fuchsia-trailing-return,
     -google-runtime-references,
