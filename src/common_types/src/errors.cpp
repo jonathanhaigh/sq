@@ -68,7 +68,13 @@ ParseError::ParseError(const Token &token, const TokenKindSet &expecting)
           "parse error: unexpected {}; expecting one of: {}\n{}", token,
           fmt::join(expecting, ", "), show_pos_in_query(token))} {}
 
-FileNotFoundError::FileNotFoundError(const std::filesystem::path &path)
-    : FilesystemError{fmt::format("file {} not found", path)} {}
+FilesystemError::FilesystemError(std::string_view operation,
+                                 const std::filesystem::path &path,
+                                 std::error_code code)
+    : Exception{fmt::format("{} failed for path {}: {}", operation, path,
+                            code.message())},
+      code_{code} {}
+
+std::error_code FilesystemError::code() const { return code_; }
 
 } // namespace sq

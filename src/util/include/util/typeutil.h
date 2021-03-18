@@ -11,6 +11,7 @@
 #include <gsl/gsl>
 #include <range/v3/range/concepts.hpp>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <variant>
 
@@ -121,6 +122,13 @@ SQ_ND inline constexpr std::size_t to_size(std::integral auto v) {
  * The "base type" is the type with no references or cv qualification.
  */
 SQ_ND std::string base_type_name(const auto &thing);
+
+/**
+ * Create a std::error code from a platform dependent error code.
+ */
+SQ_ND inline std::error_code make_error_code(int code) {
+  return std::make_error_code(static_cast<std::errc>(code));
+}
 
 } // namespace sq::util
 
