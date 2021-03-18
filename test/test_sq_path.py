@@ -215,7 +215,7 @@ def test_size(tmp_path, symlink, follow_symlinks, file_type):
         link.symlink_to(path)
         path = link
         if not follow_symlinks:
-            expected = None
+            expected = link.lstat().st_size
 
     quoted_path = util.quote(str(path))
     follow_symlinks_param = "true" if follow_symlinks else "false"
@@ -226,14 +226,14 @@ def test_size(tmp_path, symlink, follow_symlinks, file_type):
 def test_size_of_non_existent(tmp_path):
     path = tmp_path / "nonexistent"
     quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
+    util.sq_error(f"<path({quoted_path}).<size", "filesystem ?error")
 
 
 def test_size_of_broken_symlink(tmp_path):
     path = tmp_path / "broken_symlink"
     path.symlink_to(tmp_path / "nonexistent")
     quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
+    util.sq_error(f"<path({quoted_path}).<size", "filesystem ?error")
 
 
 def test_children(tmp_path):
@@ -295,11 +295,32 @@ def test_type(tmp_path, symlink, follow_symlinks, file_type):
 def test_type_of_nonexistent(tmp_path):
     path = tmp_path / "nonexistent"
     quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<type", "file ?not ?found")
+    util.sq_error(f"<path({quoted_path}).<type", "filesystem ?error")
 
 
 def test_type_of_broken_symlink(tmp_path):
     path = tmp_path / "broken_symlink"
     path.symlink_to(tmp_path / "nonexistent")
     quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<type", "file ?not ?found")
+    util.sq_error(f"<path({quoted_path}).<type", "filesystem ?error")
+
+def test_hard_link_count(tmp_path):
+    path = tmp_path / "file"
+    quoted_path = util.quote(str(path))
+    path.touch()
+    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 1
+
+    # Note: pathlib.Path.link_to() will be deprecated in Python 3.9 due to the
+    # strange argument order (opposite to pathlib.Path.symlink_to()) but we
+    # won't have the replacement, pathlib.Path.hardlink_to() until Python 3.9.
+    # See https://bugs.python.org/issue39291 and
+    #     https://bugs.python.org/issue39950
+    path.link_to(tmp_path / "file2")
+    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 2
+    path.link_to(tmp_path / "file3")
+    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 3
+
+def test_hard_link_count_of_nonexistent(tmp_path):
+    path = tmp_path / "file"
+    quoted_path = util.quote(str(path))
+    util.sq_error(f"<path({quoted_path}).<hard_link_count", "filesystem ?error")

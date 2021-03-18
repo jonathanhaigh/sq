@@ -14,6 +14,7 @@
 #include <gsl/gsl>
 #include <stdexcept>
 #include <string_view>
+#include <system_error>
 
 namespace sq {
 
@@ -169,17 +170,15 @@ class UdevError : public Exception {
  * Error indicating that a filesystem error ocurred.
  */
 class FilesystemError : public Exception {
-  using Exception::Exception;
-};
-
-/**
- * Error indicating that a file does not exist.
- */
-class FileNotFoundError : public FilesystemError {
 public:
-  using FilesystemError::FilesystemError;
+  using Exception::Exception;
+  FilesystemError(std::string_view operation, const std::filesystem::path &path,
+                  std::error_code code);
 
-  FileNotFoundError(const std::filesystem::path &path);
+  std::error_code code() const;
+
+private:
+  std::error_code code_;
 };
 
 } // namespace sq

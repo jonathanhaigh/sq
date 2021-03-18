@@ -8,9 +8,10 @@
 #include "common_types/errors.h"
 #include "system/linux/SqBoolImpl.h"
 #include "system/linux/SqDataSizeImpl.h"
+#include "system/linux/SqIntImpl.h"
 #include "system/linux/SqStringImpl.h"
 
-#include <filesystem>
+#include <cerrno>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <gsl/gsl>
@@ -24,50 +25,51 @@ namespace fs = std::filesystem;
 
 namespace {
 
-fs::file_type get_file_type(const fs::path &path, bool follow_symlinks,
-                            bool throw_if_not_exists = true) {
-  try {
-    const auto type = follow_symlinks ? fs::status(path).type()
-                                      : fs::symlink_status(path).type();
-
-    if (type == fs::file_type::none) {
-      throw FilesystemError{
-          fmt::format("Failed to get status of file {}", path)};
-    }
-    if (throw_if_not_exists && type == fs::file_type::not_found) {
-      throw FileNotFoundError{path};
-    }
-    return type;
-  } catch (fs::filesystem_error &e) {
-    throw FilesystemError{
-        fmt::format("Failed to get status of file {}: {}", path, e.what())};
+struct stat do_stat(const fs::path &path, bool follow_symlinks) {
+  errno = 0;
+  struct stat s {};
+  const int ret =
+      follow_symlinks ? stat(path.c_str(), &s) : lstat(path.c_str(), &s);
+  if (ret == -1) {
+    const auto *const operation = follow_symlinks ? "stat()" : "lstat()";
+    throw FilesystemError{operation, path, util::make_error_code(errno)};
   }
+  return s;
 }
 
-const char *file_type_to_str(fs::file_type type) {
-  switch (type) {
-  case fs::file_type::not_found:
-    return "not found";
-  case fs::file_type::regular:
-    return "regular";
-  case fs::file_type::directory:
-    return "directory";
-  case fs::file_type::symlink:
-    return "symlink";
-  case fs::file_type::block:
-    return "block";
-  case fs::file_type::character:
-    return "character";
-  case fs::file_type::fifo:
-    return "fifo";
-  case fs::file_type::socket:
-    return "socket";
+const char *get_file_type(const struct stat &s) {
 
-  case fs::file_type::none:
-  case fs::file_type::unknown:
-  default:
-    return "unknown";
+  if (S_ISREG(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "regular";
   }
+  if (S_ISDIR(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "directory";
+  }
+  if (S_ISLNK(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "symlink";
+  }
+  if (S_ISBLK(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "block";
+  }
+  if (S_ISCHR(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "character";
+  }
+  if (S_ISFIFO(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "fifo";
+  }
+  if (S_ISSOCK(s.st_mode)) { // NOLINT(hicpp-signed-bitwise)
+    return "socket";
+  }
+  if (S_TYPEISMQ(&s)) { // NOLINT(hicpp-signed-bitwise)
+    return "message queue";
+  }
+  if (S_TYPEISSEM(&s)) { // NOLINT(hicpp-signed-bitwise)
+    return "semaphore";
+  }
+  if (S_TYPEISSHM(&s)) { // NOLINT(hicpp-signed-bitwise)
+    return "shared memory";
+  }
+  return "unknown";
 }
 
 } // namespace
@@ -125,41 +127,59 @@ Result SqPathImpl::get_is_absolute() const {
 }
 
 Result SqPathImpl::get_size(PrimitiveBool follow_symlinks) const {
+  const auto &s = get_stat(follow_symlinks);
 
-  // std::filesystem::file_size(path) has implementation defined behaviour if
-  // path is not a regular file or a symlink (which are always followed). We
-  // want to be predictable, so check the type of the file first and return
-  // null if it's not a regular file.
-  const auto type = get_file_type(value_, follow_symlinks);
-
-  if (type != fs::file_type::regular) {
-    return primitive_null;
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if (S_ISREG(s.st_mode) || S_ISLNK(s.st_mode) || S_TYPEISSHM(&s)) {
+    try {
+      return std::make_shared<SqDataSizeImpl>(
+          gsl::narrow<PrimitiveInt>(s.st_size));
+    } catch (gsl::narrowing_error &e) {
+      throw OutOfRangeError{
+          fmt::format("Size of file {} ({}B) does not fit in type PrimitiveInt",
+                      value_, s.st_size)};
+    }
   }
-
-  std::uintmax_t size = 0;
-  try {
-    size = fs::file_size(value_);
-    return std::make_shared<SqDataSizeImpl>(gsl::narrow<PrimitiveInt>(size));
-  } catch (fs::filesystem_error &e) {
-    throw FilesystemError{
-        fmt::format("Failed to get size of file {}: {}", value_, e.what())};
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError(
-        fmt::format("Size of file {} ({}B) does not fit in type PrimitiveInt",
-                    value_, size));
-  }
+  return primitive_null;
 }
 
 Result SqPathImpl::get_exists(PrimitiveBool follow_symlinks) const {
-  const auto type = get_file_type(value_, follow_symlinks, false);
-  return std::make_shared<SqBoolImpl>(type != fs::file_type::not_found);
+  try {
+    (void)get_stat(follow_symlinks);
+    return std::make_shared<SqBoolImpl>(true);
+  } catch (FilesystemError &e) {
+    if (e.code().value() == ENOTDIR || e.code().value() == ENOENT) {
+      return std::make_shared<SqBoolImpl>(false);
+    }
+    throw;
+  }
 }
 
 Result SqPathImpl::get_type(PrimitiveBool follow_symlinks) const {
-  const auto type = get_file_type(value_, follow_symlinks);
-  return std::make_shared<SqStringImpl>(file_type_to_str(type));
+  return std::make_shared<SqStringImpl>(
+      get_file_type(get_stat(follow_symlinks)));
+}
+
+Result SqPathImpl::get_hard_link_count(PrimitiveBool follow_symlinks) const {
+  const auto count = get_stat(follow_symlinks).st_nlink;
+  try {
+    return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(count));
+  } catch (gsl::narrowing_error &e) {
+    throw OutOfRangeError{fmt::format(
+        "Hard link count of file {} ({}) does not fit in type PrimitiveInt",
+        value_, count)};
+  }
 }
 
 Primitive SqPathImpl::to_primitive() const { return value_.string(); }
+
+const struct stat &SqPathImpl::get_stat(bool follow_symlinks) const {
+  auto &s = follow_symlinks ? stat_ : lstat_;
+  if (s) {
+    return s.value();
+  }
+  s = do_stat(value_, follow_symlinks);
+  return s.value();
+}
 
 } // namespace sq::system::linux

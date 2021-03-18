@@ -514,6 +514,23 @@
                             "default_value": true
                         }
                     ]
+                },
+                {
+                    "name": "hard_link_count",
+                    "doc": "Get the number of hard links for the file referred to by the path",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": true
+                        }
+                    ]
                 }
             ]
         },
