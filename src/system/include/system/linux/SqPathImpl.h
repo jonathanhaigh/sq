@@ -28,8 +28,9 @@ public:
   SQ_ND Result get_absolute() const;
   SQ_ND Result get_canonical() const;
   SQ_ND Result get_is_absolute() const;
-  SQ_ND Result get_size() const;
-  SQ_ND Result get_exists() const;
+  SQ_ND Result get_size(PrimitiveBool follow_symlinks) const;
+  SQ_ND Result get_exists(PrimitiveBool follow_symlinks) const;
+  SQ_ND Result get_type(PrimitiveBool follow_symlinks) const;
   SQ_ND Primitive to_primitive() const override;
 
 private:

@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: MIT
 # ------------------------------------------------------------------------------
 
+import itertools
+import os
 import pathlib
 import pytest
+import stat
 import util
-
 
 relative_path_infos = [
     {
@@ -188,25 +190,51 @@ def test_canonical(tmp_path, path_info):
     assert result == str(canonical_path)
 
 
-def test_size_of_file(tmp_path):
+@pytest.mark.parametrize(
+    "symlink,follow_symlinks,file_type",
+    itertools.product(
+        (True, False),
+        (True, False),
+        ("regular", "directory", "fifo"),
+    )
+)
+def test_size(tmp_path, symlink, follow_symlinks, file_type):
     path = tmp_path / "file"
-    quoted_path = util.quote(str(path))
-    path.write_text("Some data")
-    size = path.stat().st_size
-    result = util.sq(f"<path({quoted_path}).<size")
-    assert result == size
+    expected = None
+    if file_type == "regular":
+        path.touch()
+        path.write_text("Some data")
+        expected = path.stat().st_size
+    elif file_type == "directory":
+        path.mkdir()
+    elif file_type == "fifo":
+        os.mkfifo(path)
 
-def test_size_of_directory(tmp_path):
-    path = tmp_path / "dir"
+    if symlink:
+        link = tmp_path / "link"
+        link.symlink_to(path)
+        path = link
+        if not follow_symlinks:
+            expected = None
+
     quoted_path = util.quote(str(path))
-    path.mkdir()
-    result = util.sq(f"<path({quoted_path}).<size")
-    assert result == None
+    follow_symlinks_param = "true" if follow_symlinks else "false"
+    query = f"<path({quoted_path}).<size({follow_symlinks_param})"
+    assert util.sq(query) == expected
+
 
 def test_size_of_non_existent(tmp_path):
     path = tmp_path / "nonexistent"
     quoted_path = util.quote(str(path))
-    result = util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
+    util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
+
+
+def test_size_of_broken_symlink(tmp_path):
+    path = tmp_path / "broken_symlink"
+    path.symlink_to(tmp_path / "nonexistent")
+    quoted_path = util.quote(str(path))
+    util.sq_error(f"<path({quoted_path}).<size", "file ?not ?found")
+
 
 def test_children(tmp_path):
     children = [tmp_path / f for f in ("f1", "x", "achild")]
@@ -216,11 +244,62 @@ def test_children(tmp_path):
     expected = sorted([str(child) for child in children])
     assert result == expected
 
-def test_exists(tmp_path):
-    quoted_path = util.quote(str(tmp_path))
-    assert util.sq(f"<path({quoted_path}).<exists") == True
+@pytest.mark.parametrize(
+    "symlink,follow_symlinks,exists",
+    itertools.product((True, False), repeat=3)
+)
+def test_exists(tmp_path, symlink, follow_symlinks, exists):
+    path = tmp_path / "file"
+    if exists:
+        path.touch()
+    if symlink:
+        link = tmp_path / "link"
+        link.symlink_to(path)
+        path = link
+    follow_symlinks_param = "true" if follow_symlinks else "false"
+    quoted_path = util.quote(str(path))
+    query = f"<path({quoted_path}).<exists({follow_symlinks_param})"
+    assert util.sq(query) == (exists or (symlink and not follow_symlinks))
 
-def test_not_exists(tmp_path):
+
+@pytest.mark.parametrize(
+    "symlink,follow_symlinks,file_type",
+    itertools.product(
+        (True, False),
+        (True, False),
+        ("regular", "directory", "fifo")
+    )
+)
+def test_type(tmp_path, symlink, follow_symlinks, file_type):
+    path = tmp_path / "file"
+    if file_type == "regular":
+        path.touch()
+    elif file_type == "directory":
+        path.mkdir()
+    elif file_type == "fifo":
+        os.mkfifo(path)
+
+    expected = file_type
+    if symlink:
+        link = tmp_path / "link"
+        link.symlink_to(path)
+        path = link
+        expected = file_type if follow_symlinks else "symlink"
+
+    follow_symlinks_param = "true" if follow_symlinks else "false"
+    quoted_path = util.quote(str(path))
+    query = f"<path({quoted_path}).<type({follow_symlinks_param})"
+    assert util.sq(query) == expected
+
+
+def test_type_of_nonexistent(tmp_path):
     path = tmp_path / "nonexistent"
     quoted_path = util.quote(str(path))
-    assert util.sq(f"<path({quoted_path}).<exists") == False
+    util.sq_error(f"<path({quoted_path}).<type", "file ?not ?found")
+
+
+def test_type_of_broken_symlink(tmp_path):
+    path = tmp_path / "broken_symlink"
+    path.symlink_to(tmp_path / "nonexistent")
+    quoted_path = util.quote(str(path))
+    util.sq_error(f"<path({quoted_path}).<type", "file ?not ?found")
