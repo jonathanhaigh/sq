@@ -274,6 +274,38 @@
                     "return_list": false,
                     "null": false,
                     "params": []
+                },
+                {
+                    "name": "atime",
+                    "doc": "Get the last access time of the file",
+                    "return_type": "SqTimePoint",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "mtime",
+                    "doc": "Get the last modification time of the file",
+                    "return_type": "SqTimePoint",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "ctime",
+                    "doc": "Get the last status change time of the file",
+                    "return_type": "SqTimePoint",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "block_count",
+                    "doc": "Get the number of blocks allocated for the file",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
                 }
             ]
         },
@@ -803,7 +835,12 @@
         {
             "name": "SqString",
             "doc": "A string of characters",
-            "fields": [ ]
+            "fields": []
+        },
+        {
+            "name": "SqTimePoint",
+            "doc": "A point in time",
+            "fields": []
         },
         {
             "name": "SqTypeSchema",
