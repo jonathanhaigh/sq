@@ -324,3 +324,9 @@ def test_hard_link_count_of_nonexistent(tmp_path):
     path = tmp_path / "file"
     quoted_path = util.quote(str(path))
     util.sq_error(f"<path({quoted_path}).<hard_link_count", "filesystem ?error")
+
+def test_mode(tmp_path):
+    path = tmp_path / "file"
+    path.touch()
+    quoted_path = util.quote(str(path))
+    assert util.sq(f"<path({quoted_path}).<mode") == stat.S_IMODE(path.stat().st_mode)
