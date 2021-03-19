@@ -2,3 +2,5 @@ build
 *.swp
 *.pyc
 *.swo
+compile_commands.json
+.cache

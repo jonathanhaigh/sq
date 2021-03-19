@@ -34,6 +34,8 @@ public:
   SQ_ND Result get_mtime() const;
   SQ_ND Result get_ctime() const;
   SQ_ND Result get_block_count() const;
+  SQ_ND Result get_user() const;
+  SQ_ND Result get_group() const;
   SQ_ND Primitive to_primitive() const override;
 
 private:
