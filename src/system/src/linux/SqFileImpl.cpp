@@ -8,9 +8,11 @@
 #include "common_types/errors.h"
 #include "system/linux/SqDataSizeImpl.h"
 #include "system/linux/SqFileModeImpl.h"
+#include "system/linux/SqGroupImpl.h"
 #include "system/linux/SqIntImpl.h"
 #include "system/linux/SqStringImpl.h"
 #include "system/linux/SqTimePointImpl.h"
+#include "system/linux/SqUserImpl.h"
 
 #include <fmt/format.h>
 #include <gsl/gsl>
@@ -123,6 +125,14 @@ Result SqFileImpl::get_block_count() const {
         "block count of file {} ({}) does not fit in type PrimitiveInt", path_,
         stat_.st_blocks)};
   }
+}
+
+Result SqFileImpl::get_user() const {
+  return std::make_shared<SqUserImpl>(stat_.st_uid);
+}
+
+Result SqFileImpl::get_group() const {
+  return std::make_shared<SqGroupImpl>(stat_.st_gid);
 }
 
 Primitive SqFileImpl::to_primitive() const {

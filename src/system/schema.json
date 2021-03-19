@@ -306,6 +306,22 @@
                     "return_list": false,
                     "null": false,
                     "params": []
+                },
+                {
+                    "name": "user",
+                    "doc": "Get the file's user",
+                    "return_type": "SqUser",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "group",
+                    "doc": "Get the file's group",
+                    "return_type": "SqUser",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
                 }
             ]
         },
@@ -867,6 +883,34 @@
                     "doc": "a list of the type's fields",
                     "return_type": "SqFieldSchema",
                     "return_list": true,
+                    "null": false,
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqUser",
+            "doc": "A user",
+            "fields": [
+                {
+                    "name": "uid",
+                    "doc": "The user's ID number",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                }
+            ]
+        },
+        {
+            "name": "SqGroup",
+            "doc": "A group",
+            "fields": [
+                {
+                    "name": "gid",
+                    "doc": "The group's ID number",
+                    "return_type": "SqInt",
+                    "return_list": false,
                     "null": false,
                     "params": []
                 }

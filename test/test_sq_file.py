@@ -82,3 +82,13 @@ def test_block_count(tmp_path):
     quoted_path = util.quote(str(tmp_path))
     result = util.sq(f"<path({quoted_path}).<file.<block_count")
     assert result == tmp_path.stat().st_blocks
+
+def test_user(tmp_path):
+    quoted_path = util.quote(str(tmp_path))
+    result = util.sq(f"<path({quoted_path}).<file.<user")
+    assert result == tmp_path.stat().st_uid
+
+def test_group(tmp_path):
+    quoted_path = util.quote(str(tmp_path))
+    result = util.sq(f"<path({quoted_path}).<file.<group")
+    assert result == tmp_path.stat().st_gid

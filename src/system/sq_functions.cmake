@@ -13,6 +13,7 @@ function(sq_expand_for_each_type FORMAT_STRING OUTPUT_VAR)
         SqFile
         SqFileMode
         SqFloat
+        SqGroup
         SqInt
         SqParamSchema
         SqPath
@@ -22,6 +23,7 @@ function(sq_expand_for_each_type FORMAT_STRING OUTPUT_VAR)
         SqString
         SqTimePoint
         SqTypeSchema
+        SqUser
     )
     set(EXPANDED_STRINGS)
     foreach(SQ_TYPE ${SQ_TYPES})
