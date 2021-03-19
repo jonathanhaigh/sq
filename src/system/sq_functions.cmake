@@ -20,6 +20,7 @@ function(sq_expand_for_each_type FORMAT_STRING OUTPUT_VAR)
         SqRoot
         SqSchema
         SqString
+        SqTimePoint
         SqTypeSchema
     )
     set(EXPANDED_STRINGS)

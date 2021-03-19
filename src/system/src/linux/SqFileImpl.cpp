@@ -10,6 +10,7 @@
 #include "system/linux/SqFileModeImpl.h"
 #include "system/linux/SqIntImpl.h"
 #include "system/linux/SqStringImpl.h"
+#include "system/linux/SqTimePointImpl.h"
 
 #include <fmt/format.h>
 #include <gsl/gsl>
@@ -99,6 +100,29 @@ Result SqFileImpl::get_hard_link_count() const {
 
 Result SqFileImpl::get_mode() const {
   return std::make_shared<SqFileModeImpl>(stat_.st_mode & ~mode_t{S_IFMT});
+}
+
+Result SqFileImpl::get_atime() const {
+  return SqTimePointImpl::from_unix_timespec(stat_.st_atim);
+}
+
+Result SqFileImpl::get_mtime() const {
+  return SqTimePointImpl::from_unix_timespec(stat_.st_mtim);
+}
+
+Result SqFileImpl::get_ctime() const {
+  return SqTimePointImpl::from_unix_timespec(stat_.st_ctim);
+}
+
+Result SqFileImpl::get_block_count() const {
+  try {
+    return std::make_shared<SqIntImpl>(
+        gsl::narrow<PrimitiveInt>(stat_.st_blocks));
+  } catch (gsl::narrowing_error &e) {
+    throw OutOfRangeError{fmt::format(
+        "block count of file {} ({}) does not fit in type PrimitiveInt", path_,
+        stat_.st_blocks)};
+  }
 }
 
 Primitive SqFileImpl::to_primitive() const {

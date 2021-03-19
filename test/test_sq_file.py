@@ -1,4 +1,5 @@
 import itertools
+import math
 import os
 import pathlib
 import pytest
@@ -65,3 +66,19 @@ def test_inode(tmp_path):
     path.touch()
     quoted_path = util.quote(str(path))
     assert util.sq(f"<path({quoted_path}).<file.<inode") == path.stat().st_ino
+
+def test_time(tmp_path):
+    quoted_path = util.quote(str(tmp_path))
+    result = util.sq(f"<path({quoted_path}).<file {{ atime mtime ctime }}")
+    stat = tmp_path.stat()
+    # We can't check for an exact atime value because the value might change
+    # between accesses. Also, try not to underflow if atime is zero.
+    assert result["atime"] + 10 > stat.st_atime
+    assert result["atime"] < stat.st_atime + 10
+    assert result["mtime"] == math.floor(stat.st_mtime)
+    assert result["ctime"] == math.floor(stat.st_ctime)
+
+def test_block_count(tmp_path):
+    quoted_path = util.quote(str(tmp_path))
+    result = util.sq(f"<path({quoted_path}).<file.<block_count")
+    assert result == tmp_path.stat().st_blocks
