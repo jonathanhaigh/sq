@@ -4,10 +4,8 @@
 # ------------------------------------------------------------------------------
 
 import itertools
-import os
 import pathlib
 import pytest
-import stat
 import util
 
 relative_path_infos = [
@@ -190,52 +188,6 @@ def test_canonical(tmp_path, path_info):
     assert result == str(canonical_path)
 
 
-@pytest.mark.parametrize(
-    "symlink,follow_symlinks,file_type",
-    itertools.product(
-        (True, False),
-        (True, False),
-        ("regular", "directory", "fifo"),
-    )
-)
-def test_size(tmp_path, symlink, follow_symlinks, file_type):
-    path = tmp_path / "file"
-    expected = None
-    if file_type == "regular":
-        path.touch()
-        path.write_text("Some data")
-        expected = path.stat().st_size
-    elif file_type == "directory":
-        path.mkdir()
-    elif file_type == "fifo":
-        os.mkfifo(path)
-
-    if symlink:
-        link = tmp_path / "link"
-        link.symlink_to(path)
-        path = link
-        if not follow_symlinks:
-            expected = link.lstat().st_size
-
-    quoted_path = util.quote(str(path))
-    follow_symlinks_param = "true" if follow_symlinks else "false"
-    query = f"<path({quoted_path}).<size({follow_symlinks_param})"
-    assert util.sq(query) == expected
-
-
-def test_size_of_non_existent(tmp_path):
-    path = tmp_path / "nonexistent"
-    quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<size", "filesystem ?error")
-
-
-def test_size_of_broken_symlink(tmp_path):
-    path = tmp_path / "broken_symlink"
-    path.symlink_to(tmp_path / "nonexistent")
-    quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<size", "filesystem ?error")
-
-
 def test_children(tmp_path):
     children = [tmp_path / f for f in ("f1", "x", "achild")]
     for child in children:
@@ -261,72 +213,21 @@ def test_exists(tmp_path, symlink, follow_symlinks, exists):
     query = f"<path({quoted_path}).<exists({follow_symlinks_param})"
     assert util.sq(query) == (exists or (symlink and not follow_symlinks))
 
-
 @pytest.mark.parametrize(
-    "symlink,follow_symlinks,file_type",
-    itertools.product(
-        (True, False),
-        (True, False),
-        ("regular", "directory", "fifo")
-    )
+    "symlink,follow_symlinks",
+    itertools.product((True, False), repeat=2)
 )
-def test_type(tmp_path, symlink, follow_symlinks, file_type):
+def test_file(tmp_path, symlink, follow_symlinks):
     path = tmp_path / "file"
-    if file_type == "regular":
-        path.touch()
-    elif file_type == "directory":
-        path.mkdir()
-    elif file_type == "fifo":
-        os.mkfifo(path)
-
-    expected = file_type
+    path.touch()
+    expected = path.stat().st_ino
     if symlink:
         link = tmp_path / "link"
         link.symlink_to(path)
         path = link
-        expected = file_type if follow_symlinks else "symlink"
-
+        if not follow_symlinks:
+            expected = path.lstat().st_ino
     follow_symlinks_param = "true" if follow_symlinks else "false"
     quoted_path = util.quote(str(path))
-    query = f"<path({quoted_path}).<type({follow_symlinks_param})"
+    query = f"<path({quoted_path}).<file({follow_symlinks_param})"
     assert util.sq(query) == expected
-
-
-def test_type_of_nonexistent(tmp_path):
-    path = tmp_path / "nonexistent"
-    quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<type", "filesystem ?error")
-
-
-def test_type_of_broken_symlink(tmp_path):
-    path = tmp_path / "broken_symlink"
-    path.symlink_to(tmp_path / "nonexistent")
-    quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<type", "filesystem ?error")
-
-def test_hard_link_count(tmp_path):
-    path = tmp_path / "file"
-    quoted_path = util.quote(str(path))
-    path.touch()
-    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 1
-
-    # Note: pathlib.Path.link_to() will be deprecated in Python 3.9 due to the
-    # strange argument order (opposite to pathlib.Path.symlink_to()) but we
-    # won't have the replacement, pathlib.Path.hardlink_to() until Python 3.9.
-    # See https://bugs.python.org/issue39291 and
-    #     https://bugs.python.org/issue39950
-    path.link_to(tmp_path / "file2")
-    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 2
-    path.link_to(tmp_path / "file3")
-    assert util.sq(f"<path({quoted_path}).<hard_link_count") == 3
-
-def test_hard_link_count_of_nonexistent(tmp_path):
-    path = tmp_path / "file"
-    quoted_path = util.quote(str(path))
-    util.sq_error(f"<path({quoted_path}).<hard_link_count", "filesystem ?error")
-
-def test_mode(tmp_path):
-    path = tmp_path / "file"
-    path.touch()
-    quoted_path = util.quote(str(path))
-    assert util.sq(f"<path({quoted_path}).<mode") == stat.S_IMODE(path.stat().st_mode)

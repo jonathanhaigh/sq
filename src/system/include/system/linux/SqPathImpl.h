@@ -10,7 +10,6 @@
 #include "util/typeutil.h"
 
 #include <filesystem>
-#include <sys/stat.h>
 
 namespace sq::system::linux {
 
@@ -29,19 +28,12 @@ public:
   SQ_ND Result get_absolute() const;
   SQ_ND Result get_canonical() const;
   SQ_ND Result get_is_absolute() const;
-  SQ_ND Result get_size(PrimitiveBool follow_symlinks) const;
   SQ_ND Result get_exists(PrimitiveBool follow_symlinks) const;
-  SQ_ND Result get_type(PrimitiveBool follow_symlinks) const;
-  SQ_ND Result get_hard_link_count(PrimitiveBool follow_symlinks) const;
-  SQ_ND Result get_mode(PrimitiveBool follow_symlinks) const;
+  SQ_ND Result get_file(PrimitiveBool follow_symlinks) const;
   SQ_ND Primitive to_primitive() const override;
 
 private:
-  const struct stat &get_stat(bool follow_symlinks) const;
-
   std::filesystem::path value_;
-  mutable struct stat stat_ = {};
-  mutable struct stat lstat_ = {};
 };
 
 } // namespace sq::system::linux

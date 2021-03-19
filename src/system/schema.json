@@ -232,6 +232,52 @@
             ]
         },
         {
+            "name": "SqFile",
+            "doc": "A file",
+            "fields": [
+                {
+                    "name": "inode",
+                    "doc": "Get the inode of the file",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "size",
+                    "doc": "Get the size of the file",
+                    "return_type": "SqDataSize",
+                    "return_list": false,
+                    "null": true,
+                    "params": []
+                },
+                {
+                    "name": "type",
+                    "doc": "Get the type of the file",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "hard_link_count",
+                    "doc": "Get the number of the file's hard links",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "mode",
+                    "doc": "Get the mode of the file",
+                    "return_type": "SqFileMode",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                }
+            ]
+        },
+        {
             "name": "SqFileMode",
             "doc": "File mode information. I.e. permissions and SUID, SGID and sticky bits",
             "fields": [
@@ -520,60 +566,9 @@
                     "params": []
                 },
                 {
-                    "name": "size",
-                    "doc": "Get the size of the file referred to by the path",
-                    "return_type": "SqDataSize",
-                    "return_list": false,
-                    "null": true,
-                    "params": [
-                        {
-                            "index": 0,
-                            "name": "follow_symlinks",
-                            "doc": "Whether to dereference symlinks",
-                            "type": "PrimitiveBool",
-                            "required": false,
-                            "default_value": true
-                        }
-                    ]
-                },
-                {
-                    "name": "type",
-                    "doc": "Get the type of the file referred to by the path",
-                    "return_type": "SqString",
-                    "return_list": false,
-                    "null": false,
-                    "params": [
-                        {
-                            "index": 0,
-                            "name": "follow_symlinks",
-                            "doc": "Whether to dereference symlinks",
-                            "type": "PrimitiveBool",
-                            "required": false,
-                            "default_value": true
-                        }
-                    ]
-                },
-                {
-                    "name": "hard_link_count",
-                    "doc": "Get the number of hard links for the file referred to by the path",
-                    "return_type": "SqInt",
-                    "return_list": false,
-                    "null": false,
-                    "params": [
-                        {
-                            "index": 0,
-                            "name": "follow_symlinks",
-                            "doc": "Whether to dereference symlinks",
-                            "type": "PrimitiveBool",
-                            "required": false,
-                            "default_value": true
-                        }
-                    ]
-                },
-                {
-                    "name": "mode",
-                    "doc": "Get the mode of the file referred to by the path",
-                    "return_type": "SqFileMode",
+                    "name": "file",
+                    "doc": "Get the file to which the path refers",
+                    "return_type": "SqFile",
                     "return_list": false,
                     "null": false,
                     "params": [
