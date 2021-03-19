@@ -232,6 +232,44 @@
             ]
         },
         {
+            "name": "SqFileMode",
+            "doc": "File mode information. I.e. permissions and SUID, SGID and sticky bits",
+            "fields": [
+                {
+                    "name": "permissions",
+                    "doc": "Get the permissions specified by the mode",
+                    "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "suid",
+                    "doc": "Get whether the SUID bit is set",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "sgid",
+                    "doc": "Get whether the SGID bit is set",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "sticky",
+                    "doc": "Get whether the sticky (ISVTX) bit ist set",
+                    "return_type": "SqBool",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                }
+            ]
+        },
+        {
             "name": "SqFloat",
             "doc": "A double precision floating point type",
             "fields": []
@@ -519,6 +557,23 @@
                     "name": "hard_link_count",
                     "doc": "Get the number of hard links for the file referred to by the path",
                     "return_type": "SqInt",
+                    "return_list": false,
+                    "null": false,
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": true
+                        }
+                    ]
+                },
+                {
+                    "name": "mode",
+                    "doc": "Get the mode of the file referred to by the path",
+                    "return_type": "SqFileMode",
                     "return_list": false,
                     "null": false,
                     "params": [
