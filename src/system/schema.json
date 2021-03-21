@@ -899,6 +899,59 @@
                     "return_list": false,
                     "null": false,
                     "params": []
+                },
+                {
+                    "name": "username",
+                    "doc": "The user's login name",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "group",
+                    "doc": "The user's group",
+                    "return_type": "SqGroup",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "gecos",
+                    "doc": [
+                        "The user's GECOS field",
+                        "The GECOS field is a list of general information",
+                        "about the user. See",
+                        "https://en.wikipedia.org/wiki/Gecos_field for details."
+                    ],
+                    "return_type": "SqString",
+                    "return_list": true,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "name",
+                    "doc": "The user's full name",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "home",
+                    "doc": "The user's home directory",
+                    "return_type": "SqPath",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "shell",
+                    "doc": "The user's shell",
+                    "return_type": "SqPath",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
                 }
             ]
         },
@@ -911,6 +964,22 @@
                     "doc": "The group's ID number",
                     "return_type": "SqInt",
                     "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "name",
+                    "doc": "The group's name",
+                    "return_type": "SqString",
+                    "return_list": false,
+                    "null": false,
+                    "params": []
+                },
+                {
+                    "name": "members",
+                    "doc": "The group's members",
+                    "return_type": "SqUser",
+                    "return_list": true,
                     "null": false,
                     "params": []
                 }

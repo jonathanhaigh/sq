@@ -8,6 +8,7 @@
 
 #include "common_types/Primitive.fwd.h"
 #include "common_types/Token.fwd.h"
+#include "util/typeutil.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -27,7 +28,7 @@ public:
 };
 
 /**
- * Error indicating that a required parameter of a field is missing.
+ * Indicates that a required parameter of a field is missing.
  */
 class ArgumentMissingError : public Exception {
 public:
@@ -39,7 +40,7 @@ public:
 };
 
 /**
- * Error indicating that a given parameter is of incorrect type.
+ * Indicates that a given parameter is of incorrect type.
  */
 class ArgumentTypeError : public Exception {
 public:
@@ -51,7 +52,7 @@ public:
 };
 
 /**
- * Exception indicating a programming error in SQ.
+ * Indicates a programming error in SQ.
  *
  * InternalError should never actually be thrown - they are used in places that
  * the programmer believes are dead code, but where the C++ language still
@@ -69,7 +70,7 @@ public:
 };
 
 /**
- * Error indicating access of a non-existent field.
+ * Indicates attempted access of a non-existent field.
  */
 class InvalidFieldError : public Exception {
 public:
@@ -84,7 +85,7 @@ public:
 };
 
 /**
- * Error indicating incorrect grammar in a query.
+ * Indicates incorrect grammar in a query.
  */
 class ParseError : public Exception {
 public:
@@ -114,8 +115,7 @@ public:
 };
 
 /**
- * Error indicating that an array operation has been requested on a non-array
- * type.
+ * Indicates that an array operation has been requested on a non-array type.
  */
 class NotAScalarError : public Exception {
 public:
@@ -123,15 +123,14 @@ public:
 };
 
 /**
- * Error indicating that an array operation has been requested on a non-array
- * type.
+ * Indicates that an array operation has been requested on a non-array type.
  */
 class NotAnArrayError : public Exception {
 public:
   using Exception::Exception;
 };
 /**
- * Error indicating that a requested feature has not been implemented.
+ * Indicates that a requested feature has not been implemented.
  */
 class NotImplementedError : public Exception {
 public:
@@ -139,7 +138,7 @@ public:
 };
 
 /**
- * Error indicating a request to access an element outside of an allowed range.
+ * Indicates that a request to access an element outside of an allowed range.
  */
 class OutOfRangeError : public Exception {
 public:
@@ -152,33 +151,60 @@ public:
 };
 
 /**
- * Error indicating that a pullup type field access has been requested for a
- * field access with siblings.
+ * Indicates that a pullup type field access has been requested for a field
+ * access with siblings.
  */
 class PullupWithSiblingsError : public Exception {
   using Exception::Exception;
 };
 
 /**
- * Error indicating that the udev library returned an error.
+ * Indicates an error was received from a system library.
  */
-class UdevError : public Exception {
-  using Exception::Exception;
-};
-
-/**
- * Error indicating that a filesystem error ocurred.
- */
-class FilesystemError : public Exception {
+class SystemError : public Exception {
 public:
   using Exception::Exception;
-  FilesystemError(std::string_view operation, const std::filesystem::path &path,
-                  std::error_code code);
 
-  std::error_code code() const;
+  /**
+   * Create a SystemError object.
+   *
+   * @param operation the operation that failed.
+   * @param code the system error code associated with the error.
+   */
+  SystemError(std::string_view operation, std::error_code code);
+
+  /**
+   * Get the system error code associated with this error.
+   */
+  SQ_ND std::error_code code() const;
 
 private:
   std::error_code code_;
+};
+
+/**
+ * Indicates that the udev library returned an error.
+ */
+class UdevError : public SystemError {
+  using SystemError::SystemError;
+};
+
+/**
+ * Indicates that a filesystem error occurred.
+ */
+class FilesystemError : public SystemError {
+public:
+  using SystemError::SystemError;
+
+  /**
+   * Create a FilesystemError object.
+   *
+   * @param operation the operation that failed.
+   * @param path the path for which the operation failed.
+   * @param code the system error code associated with the error.
+   */
+  FilesystemError(std::string_view operation, const std::filesystem::path &path,
+                  std::error_code code);
 };
 
 } // namespace sq
