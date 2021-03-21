@@ -5,9 +5,10 @@
 
 #include "parser/TokenView.h"
 
-#include "common_types/errors.h"
-#include "util/ASSERT.h"
-#include "util/typeutil.h"
+#include "core/ASSERT.h"
+#include "core/errors.h"
+#include "core/narrow.h"
+#include "core/typeutil.h"
 
 #include <gsl/gsl>
 
@@ -69,7 +70,7 @@ const Token &TokenView::read() const {
   }
 
   const auto pos = pos_ + whitespace_length();
-  const auto remaining = str_.substr(util::to_size(pos));
+  const auto remaining = str_.substr(to_size(pos));
 
   if (std::ssize(remaining) == 0) {
     cache_ = Token(str_, pos, 0, TokenKind::Eof);
@@ -103,8 +104,8 @@ void TokenView::next() {
 }
 
 gsl::index TokenView::whitespace_length() const {
-  const auto remaining = str_.substr(util::to_size(pos_));
-  return util::to_index(
+  const auto remaining = str_.substr(to_size(pos_));
+  return to_index(
       std::min(remaining.find_first_not_of(" \t\r\n"), remaining.size()));
 }
 

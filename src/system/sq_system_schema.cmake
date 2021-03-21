@@ -19,8 +19,7 @@ add_library(sq_system_schema
 
 set_target_properties(sq_system_schema PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(sq_system_schema PUBLIC ${SQ_SYSTEM_SCHEMA_INCLUDE_DIR})
-target_link_libraries(sq_system_schema PUBLIC sq_util)
-target_link_libraries(sq_system_schema PUBLIC sq_common_types)
+target_link_libraries(sq_system_schema PUBLIC sq_core)
 target_link_libraries(sq_system_schema PUBLIC sq_parser)
 target_link_libraries(sq_system_schema PUBLIC gsl)
 

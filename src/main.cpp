@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
+#include "core/narrow.h"
+#include "core/typeutil.h"
 #include "parser/Parser.h"
 #include "parser/TokenView.h"
 #include "results/results.h"
 #include "serialization/serialize.h"
 #include "system/root.h"
-#include "util/typeutil.h"
 
 #include <cstddef>
 #include <gsl/gsl>
@@ -16,7 +17,7 @@
 
 namespace {
 int run_sq(int argc, char **argv) {
-  const auto args = gsl::span{argv, sq::util::to_size(argc)};
+  const auto args = gsl::span{argv, sq::to_size(argc)};
   if (args.size() < 2) {
     std::cerr << "Not enough args\n";
     return 1;
@@ -41,7 +42,7 @@ int main(int argc, char **argv) {
   try {
     return run_sq(argc, argv);
   } catch (const std::exception &e) {
-    std::cerr << sq::util::base_type_name(e) << ": " << e.what() << std::endl;
+    std::cerr << sq::base_type_name(e) << ": " << e.what() << std::endl;
     return 1;
   }
 }

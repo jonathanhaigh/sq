@@ -1,9 +1,9 @@
 #ifndef SQ_INCLUDE_GUARD_results_test_results_test_util_h_
 #define SQ_INCLUDE_GUARD_results_test_results_test_util_h_
 
+#include "core/typeutil.h"
 #include "results/results.h"
 #include "test/Primitive_test_util.h"
-#include "util/typeutil.h"
 
 #include <functional>
 #include <gmock/gmock.h>
@@ -129,7 +129,7 @@ SQ_ND ResultTree obj_data_tree(auto &&...args);
 /**
  * Create a ResultTree representing an array with the given values.
  */
-template <util::ConvertibleToAlternative<ResultTree::Data>... Args>
+template <ConvertibleToAlternative<ResultTree::Data>... Args>
 SQ_ND ResultTree array_data_tree(Args &&...args);
 
 ///@{
@@ -141,8 +141,8 @@ requires std::is_convertible_v<ranges::cpp20::range_value_t<R>, ResultTree>
     SQ_ND ResultTree to_array_data_tree(R &&rng);
 
 template <ranges::cpp20::view R>
-requires util::ConvertibleToAlternative<ranges::cpp20::range_value_t<R>,
-                                        ResultTree::Data>
+requires ConvertibleToAlternative<ranges::cpp20::range_value_t<R>,
+                                  ResultTree::Data>
     SQ_ND ResultTree to_array_data_tree(R &&rng);
 ///@}
 

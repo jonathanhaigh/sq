@@ -4,12 +4,11 @@
 # ------------------------------------------------------------------------------
 
 set(SQ_ALL_LIBS
-    common_types
+    core
     parser
     results
     serialization
     system
-    util
 )
 
 add_executable(sq main.cpp)

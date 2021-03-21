@@ -5,8 +5,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_CacheingField_h_
 #define SQ_INCLUDE_GUARD_system_CacheingField_h_
 
-#include "common_types/Field.h"
-#include "util/typeutil.h"
+#include "core/Field.h"
+#include "core/typeutil.h"
 
 #include <map>
 #include <string>

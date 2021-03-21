@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_schema_h_
 #define SQ_INCLUDE_GUARD_system_schema_h_
 
-#include "common_types/Primitive.h"
-#include "util/typeutil.h"
+#include "core/Primitive.h"
+#include "core/typeutil.h"
 
 #include <cstddef>
 #include <gsl/gsl>

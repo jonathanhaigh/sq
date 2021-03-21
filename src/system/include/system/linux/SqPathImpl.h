@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqPathImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqPathImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqPath.gen.h"
-#include "util/typeutil.h"
 
 #include <filesystem>
 

@@ -6,11 +6,11 @@
 #ifndef SQ_INCLUDE_GUARD_parser_Parser_h_
 #define SQ_INCLUDE_GUARD_parser_Parser_h_
 
-#include "common_types/Primitive.h"
-#include "common_types/Token.h"
+#include "core/Primitive.h"
+#include "core/Token.h"
+#include "core/typeutil.h"
 #include "parser/Ast.h"
 #include "parser/TokenView.h"
-#include "util/typeutil.h"
 
 #include <concepts>
 #include <optional>

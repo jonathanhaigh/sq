@@ -6,10 +6,10 @@
 #ifndef SQ_INCLUDE_GUARD_parser_Ast_h_
 #define SQ_INCLUDE_GUARD_parser_Ast_h_
 
-#include "common_types/FieldCallParams.h"
+#include "core/FieldCallParams.h"
+#include "core/MoveOnlyTree.h"
+#include "core/typeutil.h"
 #include "parser/FilterSpec.h"
-#include "util/MoveOnlyTree.h"
-#include "util/typeutil.h"
 
 #include <compare>
 #include <iosfwd>
@@ -89,7 +89,7 @@ private:
 };
 std::ostream &operator<<(std::ostream &os, const AstData &ast_data);
 
-using Ast = util::MoveOnlyTree<AstData>;
+using Ast = MoveOnlyTree<AstData>;
 
 } // namespace sq::parser
 

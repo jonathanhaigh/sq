@@ -5,7 +5,7 @@
 
 #include "system/linux/SqFileImpl.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
 #include "system/linux/SqDataSizeImpl.h"
 #include "system/linux/SqFileModeImpl.h"
 #include "system/linux/SqGroupImpl.h"
@@ -62,25 +62,14 @@ SqFileImpl::SqFileImpl(struct stat s, std::string_view path)
     : stat_{s}, path_{path} {}
 
 Result SqFileImpl::get_inode() const {
-  try {
-    return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(stat_.st_ino));
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{fmt::format(
-        "inode number of file {} ({}) does not fit in type PrimitiveInt", path_,
-        stat_.st_ino)};
-  }
+  return std::make_shared<SqIntImpl>(
+      to_primitive_int(stat_.st_ino, "inode number of file {}", path_));
 }
 
 Result SqFileImpl::get_size() const {
   if (S_ISREG(stat_.st_mode) || S_ISLNK(stat_.st_mode) || S_TYPEISSHM(&stat_)) {
-    try {
-      return std::make_shared<SqDataSizeImpl>(
-          gsl::narrow<PrimitiveInt>(stat_.st_size));
-    } catch (gsl::narrowing_error &e) {
-      throw OutOfRangeError{
-          fmt::format("size of file {} ({}B) does not fit in type PrimitiveInt",
-                      path_, stat_.st_size)};
-    }
+    return std::make_shared<SqDataSizeImpl>(
+        to_primitive_int(stat_.st_size, "size of file {}", stat_.st_size));
   }
   return primitive_null;
 }
@@ -90,14 +79,8 @@ Result SqFileImpl::get_type() const {
 }
 
 Result SqFileImpl::get_hard_link_count() const {
-  try {
-    return std::make_shared<SqIntImpl>(
-        gsl::narrow<PrimitiveInt>(stat_.st_nlink));
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{fmt::format(
-        "hard link count of file {} ({}) does not fit in type PrimitiveInt",
-        path_, stat_.st_nlink)};
-  }
+  return std::make_shared<SqIntImpl>(to_primitive_int(
+      stat_.st_nlink, "hard link count of file {}", stat_.st_nlink));
 }
 
 Result SqFileImpl::get_mode() const {
@@ -117,14 +100,8 @@ Result SqFileImpl::get_ctime() const {
 }
 
 Result SqFileImpl::get_block_count() const {
-  try {
-    return std::make_shared<SqIntImpl>(
-        gsl::narrow<PrimitiveInt>(stat_.st_blocks));
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{fmt::format(
-        "block count of file {} ({}) does not fit in type PrimitiveInt", path_,
-        stat_.st_blocks)};
-  }
+  return std::make_shared<SqIntImpl>(
+      to_primitive_int(stat_.st_blocks, "block count of file {}", path_));
 }
 
 Result SqFileImpl::get_user() const {
@@ -136,13 +113,8 @@ Result SqFileImpl::get_group() const {
 }
 
 Primitive SqFileImpl::to_primitive() const {
-  try {
-    return gsl::narrow<PrimitiveInt>(stat_.st_ino);
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{fmt::format(
-        "inode number of file {} ({}) does not fit in type PrimitiveInt", path_,
-        stat_.st_ino)};
-  }
+  return to_primitive_int(stat_.st_ino, "inode number of file {}",
+                          stat_.st_ino);
 }
 
 } // namespace sq::system::linux

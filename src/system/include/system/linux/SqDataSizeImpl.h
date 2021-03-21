@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqDataSizeImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqDataSizeImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqDataSize.gen.h"
-#include "util/typeutil.h"
 
 #include <cstdint>
 

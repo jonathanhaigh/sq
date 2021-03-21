@@ -5,8 +5,8 @@
 
 #include "parser/Ast.h"
 
-#include "util/ASSERT.h"
-#include "util/strutil.h"
+#include "core/ASSERT.h"
+#include "core/strutil.h"
 
 #include <gsl/gsl>
 #include <iostream>

@@ -28,8 +28,7 @@ add_library(sq_system_linux
     "${SQ_SYSTEM_LINUX_SRC_DIR}/udev.cpp"
 )
 target_link_libraries(sq_system_linux PUBLIC sq_system_schema)
-target_link_libraries(sq_system_linux PUBLIC sq_common_types)
-target_link_libraries(sq_system_linux PUBLIC sq_util)
+target_link_libraries(sq_system_linux PUBLIC sq_core)
 target_link_libraries(sq_system_linux PUBLIC sq_system_dispatch)
 target_link_libraries(sq_system_linux PUBLIC gsl)
 target_link_libraries(sq_system_linux PRIVATE "${SQ_UDEV_LIB_PATH}")

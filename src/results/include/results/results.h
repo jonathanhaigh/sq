@@ -6,10 +6,10 @@
 #ifndef SQ_INCLUDE_GUARD_results_generate_results_h_
 #define SQ_INCLUDE_GUARD_results_generate_results_h_
 
-#include "common_types/Field.h"
-#include "common_types/Primitive.h"
+#include "core/Field.h"
+#include "core/Primitive.h"
+#include "core/typeutil.h"
 #include "parser/Ast.h"
-#include "util/typeutil.h"
 
 #include <compare>
 #include <string>
@@ -59,7 +59,7 @@ private:
 };
 
 template <typename T>
-concept ResultTreeDataAlternative = util::Alternative<T, ResultTree::Data>;
+concept ResultTreeDataAlternative = Alternative<T, ResultTree::Data>;
 
 } // namespace sq::results
 

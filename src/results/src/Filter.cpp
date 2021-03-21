@@ -5,11 +5,12 @@
 
 #include "results/Filter.h"
 
-#include "common_types/FieldCallParams.h"
-#include "common_types/errors.h"
-#include "util/ASSERT.h"
-#include "util/SharedRange.h"
-#include "util/typeutil.h"
+#include "core/ASSERT.h"
+#include "core/FieldCallParams.h"
+#include "core/SharedRange.h"
+#include "core/errors.h"
+#include "core/narrow.h"
+#include "core/typeutil.h"
 
 #include <fmt/format.h>
 #include <functional>
@@ -29,7 +30,7 @@ namespace sq::results {
 namespace {
 
 SQ_ND auto slurp_range_into_vector(ranges::cpp20::range auto &&rng) {
-  return util::SharedRange{std::make_shared<std::vector<FieldPtr>>(
+  return SharedRange{std::make_shared<std::vector<FieldPtr>>(
       SQ_FWD(rng) | ranges::views::move | ranges::to<std::vector>())};
 }
 
@@ -37,7 +38,7 @@ SQ_ND Result to_result(ranges::cpp20::range auto &&rng) {
   return FieldRange<ranges::get_categories<decltype(rng)>()>{SQ_FWD(rng)};
 }
 
-template <util::Alternative<parser::FilterSpec> Spec> struct FilterImpl;
+template <Alternative<parser::FilterSpec> Spec> struct FilterImpl;
 
 template <> struct FilterImpl<parser::NoFilterSpec> : Filter {
   explicit FilterImpl(SQ_MU const parser::NoFilterSpec &spec) {}
@@ -66,10 +67,10 @@ template <> struct FilterImpl<parser::ElementAccessSpec> : Filter {
     if (index_ >= 0) {
       return nonnegative_index_access(SQ_FWD(rng), index_);
     }
-    if constexpr (!util::SlowSizedRange<decltype(rng)>) {
+    if constexpr (!SlowSizedRange<decltype(rng)>) {
       return (*this)(to_result(slurp_range_into_vector(rng)));
     } else {
-      const auto size = util::to_index(ranges::distance(rng));
+      const auto size = to_index(ranges::distance(rng));
       return negative_index_access(SQ_FWD(rng), index_, size);
     }
   }
@@ -84,7 +85,7 @@ private:
     if (it == end) {
       auto message =
           fmt::format("array element access (\"[{}]\"): out of range", index_);
-      if constexpr (util::SlowSizedRange<decltype(rng)>) {
+      if constexpr (SlowSizedRange<decltype(rng)>) {
         message += fmt::format("(size={})", ranges::distance(rng));
       }
       // clang-tidy bug: https://reviews.llvm.org/D72333
@@ -135,7 +136,7 @@ private:
     auto start = start_.value_or(0);
     auto stop = stop_.value_or(0);
     if (start < 0 || (stop_ && stop < 0)) {
-      if constexpr (!util::SlowSizedRange<decltype(rng)>) {
+      if constexpr (!SlowSizedRange<decltype(rng)>) {
         return (*this)(to_result(slurp_range_into_vector(rng)));
       } else {
         return stop_ ? to_result(
@@ -196,12 +197,12 @@ private:
            ranges::views::stride(step);
   }
 
-  SQ_ND static auto mixed_index_pos_step(util::SlowSizedRange auto &&rng,
+  SQ_ND static auto mixed_index_pos_step(SlowSizedRange auto &&rng,
                                          gsl::index start, gsl::index stop,
                                          gsl::index step) {
     Expects(step > 0);
     Expects(start < 0 || stop < 0);
-    auto size = util::to_index(ranges::distance(rng));
+    auto size = to_index(ranges::distance(rng));
 
     if (start < 0) {
       start += size;
@@ -218,12 +219,12 @@ private:
     return pos_index_pos_step(SQ_FWD(rng), start, stop, step);
   }
 
-  SQ_ND static auto neg_index_no_stop_pos_step(util::SlowSizedRange auto &&rng,
+  SQ_ND static auto neg_index_no_stop_pos_step(SlowSizedRange auto &&rng,
                                                gsl::index start,
                                                gsl::index step) {
     Expects(step > 0);
     Expects(start < 0);
-    start += util::to_index(ranges::distance(rng));
+    start += to_index(ranges::distance(rng));
     if (start < 0) {
       start = 0;
     }
@@ -259,7 +260,7 @@ private:
                        gsl::index start, gsl::index stop, gsl::index step) {
     Expects(step < 0);
     Expects(start >= 0 || stop >= 0);
-    auto size = util::to_index(ranges::distance(rng));
+    auto size = to_index(ranges::distance(rng));
 
     if (start >= 0) {
       start -= size;
@@ -378,7 +379,7 @@ private:
 };
 
 struct FilterCreatorVisitor {
-  template <util::Alternative<parser::FilterSpec> T>
+  template <Alternative<parser::FilterSpec> T>
   SQ_ND FilterPtr operator()(const T &spec) const {
     return std::make_unique<FilterImpl<T>>(spec);
   }

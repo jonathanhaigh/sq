@@ -5,10 +5,10 @@
 
 #include "system/linux/SqGroupImpl.h"
 
+#include "core/ASSERT.h"
 #include "system/linux/SqIntImpl.h"
 #include "system/linux/SqStringImpl.h"
 #include "system/linux/SqUserImpl.h"
-#include "util/ASSERT.h"
 
 #include <cerrno>
 #include <fmt/format.h>
@@ -25,12 +25,7 @@ Result SqGroupImpl::get_gid() const {
   if (gid_ == invalid_gid_) {
     ensure_fully_initialized();
   }
-  try {
-    return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(gid_));
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{
-        fmt::format("cannot fit GID {} in type PrimitiveInt", gid_)};
-  }
+  return std::make_shared<SqIntImpl>(to_primitive_int(gid_, "GID"));
 }
 
 Result SqGroupImpl::get_name() const {
@@ -54,12 +49,7 @@ Primitive SqGroupImpl::to_primitive() const {
   if (gid_ == invalid_gid_) {
     ensure_fully_initialized();
   }
-  try {
-    return gsl::narrow<PrimitiveInt>(gid_);
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{
-        fmt::format("cannot fit GID {} in type PrimitiveInt", gid_)};
-  }
+  return to_primitive_int(gid_, "GID");
 }
 
 void SqGroupImpl::ensure_fully_initialized() const {
@@ -78,7 +68,7 @@ void SqGroupImpl::ensure_fully_initialized() const {
     if (errno == 0) {
       throw SystemError{fmt::format("{} failed: entry not found", operation)};
     }
-    throw SystemError{operation, util::make_error_code(errno)};
+    throw SystemError{operation, make_error_code(errno)};
   }
 
   if (have_gid) {

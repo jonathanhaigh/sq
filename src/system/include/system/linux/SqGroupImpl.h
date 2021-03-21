@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqGroupImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqGroupImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqGroup.gen.h"
-#include "util/typeutil.h"
 
 #include <limits>
 #include <string>

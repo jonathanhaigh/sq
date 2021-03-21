@@ -5,7 +5,7 @@
 
 #include "system/linux/SqPathImpl.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
 #include "system/linux/SqBoolImpl.h"
 #include "system/linux/SqDataSizeImpl.h"
 #include "system/linux/SqFileImpl.h"
@@ -36,7 +36,7 @@ struct stat get_stat(const fs::path &path, bool follow_symlinks,
       return s;
     }
     const auto *const operation = follow_symlinks ? "stat()" : "lstat()";
-    throw FilesystemError{operation, path, util::make_error_code(errno)};
+    throw FilesystemError{operation, path, make_error_code(errno)};
   }
   return s;
 }

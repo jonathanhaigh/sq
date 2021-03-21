@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqFileModeImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqFileModeImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqFileMode.gen.h"
-#include "util/typeutil.h"
 
 #include <concepts>
 #include <sys/types.h>

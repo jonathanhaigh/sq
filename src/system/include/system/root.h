@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_root_h_
 #define SQ_INCLUDE_GUARD_system_root_h_
 
-#include "common_types/Field.h"
-#include "util/typeutil.h"
+#include "core/Field.h"
+#include "core/typeutil.h"
 
 namespace sq::system {
 

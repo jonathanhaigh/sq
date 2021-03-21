@@ -5,9 +5,9 @@
 
 #include "results/results.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
+#include "core/typeutil.h"
 #include "results/Filter.h"
-#include "util/typeutil.h"
 
 #include <gsl/gsl>
 

@@ -5,7 +5,7 @@
 
 #include "system/linux/SqDataSizeImpl.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
 #include "system/linux/SqFloatImpl.h"
 #include "system/linux/SqIntImpl.h"
 
@@ -32,8 +32,9 @@ inline constexpr Multiplier multiplier_Pi = multiplier_Ti * multiplier_Ki;
 inline constexpr Multiplier multiplier_Ei = multiplier_Pi * multiplier_Ki;
 
 Result size_in_units(PrimitiveInt size, Multiplier multiplier) {
-  return std::make_shared<SqFloatImpl>(gsl::narrow<PrimitiveFloat>(size) /
-                                       gsl::narrow<PrimitiveFloat>(multiplier));
+  return std::make_shared<SqFloatImpl>(
+      to_primitive_float(size, "data size") /
+      to_primitive_float(multiplier, "data size unit"));
 }
 
 } // namespace
@@ -99,7 +100,7 @@ Result SqDataSizeImpl::get_EB() const {
 }
 
 Primitive SqDataSizeImpl::to_primitive() const {
-  return gsl::narrow<PrimitiveInt>(value_);
+  return to_primitive_int(value_, "data size");
 }
 
 } // namespace sq::system::linux
