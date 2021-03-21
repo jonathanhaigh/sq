@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqFileImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqFileImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqFile.gen.h"
-#include "util/typeutil.h"
 
 #include <string>
 #include <string_view>

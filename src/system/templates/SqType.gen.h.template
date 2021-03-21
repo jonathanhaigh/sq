@@ -6,7 +6,7 @@
 #define SQ_INCLUDE_GUARD_system_{{= name }}_gen_h_
 
 #include "system/CacheingField.h"
-#include "util/typeutil.h"
+#include "core/typeutil.h"
 
 namespace sq::system {
 

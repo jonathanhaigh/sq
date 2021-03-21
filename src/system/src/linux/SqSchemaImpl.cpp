@@ -5,9 +5,9 @@
 
 #include "system/linux/SqSchemaImpl.h"
 
+#include "core/typeutil.h" // for ranges::enable_view<gsl::span<T, N>>
 #include "system/linux/SqPrimitiveTypeSchemaImpl.h"
 #include "system/linux/SqTypeSchemaImpl.h"
-#include "util/typeutil.h" // for ranges::enable_view<gsl::span<T, N>>
 
 #include <memory>
 #include <range/v3/view/transform.hpp>

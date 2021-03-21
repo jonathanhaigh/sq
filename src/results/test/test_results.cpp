@@ -5,14 +5,15 @@
 
 #include "results/results.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
+#include "core/narrow.h"
+#include "core/strutil.h"
+#include "core/typeutil.h"
 #include "parser/Ast.h"
 #include "parser/Parser.h"
 #include "parser/TokenView.h"
 #include "test/FieldCallParams_test_util.h"
 #include "test/results_test_util.h"
-#include "util/strutil.h"
-#include "util/typeutil.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -532,7 +533,7 @@ void test_comparison_filter(std::string_view member,
   ASSERT_EQ(ranges::size(res_a_arr), noof_matches);
 
   for (auto i = 0; i < noof_matches; ++i) {
-    const auto &res_a_element = res_a_arr.at(util::to_size(i)).data();
+    const auto &res_a_element = res_a_arr.at(to_size(i)).data();
     ASSERT_TRUE(std::holds_alternative<Primitive>(res_a_element));
     const auto &prim = std::get<Primitive>(res_a_element);
     ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));

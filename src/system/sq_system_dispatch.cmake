@@ -36,6 +36,6 @@ add_library(sq_system_dispatch
 )
 
 set_target_properties(sq_system_dispatch PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(sq_system_dispatch PUBLIC sq_common_types)
+target_link_libraries(sq_system_dispatch PUBLIC sq_core)
 target_include_directories(sq_system_dispatch PUBLIC ${SQ_SYSTEM_DISPATCH_GEN_INCLUDE_DIR})
 target_include_directories(sq_system_dispatch PUBLIC ${SQ_SYSTEM_DISPATCH_NOGEN_INCLUDE_DIR})

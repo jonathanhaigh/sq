@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_results_test_results_test_util_inl_h_
 #define SQ_INCLUDE_GUARD_results_test_results_test_util_inl_h_
 
+#include "core/ASSERT.h"
+#include "core/typeutil.h"
 #include "test/Primitive_test_util.h"
-#include "util/ASSERT.h"
-#include "util/typeutil.h"
 
 #include <range/v3/range/conversion.hpp>
 
@@ -75,7 +75,7 @@ void add_items_to_array_data(ArrayData &arr,
   add_items_to_array_data(arr, ResultTree{SQ_FWD(field_data)});
 }
 
-template <util::ConvertibleToAlternative<ResultTree::Data> T, typename... Args>
+template <ConvertibleToAlternative<ResultTree::Data> T, typename... Args>
 void add_items_to_array_data(ArrayData &arr, T &&field_data, Args &&...args) {
   add_items_to_array_data(arr, SQ_FWD(field_data));
   add_items_to_array_data(arr, SQ_FWD(args)...);
@@ -89,7 +89,7 @@ ResultTree obj_data_tree(auto &&...args) {
   return ResultTree{std::move(obj_data)};
 }
 
-template <util::ConvertibleToAlternative<ResultTree::Data>... Args>
+template <ConvertibleToAlternative<ResultTree::Data>... Args>
 ResultTree array_data_tree(Args &&...args) {
   auto arr = ArrayData{};
   detail::add_items_to_array_data(arr, SQ_FWD(args)...);
@@ -103,8 +103,8 @@ requires std::is_convertible_v<ranges::cpp20::range_value_t<R>, ResultTree>
 }
 
 template <ranges::cpp20::view R>
-requires util::ConvertibleToAlternative<ranges::cpp20::range_value_t<R>,
-                                        ResultTree::Data>
+requires ConvertibleToAlternative<ranges::cpp20::range_value_t<R>,
+                                  ResultTree::Data>
     ResultTree to_array_data_tree(R &&rng) {
   return to_array_data_tree(SQ_FWD(rng) | rv::transform([](auto &&data) {
                               return ResultTree{data};

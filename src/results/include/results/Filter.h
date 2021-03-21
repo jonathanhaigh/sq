@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_results_Filter_h_
 #define SQ_INCLUDE_GUARD_results_Filter_h_
 
-#include "common_types/Field.h"
+#include "core/Field.h"
+#include "core/typeutil.h"
 #include "parser/FilterSpec.h"
-#include "util/typeutil.h"
 
 #include <gsl/gsl>
 #include <memory>

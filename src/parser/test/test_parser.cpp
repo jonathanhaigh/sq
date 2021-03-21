@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
-#include "common_types/errors.h"
+#include "core/errors.h"
+#include "core/strutil.h"
 #include "parser/Ast.h"
 #include "parser/FilterSpec.h"
 #include "parser/Parser.h"
 #include "parser/TokenView.h"
 #include "test/FieldCallParams_test_util.h"
-#include "util/strutil.h"
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>

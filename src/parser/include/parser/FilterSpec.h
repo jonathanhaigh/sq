@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 #define SQ_INCLUDE_GUARD_parser_FilterSpec_h_
 
-#include "common_types/Primitive.h"
-#include "util/typeutil.h"
+#include "core/Primitive.h"
+#include "core/typeutil.h"
 
 #include <compare>
 #include <gsl/gsl>

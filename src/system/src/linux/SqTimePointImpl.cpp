@@ -16,9 +16,10 @@ SqTimePointImpl::from_unix_timespec(std::timespec ts) {
 }
 
 Primitive SqTimePointImpl::to_primitive() const {
-  return gsl::narrow<PrimitiveInt>(
+  return to_primitive_int(
       std::chrono::duration_cast<std::chrono::seconds>(tp_.time_since_epoch())
-          .count());
+          .count(),
+      "Time since epoch in seconds");
 }
 
 } // namespace sq::system::linux

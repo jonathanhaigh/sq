@@ -5,12 +5,13 @@
 
 #include "serialization/serialize.h"
 
+#include "core/narrow.h"
+#include "core/typeutil.h"
 #include "results/results.h"
 
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
-
 #include <gsl/gsl>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include <string>
 
 namespace rj = rapidjson;
@@ -27,7 +28,7 @@ public:
   void operator()(const PrimitiveString &str) {
     // RapidJSON's String's size type can be smaller than
     // std::string::size_type so we have to narrow here.
-    writer_->String(str.c_str(), gsl::narrow<rj::SizeType>(str.size()),
+    writer_->String(str.c_str(), narrow<rj::SizeType>(str.size()),
                     true /* copy */
     );
   }

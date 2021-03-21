@@ -5,7 +5,7 @@
 
 #include "parser/Parser.h"
 
-#include "common_types/errors.h"
+#include "core/errors.h"
 
 #include <cerrno>
 #include <cstdlib>

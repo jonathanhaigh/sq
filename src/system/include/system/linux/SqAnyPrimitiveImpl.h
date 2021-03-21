@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqAnyPrimitiveImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqAnyPrimitiveImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqAnyPrimitive.gen.h"
-#include "util/typeutil.h"
 
 namespace sq::system::linux {
 

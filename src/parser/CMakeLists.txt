@@ -21,6 +21,5 @@ add_library(sq_parser
     "${SQ_PARSER_SRC_DIR}/TokenView.cpp"
 )
 target_include_directories(sq_parser PUBLIC "${SQ_PARSER_INCLUDE_DIR}")
-target_link_libraries(sq_parser PUBLIC sq_util)
-target_link_libraries(sq_parser PUBLIC sq_common_types)
+target_link_libraries(sq_parser PUBLIC sq_core)
 target_link_libraries(sq_parser PUBLIC range_v3)

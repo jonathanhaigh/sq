@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqParamSchemaImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqParamSchemaImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqParamSchema.gen.h"
 #include "system/schema.h"
-#include "util/typeutil.h"
 
 #include <gsl/gsl>
 

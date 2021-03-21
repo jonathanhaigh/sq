@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqStringImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqStringImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqString.gen.h"
-#include "util/typeutil.h"
 
 #include <string_view>
 

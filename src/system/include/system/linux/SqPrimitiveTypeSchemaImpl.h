@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqPrimitiveTypeSchemaImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqPrimitiveTypeSchemaImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqPrimitiveTypeSchema.gen.h"
 #include "system/schema.h"
-#include "util/typeutil.h"
 
 #include <gsl/gsl>
 

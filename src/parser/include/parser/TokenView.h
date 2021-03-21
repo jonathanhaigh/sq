@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_parser_TokenView_h_
 #define SQ_INCLUDE_GUARD_parser_TokenView_h_
 
-#include "common_types/Token.h"
-#include "util/typeutil.h"
+#include "core/Token.h"
+#include "core/typeutil.h"
 
 #include <gsl/gsl>
 #include <optional>

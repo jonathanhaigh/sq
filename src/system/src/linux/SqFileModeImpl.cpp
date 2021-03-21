@@ -32,7 +32,7 @@ Result SqFileModeImpl::get_sticky() const {
 }
 
 Primitive SqFileModeImpl::to_primitive() const {
-  return gsl::narrow<PrimitiveInt>(value_);
+  return to_primitive_int(value_, "file mode");
 }
 
 } // namespace sq::system::linux

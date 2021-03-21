@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_udev_inl_h_
 #define SQ_INCLUDE_GUARD_system_linux_udev_inl_h_
 
-#include "common_types/errors.h"
-#include "util/typeutil.h"
+#include "core/errors.h"
+#include "core/typeutil.h"
 
 #include <fmt/format.h>
 #include <gsl/gsl>
@@ -112,8 +112,7 @@ bool UdevPtr<T>::operator==(std::nullptr_t np) const noexcept {
 template <typename U, typename... Args> UdevPtr<U> make_udev(Args &&...args) {
   auto *const p = U::create_new(SQ_FWD(args)...);
   if (p == nullptr) {
-    throw UdevError{
-        fmt::format("Failed to create new {}", util::base_type_name(p))};
+    throw UdevError{fmt::format("Failed to create new {}", base_type_name(p))};
   }
   return UdevPtr<U>{p};
 }

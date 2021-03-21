@@ -8,8 +8,8 @@
 
 #include "system/SqDevice.gen.h"
 
+#include "core/typeutil.h"
 #include "system/linux/udev.h"
-#include "util/typeutil.h"
 
 namespace sq::system::linux {
 

@@ -5,10 +5,10 @@
 
 #include "parser/FilterSpec.h"
 
-#include "common_types/Primitive.h"
-#include "util/ASSERT.h"
-#include "util/strutil.h"
-#include "util/typeutil.h"
+#include "core/ASSERT.h"
+#include "core/Primitive.h"
+#include "core/strutil.h"
+#include "core/typeutil.h"
 
 #include <iostream>
 

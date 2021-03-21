@@ -6,8 +6,8 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqRootImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqRootImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqRoot.gen.h"
-#include "util/typeutil.h"
 
 namespace sq::system::linux {
 

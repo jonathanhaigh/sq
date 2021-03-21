@@ -5,13 +5,13 @@
 
 #include "system/linux/SqUserImpl.h"
 
-#include "common_types/errors.h"
+#include "core/ASSERT.h"
+#include "core/errors.h"
+#include "core/typeutil.h"
 #include "system/linux/SqGroupImpl.h"
 #include "system/linux/SqIntImpl.h"
 #include "system/linux/SqPathImpl.h"
 #include "system/linux/SqStringImpl.h"
-#include "util/ASSERT.h"
-#include "util/typeutil.h"
 
 #include <cerrno>
 #include <fmt/format.h>
@@ -32,12 +32,7 @@ Result SqUserImpl::get_uid() const {
   if (uid_ == invalid_uid_) {
     ensure_fully_initialized();
   }
-  try {
-    return std::make_shared<SqIntImpl>(gsl::narrow<PrimitiveInt>(uid_));
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{
-        fmt::format("cannot fit UID {} in type PrimitiveInt", uid_)};
-  }
+  return std::make_shared<SqIntImpl>(to_primitive_int(uid_, "UID"));
 }
 
 Result SqUserImpl::get_username() const {
@@ -91,12 +86,7 @@ Primitive SqUserImpl::to_primitive() const {
   if (uid_ == invalid_uid_) {
     ensure_fully_initialized();
   }
-  try {
-    return gsl::narrow<PrimitiveInt>(uid_);
-  } catch (gsl::narrowing_error &e) {
-    throw OutOfRangeError{
-        fmt::format("cannot fit UID {} in type PrimitiveInt", uid_)};
-  }
+  return to_primitive_int(uid_, "UID");
 }
 
 void SqUserImpl::ensure_fully_initialized() const {
@@ -118,7 +108,7 @@ void SqUserImpl::ensure_fully_initialized() const {
     if (errno == 0) {
       throw SystemError{fmt::format("{} failed: entry not found", operation)};
     }
-    throw SystemError{operation, util::make_error_code(errno)};
+    throw SystemError{operation, make_error_code(errno)};
   }
 
   if (have_uid) {

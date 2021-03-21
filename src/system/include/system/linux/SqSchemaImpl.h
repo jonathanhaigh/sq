@@ -6,9 +6,9 @@
 #ifndef SQ_INCLUDE_GUARD_system_linux_SqSchemaImpl_h_
 #define SQ_INCLUDE_GUARD_system_linux_SqSchemaImpl_h_
 
+#include "core/typeutil.h"
 #include "system/SqSchema.gen.h"
 #include "system/schema.h"
-#include "util/typeutil.h"
 
 namespace sq::system::linux {
 
