@@ -1,8 +1,0 @@
-services:
-    - docker
-
-install:
-    - docker pull jonathanhaigh/builder:20210224
-
-script:
-    - mkdir -p build && docker run --volume "$(pwd):/work" -w /work/build jonathanhaigh/builder:20210224 sh -c 'cmake -GNinja .. && cmake --build . && cmake --build . --target test'
