@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  * ---------------------------------------------------------------------------*/
 
+#include "results/Serializer.h"
 #include "results/results.h"
 
 #include "core/errors.h"
@@ -23,12 +24,14 @@
 #include <range/v3/view/cartesian_product.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
+#include <rapidjson/document.h>
 #include <utility>
 
 namespace sq::test {
 namespace {
 
 using namespace sq::results;
+namespace rj = rapidjson;
 
 inline constexpr auto all_comparison_ops = {
     parser::ComparisonOperator::GreaterThanOrEqualTo,
@@ -42,7 +45,14 @@ parser::Ast generate_ast(std::string_view query) {
   return parser.parse();
 }
 
-struct ResultTreeTest : public MockFieldTest {};
+std::string generate_results(const parser::Ast &ast, const FieldPtr &root) {
+  std::ostringstream os{};
+  auto serializer = get_serializer(os);
+  generate_results(ast, root, *serializer);
+  return os.str();
+}
+
+struct ResultsTest : public MockFieldTest {};
 
 // -----------------------------------------------------------------------------
 // Minimal system call tests:
@@ -51,17 +61,17 @@ struct ResultTreeTest : public MockFieldTest {};
 // into the system are expensive and should cache results if repeated access is
 // required.
 // -----------------------------------------------------------------------------
-TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSingleCallPerObject) {
+TEST_F(ResultsTest, TestMinimalSystemCallsWithSingleCallPerObject) {
   const auto ast = generate_ast("a.b.c");
   const auto fcp = FieldCallParams{};
   auto c = field_with_no_accesses();
   auto b = field_with_accesses("c", fcp, std::move(c));
   auto a = field_with_accesses("b", fcp, std::move(b));
   auto root = field_with_accesses("a", fcp, std::move(a));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
-TEST_F(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject) {
+TEST_F(ResultsTest, TestMinimalSystemCallsWithMultipleCallsPerObject) {
   const auto ast = generate_ast("a { b c d }");
   const auto fcp = FieldCallParams{};
   auto b = field_with_no_accesses();
@@ -70,7 +80,7 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithMultipleCallsPerObject) {
   auto a = field_with_accesses("b", fcp, std::move(b), "c", fcp, std::move(c),
                                "d", fcp, std::move(d));
   auto root = field_with_accesses("a", fcp, std::move(a));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
 struct MockFieldGenerator {
@@ -97,10 +107,10 @@ void test_minimal_system_calls_with_element_access(gsl::index index,
                       rv::transform([&](auto i) { return mfg.get(i); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
-TEST_F(ResultTreeTest, TestMinimalSystemCallsWithElementAccess) {
+TEST_F(ResultsTest, TestMinimalSystemCallsWithElementAccess) {
   test_minimal_system_calls_with_element_access<input>(3, 5);
 
   // Only sized input ranges or forward ranges can handle negative indeces
@@ -148,10 +158,10 @@ void test_minimal_system_calls_with_slice(std::optional<gsl::index> start,
       rv::transform([&](auto index) { return mfg.get(index); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
-TEST_F(ResultTreeTest, TestMinimalSystemCallsWithSlice) {
+TEST_F(ResultsTest, TestMinimalSystemCallsWithSlice) {
   test_minimal_system_calls_with_slice<input>(2, 5, 2, 6);
 
   // Non-sized input ranges can't handle negative indeces efficiently
@@ -195,10 +205,10 @@ void test_minimal_system_calls_with_comparison_filter(
                       rv::transform([&](auto i) { return mfg.get(i); })};
   const auto fcp = FieldCallParams{};
   auto root = field_with_accesses("a", fcp, std::move(arange));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
-TEST_F(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter) {
+TEST_F(ResultsTest, TestMinimalSystemCallsWithComparisonFilter) {
   static constexpr auto size = gsl::index{5};
   for (const auto op : all_comparison_ops) {
     for (const auto i : {0, 3, 5}) {
@@ -225,77 +235,57 @@ TEST_F(ResultTreeTest, TestMinimalSystemCallsWithComparisonFilter) {
 }
 
 // -----------------------------------------------------------------------------
-// Tree generation tests - to check result trees contain the right structure
-// and data.
+// Tree generation tests - to check result trees contain the right
+// structure and data.
 // -----------------------------------------------------------------------------
-TEST_F(ResultTreeTest, TestGeneratedTreeWithSingleCallPerObject) {
-  const auto ast = generate_ast("a.b.c");
-  auto root = fake_field();
-  const auto results = ResultTree{ast, std::move(root)};
 
-  auto c = primitive_tree(0);
-  auto b = obj_data_tree("c", std::move(c));
-  auto a = obj_data_tree("b", std::move(b));
-  const auto expected = obj_data_tree("a", std::move(a));
-  EXPECT_EQ(results, expected);
+struct SimpleResultsTestCase {
+
+  SimpleResultsTestCase(const char *query, const char *expected_json,
+                        FieldPtr system_root)
+      : query{query}, expected_json{expected_json}, system_root{system_root} {}
+
+  SimpleResultsTestCase(const char *query, const char *expected_json)
+      : SimpleResultsTestCase{query, expected_json, fake_field()} {}
+
+  const char *query;
+  const char *expected_json;
+  FieldPtr system_root;
+};
+
+std::ostream &operator<<(std::ostream &os, const SimpleResultsTestCase &tc) {
+  os << tc.query << "; " << tc.expected_json;
+  return os;
+}
+struct SimpleResultsTest : ::testing::TestWithParam<SimpleResultsTestCase> {};
+
+TEST_P(SimpleResultsTest, TestSimpleTreeGeneration) {
+  auto [query, expected, root] = GetParam();
+  const auto ast = generate_ast(query);
+  auto results = generate_results(ast, std::move(root));
+  expect_equivalent_json(results, expected);
 }
 
-TEST_F(ResultTreeTest, TestGeneratedTreeWithMultipleCallsPerObject) {
-  const auto ast = generate_ast("a {b c d}");
-  auto root = fake_field();
-  const auto results = ResultTree{ast, std::move(root)};
+INSTANTIATE_TEST_SUITE_P(
+    SimpleQueries, SimpleResultsTest,
+    ::testing::Values(
+        SimpleResultsTestCase{"a.b.c", R"({ "a": { "b": { "c": 0 } } })"},
+        SimpleResultsTestCase{"a {b c d}",
+                              R"({ "a": { "b": 0, "c": 0, "d": 0 } })"},
+        SimpleResultsTestCase{"a.<b", R"({ "a": 0 })"},
+        SimpleResultsTestCase{"a.<b.<c", R"({ "a": 0 })"},
+        SimpleResultsTestCase{"<a", "0"}, SimpleResultsTestCase{"<a.<b", "0"},
+        SimpleResultsTestCase{"<b", "[0, 1, 2, 3, 4, 5]",
+                              fake_field(fake_field_range(0, 5))},
 
-  auto b = primitive_tree(0);
-  auto c = primitive_tree(0);
-  auto d = primitive_tree(0);
-  auto a =
-      obj_data_tree("b", std::move(b), "c", std::move(c), "d", std::move(d));
-  const auto expected = obj_data_tree("a", std::move(a));
-  EXPECT_EQ(results, expected);
-}
-
-TEST_F(ResultTreeTest, TestGeneratedTreeWithPullup) {
-  const auto ast = generate_ast("a.<b");
-  const auto results = ResultTree{ast, fake_field()};
-  EXPECT_EQ(results, obj_data_tree("a", primitive_tree(0)));
-}
-
-TEST_F(ResultTreeTest, TestGeneratedTreeWithDoublePullup) {
-  const auto ast = generate_ast("a.<b.<c");
-  const auto results = ResultTree{ast, fake_field()};
-  EXPECT_EQ(results, obj_data_tree("a", primitive_tree(0)));
-}
-
-TEST_F(ResultTreeTest, TestGeneratedTreeWithRootPullup) {
-  const auto ast = generate_ast("<a");
-  const auto results = ResultTree{ast, fake_field()};
-  EXPECT_EQ(results, primitive_tree(0));
-}
-
-TEST_F(ResultTreeTest, TestGeneratedTreeWithArrayPullup) {
-  const auto ast = generate_ast("a.<b");
-  auto root = fake_field(fake_field(fake_field_range(0, 10)));
-  const auto results = ResultTree{ast, std::move(root)};
-
-  const auto expected = obj_data_tree("a", int_array_data_tree(0, 10));
-  EXPECT_EQ(results, expected);
-}
-
-TEST_F(ResultTreeTest, TestGeneratedTreeWithDoubleArrayPullup) {
-  const auto ast = generate_ast("a.<b.<c");
-  auto a = fake_field([](auto, auto) {
-    return to_field_range(input, rv::iota(0, 10) | rv::transform([](int i) {
-                                   return fake_field(fake_field_range(0, i));
-                                 }));
-  });
-  const auto results = ResultTree{ast, fake_field(std::move(a))};
-
-  auto expected = obj_data_tree(
-      "a", to_array_data_tree(rv::iota(0, 10) | rv::transform([](auto i) {
-                                return int_array_data_tree(0, i);
-                              })));
-  EXPECT_EQ(results, expected);
-}
+        SimpleResultsTestCase{"<b.<c", "[[], [0], [0, 1, 2], [0, 1, 2, 3]]",
+                              fake_field([](auto, auto) {
+                                return to_field_range(
+                                    input,
+                                    rv::iota(0, 5) | rv::transform([](int i) {
+                                      return fake_field(fake_field_range(0, i));
+                                    }));
+                              })}));
 
 // -----------------------------------------------------------------------------
 // Param passing tests
@@ -311,20 +301,20 @@ std::ostream &operator<<(std::ostream &os, const ParamPassingTestCase &pptc) {
   return os;
 }
 
-struct ResultTreeParamTest
-    : MockFieldTest,
-      ::testing::WithParamInterface<ParamPassingTestCase> {};
+struct ResultsParamTest : MockFieldTest,
+                          ::testing::WithParamInterface<ParamPassingTestCase> {
+};
 
-TEST_P(ResultTreeParamTest, TestParamPassing) {
+TEST_P(ResultsParamTest, TestParamPassing) {
   const auto [query, params] = GetParam();
   const auto ast = generate_ast(query);
   auto a = field_with_no_accesses();
   auto root = field_with_accesses("a", params, std::move(a));
-  const auto results = ResultTree(ast, std::move(root));
+  generate_results(ast, std::move(root));
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    ResultTreeParamTestInstantiation, ResultTreeParamTest,
+    ResultsParamTestInstantiation, ResultsParamTest,
     testing::Values(
         ParamPassingTestCase{"a(\"str\")", params("str")},
         ParamPassingTestCase{"a(\"\")", params("")},
@@ -355,26 +345,19 @@ void test_element_access(ranges::category cat, gsl::index index,
                                   << "index=" << index << ", "
                                   << "size=" << size << ")");
 
-  const auto ast = generate_ast(fmt::format("a[{}]", index));
+  const auto ast = generate_ast(fmt::format("<a[{}]", index));
 
   const auto normalized_index = (index >= 0) ? index : (size + index);
   auto arange = to_field_range(
       cat, rv::iota(PrimitiveInt{0}, size) |
                rv::transform([](auto i) { return fake_field(i); }));
   auto root = fake_field(std::move(arange));
-  const auto results = ResultTree(ast, std::move(root));
-  ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
-  const auto &res_root = std::get<ObjData>(results.data());
-  EXPECT_EQ(res_root.size(), 1);
-  EXPECT_EQ(res_root[0].first, "a");
-  ASSERT_TRUE(std::holds_alternative<Primitive>(res_root[0].second.data()));
-  const auto &res_a_prim = std::get<Primitive>(res_root[0].second.data());
-  ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(res_a_prim));
-  const auto &res_a = std::get<PrimitiveInt>(res_a_prim);
-  EXPECT_EQ(res_a, normalized_index);
+  const auto results = generate_results(ast, std::move(root));
+
+  expect_equivalent_json(results, fmt::to_string(normalized_index));
 }
 
-TEST_F(ResultTreeTest, TestElementAccess) {
+TEST_F(ResultsTest, TestElementAccess) {
   static constexpr auto size = gsl::index{4};
 
   for (const auto cat : all_categories) {
@@ -384,7 +367,7 @@ TEST_F(ResultTreeTest, TestElementAccess) {
   }
 }
 
-TEST_F(ResultTreeTest, TestElementAccessOutOfRange) {
+TEST_F(ResultsTest, TestElementAccessOutOfRange) {
   for (const auto cat : all_categories) {
     EXPECT_THROW({ test_element_access(cat, 10, 10); }, OutOfRangeError);
     EXPECT_THROW({ test_element_access(cat, 11, 10); }, OutOfRangeError);
@@ -393,18 +376,10 @@ TEST_F(ResultTreeTest, TestElementAccessOutOfRange) {
   }
 }
 
-void test_slice(ranges::category cat, std::optional<gsl::index> start,
-                std::optional<gsl::index> stop, std::optional<gsl::index> step,
-                gsl::index size) {
-  SCOPED_TRACE(testing::Message() << "test_slice("
-                                  << "cat=" << cat << ", "
-                                  << "start=" << fmt::to_string(start) << ", "
-                                  << "stop=" << fmt::to_string(stop) << ", "
-                                  << "step=" << fmt::to_string(step) << ", "
-                                  << "size=" << size << ")");
-
-  const auto query = fmt::format("a[{}:{}:{}]", start, stop, step);
-  const auto ast = generate_ast(query);
+std::vector<gsl::index> get_slice_indeces(std::optional<gsl::index> start,
+                                          std::optional<gsl::index> stop,
+                                          std::optional<gsl::index> step,
+                                          gsl::index size) {
   auto step_v = step.value_or(1);
   auto start_v = gsl::index{0};
   auto stop_v = gsl::index{0};
@@ -445,23 +420,39 @@ void test_slice(ranges::category cat, std::optional<gsl::index> start,
     }
   }
 
-  auto expected_a_data = ArrayData{};
+  std::vector<gsl::index> ret{};
   for (auto i = start_v; compare(i, stop_v); i += step_v) {
-    expected_a_data.emplace_back(PrimitiveInt{i});
+    ret.push_back(i);
   }
-  auto expected_a = ResultTree{std::move(expected_a_data)};
-  auto expected_root = obj_data_tree("a", std::move(expected_a));
-
-  auto system_a = to_field_range(
-      cat, rv::iota(PrimitiveInt{0}, size) |
-               rv::transform([](auto i) { return fake_field(i); }));
-
-  auto system_root = fake_field(std::move(system_a));
-  const auto root = ResultTree(ast, std::move(system_root));
-  ASSERT_EQ(root, expected_root);
+  return ret;
 }
 
-TEST_F(ResultTreeTest, TestSlice) {
+void test_slice(ranges::category cat, std::optional<gsl::index> start,
+                std::optional<gsl::index> stop, std::optional<gsl::index> step,
+                gsl::index size) {
+  SCOPED_TRACE(testing::Message() << "test_slice("
+                                  << "cat=" << cat << ", "
+                                  << "start=" << fmt::to_string(start) << ", "
+                                  << "stop=" << fmt::to_string(stop) << ", "
+                                  << "step=" << fmt::to_string(step) << ", "
+                                  << "size=" << size << ")");
+
+  const auto query = fmt::format("<a[{}:{}:{}]", start, stop, step);
+  const auto ast = generate_ast(query);
+  auto root = fake_field(to_field_range(
+      cat, rv::iota(PrimitiveInt{0}, size) |
+               rv::transform([](auto i) { return fake_field(i); })));
+
+  const auto results = generate_results(ast, std::move(root));
+
+  auto expected_indeces = get_slice_indeces(start, stop, step, size);
+  auto expected_json =
+      fmt::format("[{}]", fmt::join(std::move(expected_indeces), ", "));
+
+  expect_equivalent_json(results, expected_json);
+}
+
+TEST_F(ResultsTest, TestSlice) {
   using OIL = std::initializer_list<std::optional<gsl::index>>;
   auto indeces = OIL{std::nullopt, 0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5, -6};
   auto steps = OIL{std::nullopt, -3, -2, -1, 1, 2, 3};
@@ -484,7 +475,7 @@ void test_comparison_filter(std::string_view member,
                                   << "cat=" << cat << ", "
                                   << "index=" << index << ", "
                                   << "size=" << size << ")");
-  const auto ast = generate_ast(fmt::format("a[{}{}{}]", member, op, index));
+  const auto ast = generate_ast(fmt::format("<a[{}{}{}]", member, op, index));
 
   auto transformer = std::function<FieldPtr(PrimitiveInt)>{};
   if (member.empty()) {
@@ -497,17 +488,10 @@ void test_comparison_filter(std::string_view member,
     };
   }
 
-  auto arange = to_field_range(cat, rv::iota(PrimitiveInt{0}, size) |
-                                        rv::transform(transformer));
+  auto root = to_field_range(cat, rv::iota(PrimitiveInt{0}, size) |
+                                      rv::transform(transformer));
 
-  auto root = fake_field(std::move(arange));
-  const auto results = ResultTree(ast, std::move(root));
-  ASSERT_TRUE(std::holds_alternative<ObjData>(results.data()));
-  const auto &res_root = std::get<ObjData>(results.data());
-  EXPECT_EQ(res_root.size(), 1);
-  EXPECT_EQ(res_root[0].first, "a");
-  ASSERT_TRUE(std::holds_alternative<ArrayData>(res_root[0].second.data()));
-  const auto &res_a_arr = std::get<ArrayData>(res_root[0].second.data());
+  const auto results = generate_results(ast, fake_field(std::move(root)));
 
   // Get the half-open range of indeces for which we expect the comparison to
   // be true
@@ -529,24 +513,17 @@ void test_comparison_filter(std::string_view member,
     return std::pair{0, 0};
   }();
 
-  const auto noof_matches = end_matching - begin_matching;
-  ASSERT_EQ(ranges::size(res_a_arr), noof_matches);
+  const auto num_matches = end_matching - begin_matching;
+  auto expected_values =
+      member.empty() ? ranges::views::iota(begin_matching, end_matching) |
+                           ranges::to<std::vector>()
+                     : std::vector<gsl::index>(to_size(num_matches), 0);
 
-  for (auto i = 0; i < noof_matches; ++i) {
-    const auto &res_a_element = res_a_arr.at(to_size(i)).data();
-    ASSERT_TRUE(std::holds_alternative<Primitive>(res_a_element));
-    const auto &prim = std::get<Primitive>(res_a_element);
-    ASSERT_TRUE(std::holds_alternative<PrimitiveInt>(prim));
-    const auto &primint = std::get<PrimitiveInt>(prim);
-    if (member.empty()) {
-      EXPECT_EQ(primint, begin_matching + i);
-    } else {
-      EXPECT_EQ(primint, 0);
-    }
-  }
+  auto expected_json = fmt::format("[{}]", fmt::join(expected_values, ", "));
+  expect_equivalent_json(results, expected_json);
 }
 
-TEST_F(ResultTreeTest, TestComparisonFilter) {
+TEST_F(ResultsTest, TestComparisonFilter) {
   static constexpr auto size = gsl::index{4};
 
   for (const auto cat : all_categories) {
@@ -560,15 +537,14 @@ TEST_F(ResultTreeTest, TestComparisonFilter) {
   }
 }
 
-TEST_F(ResultTreeTest, TestNotAnArrayError) {
+TEST_F(ResultsTest, TestNotAnArrayError) {
   for (const auto &query : {"a[0]", "a[::]"}) {
     SCOPED_TRACE(testing::Message() << "query=" << query);
 
     const auto ast = generate_ast(query);
     auto root = fake_field();
 
-    EXPECT_THROW({ auto results = ResultTree(ast, std::move(root)); },
-                 NotAnArrayError);
+    EXPECT_THROW({ generate_results(ast, std::move(root)); }, NotAnArrayError);
   }
 }
 

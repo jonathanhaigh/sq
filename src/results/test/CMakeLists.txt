@@ -15,13 +15,16 @@ add_library(sq_results_test_util
 
 set_target_properties(sq_results_test_util PROPERTIES CXX_CLANG_TIDY "")
 target_include_directories(sq_results_test_util PUBLIC "${SQ_RT_INCLUDE_DIR}")
+target_link_libraries(sq_results_test_util PUBLIC rapidjson)
 target_link_libraries(sq_results_test_util PUBLIC sq_results)
-target_link_libraries(sq_results_test_util PUBLIC sq_serialization)
 target_link_libraries(sq_results_test_util PUBLIC sq_core_test_util)
 target_link_libraries(sq_results_test_util PUBLIC gtest)
 target_link_libraries(sq_results_test_util PUBLIC gmock)
 
-add_executable(sq-results-test "${SQ_RT_SRC_DIR}/test_results.cpp")
+add_executable(sq-results-test
+  "${SQ_RT_SRC_DIR}/test_results.cpp"
+  "${SQ_RT_SRC_DIR}/test_Serializer.cpp"
+)
 set_target_properties(sq-results-test PROPERTIES CXX_CLANG_TIDY "")
 target_link_libraries(sq-results-test sq_results_test_util)
 target_link_libraries(sq-results-test gtest_main)

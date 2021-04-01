@@ -16,9 +16,16 @@
 #include <type_traits>
 #include <variant>
 
+// The following macros can't be replaced with constexpr functions or constants
+// so tell clang-tidy not to complain
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define SQ_FWD(x) static_cast<decltype(x) &&>(x)
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define SQ_ND [[nodiscard]]
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define SQ_MU [[maybe_unused]]
 
 namespace sq {

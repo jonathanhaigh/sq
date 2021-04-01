@@ -7,79 +7,87 @@
 
 #include "core/errors.h"
 #include "core/typeutil.h"
+#include "parser/Ast.h"
 #include "results/Filter.h"
-
-#include <gsl/gsl>
+#include "results/Serializer.h"
 
 namespace sq::results {
 
 namespace {
 
-using Data = ResultTree::Data;
-using ObjData = ResultTree::ObjData;
-using ArrayData = ResultTree::ArrayData;
+bool is_pullup_node(const parser::Ast &ast_node) {
+  return ast_node.data().access_type() == parser::FieldAccessType::Pullup;
+}
 
-/**
- * Convert the result of accessing a field into a ResultTree containing data
- * ready for serialization and output.
- */
-class ResultToDataVisitor {
+class ResultStreamer {
 public:
-  explicit ResultToDataVisitor(const parser::Ast &ast) : ast_{&ast} {}
+  ResultStreamer(const parser::Ast &ast, Serializer &serializer)
+      : ast_{&ast}, serializer_{&serializer} {}
 
-  SQ_ND Data operator()(PrimitiveNull &&null) const;
-  SQ_ND Data operator()(FieldPtr &&field) const;
-  SQ_ND Data operator()(ranges::cpp20::view auto &&rng) const;
+  void operator()(const PrimitiveNull &null);
+  void operator()(const FieldPtr &field);
+  void operator()(ranges::cpp20::view auto &&rng);
 
 private:
-  gsl::not_null<const parser::Ast *> ast_;
+  const parser::Ast *ast_;
+  Serializer *serializer_;
 };
 
-Data ResultToDataVisitor::operator()(PrimitiveNull &&null) const {
-  return null;
+void ResultStreamer::operator()(const PrimitiveNull &null) {
+  serializer_->write_value(null);
 }
 
-Data ResultToDataVisitor::operator()(FieldPtr &&field) const {
+void ResultStreamer::operator()(const FieldPtr &field) {
   if (ast_->children().empty()) {
-    return field->to_primitive();
+    serializer_->write_value(field->to_primitive());
+    return;
   }
 
-  auto obj = ObjData{};
+  const auto &children = ast_->children();
+  const bool pullup = children.size() == 1 && is_pullup_node(children.front());
+
+  if (!pullup) {
+    serializer_->start_object();
+  }
+
   for (const auto &child : ast_->children()) {
-    const auto &field_name = child.data().name();
-    const auto &params = child.data().params();
-    const auto visitor = ResultToDataVisitor{child};
-    const auto filter = Filter::create(child.data().filter_spec());
-    auto child_results = (*filter)(field->get(field_name, params));
-    auto child_data = std::visit(visitor, std::move(child_results));
 
-    if (child.data().access_type() == parser::FieldAccessType::Pullup) {
-      if (ast_->children().size() != 1) {
-        auto ss = std::ostringstream{};
-        ss << "Cannot use pullup access for field \"" << field_name
-           << "\": it has sibling fields.";
-        throw PullupWithSiblingsError{ss.str()};
-      }
-      return child_data;
+    const auto &field_name = child.data().name();
+    if (!pullup) {
+      serializer_->write_key(field_name);
     }
-    obj.emplace_back(field_name, std::move(child_data));
+
+    const auto &params = child.data().params();
+    const auto filter = Filter::create(child.data().filter_spec());
+    auto visitor = ResultStreamer{child, *serializer_};
+    auto child_results = (*filter)(field->get(field_name, params));
+    std::visit(visitor, std::move(child_results));
+
+    if (!pullup && is_pullup_node(child)) {
+      throw PullupWithSiblingsError{fmt::format(
+          "cannot use pullup access for field \"{}\": it has sibling fields",
+          field_name)};
+    }
   }
-  return obj;
+
+  if (!pullup) {
+    serializer_->end_object();
+  }
 }
 
-Data ResultToDataVisitor::operator()(ranges::cpp20::view auto &&rng) const {
-  auto arr = ArrayData{};
+void ResultStreamer::operator()(ranges::cpp20::view auto &&rng) {
+  serializer_->start_array();
   for (auto field : SQ_FWD(rng)) {
-    arr.emplace_back(*ast_, field);
+    (*this)(field);
   }
-  return arr;
+  serializer_->end_array();
 }
 
 } // namespace
 
-ResultTree::ResultTree(const parser::Ast &ast, Result &&result)
-    : ResultTree{std::visit(ResultToDataVisitor{ast}, std::move(result))} {}
-
-ResultTree::ResultTree(Data &&data) : data_{std::move(data)} {}
+void generate_results(const parser::Ast &ast, const FieldPtr &system_root,
+                      Serializer &serializer) {
+  ResultStreamer{ast, serializer}(system_root);
+}
 
 } // namespace sq::results
