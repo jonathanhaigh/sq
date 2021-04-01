@@ -7,7 +7,6 @@ set(SQ_ALL_LIBS
     core
     parser
     results
-    serialization
     system
 )
 

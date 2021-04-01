@@ -5,7 +5,9 @@
 
 #include "test/results_test_util.h"
 
-#include "serialization/serialize.h"
+#include "results/Serializer.h"
+
+#include <rapidjson/document.h>
 
 namespace sq::test {
 
@@ -43,21 +45,14 @@ StrictMockFieldPtr field_with_no_accesses() {
   return std::make_shared<StrictMockField>();
 }
 
-namespace detail {
-
-void add_fields_to_obj_data(ObjData &obj, std::string_view field_name,
-                            ResultTree &&field_data) {
-  obj.emplace_back(field_name, std::move(field_data));
-}
-
-void add_items_to_array_data(ArrayData &arr, ResultTree &&field_data) {
-  arr.emplace_back(std::move(field_data));
-}
-
-} // namespace detail
-
-ResultTree int_array_data_tree(PrimitiveInt start, PrimitiveInt stop) {
-  return to_array_data_tree(rv::iota(start, stop));
+void expect_equivalent_json(std::string_view json1, std::string_view json2) {
+  SCOPED_TRACE(testing::Message()
+               << "assert_equivalent_json(" << json1 << ", " << json2 << ")");
+  ::rapidjson::Document d1{};
+  d1.Parse(json1.data(), json1.size());
+  ::rapidjson::Document d2{};
+  d2.Parse(json2.data(), json2.size());
+  EXPECT_EQ(d1, d2);
 }
 
 } // namespace sq::test
@@ -83,12 +78,3 @@ std::ostream &operator<<(std::ostream &os, const category &cat) {
 }
 
 } // namespace ranges
-
-namespace sq::results {
-
-std::ostream &operator<<(std::ostream &os, const ResultTree &tree) {
-  serialization::serialize_results(os, tree);
-  return os;
-}
-
-} // namespace sq::results

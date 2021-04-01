@@ -11,6 +11,7 @@ Checks: >-
     -llvmlibc-*,
     -llvm-header-guard,
     -misc-no-recursion,
+    -misc-non-private-member-variables-in-classes,
     -modernize-use-trailing-return-type,
     -modernize-pass-by-value,
     -readability-convert-member-functions-to-static,

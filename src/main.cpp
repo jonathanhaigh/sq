@@ -7,8 +7,8 @@
 #include "core/typeutil.h"
 #include "parser/Parser.h"
 #include "parser/TokenView.h"
+#include "results/Serializer.h"
 #include "results/results.h"
-#include "serialization/serialize.h"
 #include "system/root.h"
 
 #include <cstddef>
@@ -30,9 +30,8 @@ int run_sq(int argc, char **argv) {
   auto tokens = sq::parser::TokenView{sq_command};
   auto parser = sq::parser::Parser(tokens);
   const auto ast = parser.parse();
-  const auto results = sq::results::ResultTree(ast, sq::system::root());
-
-  sq::serialization::serialize_results(std::cout, results);
+  auto serializer = sq::results::get_serializer(std::cout);
+  sq::results::generate_results(ast, sq::system::root(), *serializer);
 
   return 0;
 }

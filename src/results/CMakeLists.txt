@@ -11,8 +11,11 @@ add_library(sq_results
     "${SQ_RESULTS_INCLUDE_DIR}/results/results.h"
     "${SQ_RESULTS_SRC_DIR}/Filter.cpp"
     "${SQ_RESULTS_SRC_DIR}/results.cpp"
+    "${SQ_RESULTS_INCLUDE_DIR}/results/Serializer.h"
+    "${SQ_RESULTS_SRC_DIR}/Serializer.cpp"
 )
 target_link_libraries(sq_results PUBLIC gsl)
+target_link_libraries(sq_results PUBLIC rapidjson)
 target_link_libraries(sq_results PUBLIC sq_core)
 target_link_libraries(sq_results PUBLIC sq_parser)
 
