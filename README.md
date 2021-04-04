@@ -88,31 +88,6 @@ into the main SQ binary or the SQ test binaries.
 * License file: [3rdparty/LICENSE.range-v3.FULL](3rdparty/LICENSE.range-v3.FULL)
 * SPDX-License-Identifier: ?
 
-### RapidJSON
-The [RapidJSON](https://rapidjson.org) source code is downloaded as part of the
-SQ build process. It is incorporated into the main SQ binary and the SQ test
-binaries. The RapidJSON download contains source code from other sources that
-are detailed separately below.
-* License name: MIT License
-* License file: [3rdparty/LICENSE.RapidJSON.FULL](3rdparty/LICENSE.RapidJSON.FULL)
-* SPDX-License-Identifier: MIT
-
-### msinttypes
-The RapidJSON download includes source code from
-[msinttypes](https://github.com/chemeris/msinttypes) that may be incorporated
-into the main SQ binary or the SQ test binaries.
-* License name: BSD 3-Clause "New" or "Revised" License
-* License file: [3rdparty/LICENSE.RapidJSON.FULL](3rdparty/LICENSE.RapidJSON.FULL)
-* SPDX-License-Identifier: BSD-3-Clause
-
-### JSON\_checker
-The RapidJSON download includes source code from
-[JSON\_checker](https://www.json.org/JSON_checker) that is not incorporated
-into any SQ binaries.
-* License name: JSON License
-* License file: [3rdparty/LICENSE.RapidJSON.FULL](3rdparty/LICENSE.RapidJSON.FULL)
-* SPDX-License-Identifier: JSON
-
 ### `{fmt}`
 The [`{fmt}`](https://fmt.dev) source code is downloaded as part of the SQ
 build process. It is incorporated into the main SQ binary and the SQ test

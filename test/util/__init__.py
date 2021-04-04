@@ -92,15 +92,15 @@ def sq_binary():
 
 def sq(query, **kwargs):
     log(f"SQ query: {query}")
-    return json.loads(
-        subprocess.run(
+    output = subprocess.run(
             [sq_binary(), query],
             capture_output=True,
             check=True,
             text=True,
             **kwargs,
         ).stdout
-    )
+    log(f"SQ output: {output}")
+    return json.loads(output)
 
 
 def sq_error(query, pattern=None, flags=re.I):

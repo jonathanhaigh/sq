@@ -130,7 +130,7 @@ SQ_ND Result to_field_range(ranges::category cat,
 /**
  * Assert that two JSON strings encode the same value.
  */
-void expect_equivalent_json(std::string_view json1, std::string_view json2);
+void expect_equivalent_json(std::string json1, std::string json2);
 
 } // namespace sq::test
 
