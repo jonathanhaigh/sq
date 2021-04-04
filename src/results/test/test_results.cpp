@@ -24,14 +24,12 @@
 #include <range/v3/view/cartesian_product.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/transform.hpp>
-#include <rapidjson/document.h>
 #include <utility>
 
 namespace sq::test {
 namespace {
 
 using namespace sq::results;
-namespace rj = rapidjson;
 
 inline constexpr auto all_comparison_ops = {
     parser::ComparisonOperator::GreaterThanOrEqualTo,

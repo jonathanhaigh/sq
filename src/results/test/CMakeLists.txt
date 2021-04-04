@@ -15,7 +15,6 @@ add_library(sq_results_test_util
 
 set_target_properties(sq_results_test_util PROPERTIES CXX_CLANG_TIDY "")
 target_include_directories(sq_results_test_util PUBLIC "${SQ_RT_INCLUDE_DIR}")
-target_link_libraries(sq_results_test_util PUBLIC rapidjson)
 target_link_libraries(sq_results_test_util PUBLIC sq_results)
 target_link_libraries(sq_results_test_util PUBLIC sq_core_test_util)
 target_link_libraries(sq_results_test_util PUBLIC gtest)

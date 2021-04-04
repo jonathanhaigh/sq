@@ -15,7 +15,6 @@ add_library(sq_results
     "${SQ_RESULTS_SRC_DIR}/Serializer.cpp"
 )
 target_link_libraries(sq_results PUBLIC gsl)
-target_link_libraries(sq_results PUBLIC rapidjson)
 target_link_libraries(sq_results PUBLIC sq_core)
 target_link_libraries(sq_results PUBLIC sq_parser)
 

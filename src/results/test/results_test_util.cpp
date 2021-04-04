@@ -7,8 +7,6 @@
 
 #include "results/Serializer.h"
 
-#include <rapidjson/document.h>
-
 namespace sq::test {
 
 FakeField::FakeField(Result &&result)
@@ -45,14 +43,16 @@ StrictMockFieldPtr field_with_no_accesses() {
   return std::make_shared<StrictMockField>();
 }
 
-void expect_equivalent_json(std::string_view json1, std::string_view json2) {
+void expect_equivalent_json(std::string json1, std::string json2) {
   SCOPED_TRACE(testing::Message()
                << "assert_equivalent_json(" << json1 << ", " << json2 << ")");
-  ::rapidjson::Document d1{};
-  d1.Parse(json1.data(), json1.size());
-  ::rapidjson::Document d2{};
-  d2.Parse(json2.data(), json2.size());
-  EXPECT_EQ(d1, d2);
+  // Just remove all spaces and do a string comparison. This is not ideal for a
+  // number of reasons (one being that the order of members in objects is not
+  // ignored) but it works for now.
+  //
+  json1.erase(remove_if(json1.begin(), json1.end(), isspace), json1.end());
+  json2.erase(remove_if(json2.begin(), json2.end(), isspace), json2.end());
+  EXPECT_EQ(json1, json2);
 }
 
 } // namespace sq::test
