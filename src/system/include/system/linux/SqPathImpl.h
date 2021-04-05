@@ -23,7 +23,9 @@ public:
   SQ_ND Result get_filename() const;
   SQ_ND Result get_extension() const;
   SQ_ND Result get_stem() const;
-  SQ_ND Result get_children() const;
+  SQ_ND Result get_children(PrimitiveBool recurse,
+                            PrimitiveBool follow_symlinks,
+                            PrimitiveBool skip_permission_denied) const;
   SQ_ND Result get_parts() const;
   SQ_ND Result get_absolute() const;
   SQ_ND Result get_canonical() const;

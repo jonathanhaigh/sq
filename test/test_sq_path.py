@@ -188,13 +188,41 @@ def test_canonical(tmp_path, path_info):
     assert result == str(canonical_path)
 
 
-def test_children(tmp_path):
+@pytest.mark.parametrize(
+    "recurse,follow_symlinks", itertools.product((True, False), repeat=2)
+)
+def test_children(tmp_path, recurse, follow_symlinks):
     children = [tmp_path / f for f in ("f1", "x", "achild")]
     for child in children:
         child.touch()
-    result = sorted(util.sq(f"<path.<children", cwd=tmp_path))
-    expected = sorted([str(child) for child in children])
+    subdir = tmp_path / "a_subdir"
+    subdir.mkdir()
+    children.append(subdir)
+
+    subchildren = [subdir / f for f in ("f2", "x2", "achild2")]
+    for child in subchildren:
+        child.touch()
+
+    subsubdir = subdir / "another_subdir"
+    subsubdir.mkdir()
+    subchildren.append(subsubdir);
+
+    link = tmp_path / "a_link"
+    link.symlink_to(subdir)
+    children.append(link)
+
+    expected = children
+    if recurse:
+        expected.extend(subchildren)
+        if (follow_symlinks):
+            expected.extend([link / f.relative_to(subdir) for f in subchildren])
+    expected = sorted([str(f) for f in expected])
+
+    recurse_str = f"recurse={util.bool_str(recurse)}"
+    follow_str = f"follow_symlinks={util.bool_str(follow_symlinks)}"
+    result = sorted(util.sq(f"<path.<children({recurse_str},{follow_str})", cwd=tmp_path))
     assert result == expected
+
 
 @pytest.mark.parametrize(
     "symlink,follow_symlinks,exists",

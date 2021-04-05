@@ -558,7 +558,32 @@
                     "return_type": "SqPath",
                     "return_list": true,
                     "null": false,
-                    "params": []
+                    "params": [
+                        {
+                            "index": 0,
+                            "name": "recurse",
+                            "doc": "Whether recursively list children of subdirectories",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": false
+                        },
+                        {
+                            "index": 1,
+                            "name": "follow_symlinks",
+                            "doc": "Whether to dereference symlinks",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": false
+                        },
+                        {
+                            "index": 1,
+                            "name": "skip_permission_denied",
+                            "doc": "Whether to skip subdirectories that would otherwise cause permission errors",
+                            "type": "PrimitiveBool",
+                            "required": false,
+                            "default_value": false
+                        }
+                    ]
                 },
                 {
                     "name": "parts",
