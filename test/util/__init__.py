@@ -115,3 +115,7 @@ def sq_error(query, pattern=None, flags=re.I):
 
 def quote(string):
     return '"{}"'.format(string.replace("\\", "\\\\").replace('"', '\\"'))
+
+
+def bool_str(b):
+    return "true" if b else "false"

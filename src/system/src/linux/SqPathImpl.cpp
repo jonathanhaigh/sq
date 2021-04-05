@@ -41,6 +41,15 @@ struct stat get_stat(const fs::path &path, bool follow_symlinks,
   return s;
 }
 
+template <typename DirIt>
+Result get_child_range(const fs::path &path, fs::directory_options opts) {
+  return FieldRange<ranges::category::input>{
+      ranges::iterator_range{DirIt{path, opts}, DirIt{}} |
+      ranges::views::transform([](const auto &dirent) {
+        return std::make_shared<SqPathImpl>(dirent.path());
+      })};
+}
+
 } // namespace
 
 SqPathImpl::SqPathImpl(const fs::path &value) : value_{value} {}
@@ -67,13 +76,21 @@ Result SqPathImpl::get_stem() const {
   return std::make_shared<SqStringImpl>(value_.stem().string());
 }
 
-Result SqPathImpl::get_children() const {
-  return FieldRange<ranges::category::input>{
-      ranges::iterator_range(fs::directory_iterator{value_},
-                             fs::directory_iterator{}) |
-      ranges::views::transform([](const auto &dirent) {
-        return std::make_shared<SqPathImpl>(dirent.path());
-      })};
+Result SqPathImpl::get_children(PrimitiveBool recurse,
+                                PrimitiveBool follow_symlinks,
+                                PrimitiveBool skip_permission_denied) const {
+
+  auto opts = fs::directory_options::none;
+  if (follow_symlinks) {
+    opts |= fs::directory_options::follow_directory_symlink;
+  }
+  if (skip_permission_denied) {
+    opts |= fs::directory_options::skip_permission_denied;
+  }
+
+  return recurse
+             ? get_child_range<fs::recursive_directory_iterator>(value_, opts)
+             : get_child_range<fs::directory_iterator>(value_, opts);
 }
 
 Result SqPathImpl::get_parts() const {
